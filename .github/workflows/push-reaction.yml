@@ -1,0 +1,13 @@
+name: StarCalc Push Reaction
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+    - 'master'
+
+jobs:
+  trigger-windows-build:
+    name: Build StarCalc (Windows)
+    uses: ./.github/workflows/build-starcalc-windows.yml
+    secrets:
+      qt_static_url: ${{ secrets.QT_WINDOWS_STATIC_URL }}

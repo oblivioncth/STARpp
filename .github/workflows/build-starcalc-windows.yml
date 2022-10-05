@@ -1,0 +1,103 @@
+name: Build StarCalc - Windows
+on:
+  workflow_call:
+    secrets:
+      qt_static_url:
+        description: 'MEGA Qt static install archive URL'
+        required: true
+    outputs:
+      qt_static_artifact_name:
+        description: "StarCalc (Qt static) build artifact"
+        value: ${{ jobs.build-star_calc.outputs.qt_static_artifact_name }}
+env:
+  qt_install_dir: ${{ github.workspace }}/Qt/Install
+  qt_download_dir: ${{ github.workspace }}/Qt/Download
+  star_calc_src_suffix: StarCalc/Source
+  star_calc_src_dir: ${{ github.workspace }}/StarCalc/Source
+  star_calc_build_dir: ${{ github.workspace }}/StarCalc/Build
+
+jobs:
+  build-star_calc:
+    name: Build StarCalc - Windows (Release)
+    strategy:
+      matrix:
+        qt_linkage: [static]
+    runs-on: windows-latest
+    env:
+      vs_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise
+      cmake_gen: Ninja Multi-Config
+    outputs:
+      qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
+    steps:
+    - name: Set matrix derived variables
+      uses: kanga333/variable-mapper@v0.2.2
+      with:
+        key: ${{ matrix.qt_linkage }}
+        map: |
+          {
+            "static": {
+              "qt_install_url": "${{ secrets.qt_static_url }}",
+              "artifact_output_var": "qt_static_artifact_name"
+            }
+          }
+        export_to: env,log
+    - name: Set derived variables with shell because GitHub Actions env context sucks
+      run: |
+        echo "star_calc_package_path=${{ env.star_calc_build_dir }}/out/dist" >> $Env:GITHUB_ENV
+        $star_calc_install_path="${{ env.star_calc_build_dir }}/out/install"
+        echo "star_calc_install_path=$star_calc_install_path" >> $Env:GITHUB_ENV
+        echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake.bat" >> $Env:GITHUB_ENV
+    - name: Cache Qt Build
+      id: cache-qt
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.qt_install_dir }}
+        key: ${{ env.qt_install_url }}
+    - name: Install megatools
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: choco install megatools
+    - name: Create Qt Download Directory
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: New-Item -Path "${{ env.qt_download_dir }}" -ItemType "directory"
+    - name: Download Qt Install
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: megatools dl "${Env:qt_install_url}" --path "${{ env.qt_download_dir }}"
+    - name: Determine Qt Install Package Name
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
+        $qt_install_name=(Get-ChildItem -Path "${{ env.qt_download_dir }}" -Name -Filter qt-*.7z)
+        echo "qt_install_dest=${{ env.qt_download_dir }}/${qt_install_name}" >> $Env:GITHUB_ENV
+    - name: Extract Qt Install
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
+    - name: Checkout StarCalc
+      uses: actions/checkout@v3
+      with:
+        path: ${{ env.star_calc_src_suffix }}
+        fetch-depth: 0 # Required for verbose versioning to work correctly
+    - name: Build/Install StarCalc
+      working-directory: ${{ env.star_calc_src_dir }}
+      shell: cmd
+      run: |
+        echo "Setup C++ Build Environment..."
+        CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
+        echo "Configure CMake using Qt wrapper..."
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.star_calc_src_dir}}" -B "${{ env.star_calc_build_dir }}"  
+        echo "Changing to build directory..."
+        cd "%star_calc_build_dir%"
+        echo "Building StarCalc release..."
+        cmake --build . --target all --config Release
+        echo "Installing StarCalc Release..."
+        cmake --build . --target install --config Release
+        echo "Packaging StarCalc..."
+        cpack -C "Release"
+        echo "Build complete."
+    - name: Get StarCalc artifact name
+      id: get_artifact_name
+      run: echo "::set-output name=${{ env.artifact_output_var }}::$((Get-ChildItem -Path "${{ env.star_calc_package_path }}" -Filter *.zip)[0].BaseName)"
+    - name: Upload StarCalc build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.get_artifact_name.outputs[env.artifact_output_var] }}
+        path: ${{ env.star_calc_install_path }}
+        if-no-files-found: error
