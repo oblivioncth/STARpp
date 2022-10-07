@@ -31,18 +31,18 @@ namespace
                 const QList<uint>& categoryVotes = rBallot.votes[cIdx];
 
                 // List to fill with nominee mapped votes in standard form
-                QList<Vote> mappedVotes;
+                QList<Election::Vote> mappedVotes;
 
                 // Map votes to nominees, convert to standard Vote, add to list
                 for(qsizetype nIdx = 0; nIdx < categoryVotes.size(); nIdx++)
                 {
-                    Vote stdVote{.nominee = rCategory.nominees[nIdx], .score = categoryVotes[nIdx]};
+                    Election::Vote stdVote{.nominee = rCategory.nominees[nIdx], .score = categoryVotes[nIdx]};
                     mappedVotes.append(stdVote);
                 }
 
                 // Create standard voter (For now, just set the anonymous name to "Voter N")
                 static const QString anonTemplate = QStringLiteral("Voter %1");
-                Voter stdVoter{.name = rBallot.voter, .anonymousName = anonTemplate.arg(bIdx)};
+                Election::Voter stdVoter{.name = rBallot.voter, .anonymousName = anonTemplate.arg(bIdx)};
 
                 // Add ballot to builder
                 eBuilder.wBallot(stdVoter, mappedVotes);

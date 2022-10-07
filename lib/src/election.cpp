@@ -40,7 +40,7 @@ Election::Ballot::Ballot() {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-const Voter& Election::Ballot::voter() const { return mVoter; }
+const Election::Voter& Election::Ballot::voter() const { return mVoter; }
 uint Election::Ballot::score(const QString& nominee) const { return mVotes.value(nominee, 0); }
 
 QString Election::Ballot::preference(const QString& first, const QString& second) const

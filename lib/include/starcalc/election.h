@@ -9,23 +9,13 @@
 namespace Star
 {
 
-struct Voter
-{
-    QString name;
-    QString anonymousName;
-};
-
-struct Vote
-{
-    QString nominee;
-    uint score = 0;
-};
-
 class Election
 {
 //-Inner Classes----------------------------------------------------------------------------------------------------
 public:
     struct Rank;
+    struct Vote;
+    struct Voter;
     class Ballot;
     class Builder;
 
@@ -49,6 +39,19 @@ public:
     uint totalScore(const QString& nominee) const;
     const QList<Rank>& rankings() const;
 };
+
+struct Election::Voter
+{
+    QString name;
+    QString anonymousName;
+};
+
+struct Election::Vote
+{
+    QString nominee;
+    uint score = 0;
+};
+
 
 struct Election::Rank
 {
