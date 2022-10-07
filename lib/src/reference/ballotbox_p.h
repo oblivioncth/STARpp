@@ -10,6 +10,9 @@
 // Qx Includes
 #include <qx/core/qx-genericerror.h>
 
+namespace Star
+{
+
 // Project Forward Declarations
 class RefCategoryConfig;
 
@@ -87,5 +90,7 @@ private:
 public:
     Qx::GenericError readInto();
 };
+
+}
 
 #endif //BALLOTBOX_P_H

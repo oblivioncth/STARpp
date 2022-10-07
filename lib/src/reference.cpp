@@ -3,6 +3,9 @@
 #include "reference/categoryconfig_p.h"
 #include "reference/ballotbox_p.h"
 
+namespace Star
+{
+
 namespace
 {
     QList<Election> electionTransform(const RefBallotBox& box)
@@ -53,7 +56,7 @@ namespace
     }
 }
 
-//-Global-Functions--------------------------------------------------------------------------------
+//-Namespace-Functions--------------------------------------------------------------------------------
 Qx::GenericError electionsFromReferenceInput(QList<Election>& returnBuffer,
                                             const QString& categoryConfigPath,
                                             const QString& ballotBoxPath)
@@ -80,4 +83,6 @@ Qx::GenericError electionsFromReferenceInput(QList<Election>& returnBuffer,
     returnBuffer = electionTransform(bb);
 
     return errorStatus;
+}
+
 }

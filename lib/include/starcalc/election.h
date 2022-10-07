@@ -6,6 +6,9 @@
 #include <QString>
 #include <QList>
 
+namespace Star
+{
+
 struct Voter
 {
     QString name;
@@ -92,5 +95,7 @@ public:
     Builder& wBallot(const Voter& voter, const QList<Vote>& votes);
     Election build();
 };
+
+}
 
 #endif // ELECTION_H

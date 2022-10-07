@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
     QString ccPath = "C:/Users/Chris/Desktop/test_config.ini";
     QString bbPath = "C:/Users/Chris/Desktop/test_box.csv";
 
-    QList<Election> elections;
-    Qx::GenericError electionLoadError = electionsFromReferenceInput(elections, ccPath, bbPath);
+    QList<Star::Election> elections;
+    Qx::GenericError electionLoadError = Star::electionsFromReferenceInput(elections, ccPath, bbPath);
     qDebug() << electionLoadError.isValid();
 
     return 0;

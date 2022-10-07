@@ -4,8 +4,11 @@
 // Qt Includes
 #include <QFileInfo>
 
+namespace Star
+{
+
 //===============================================================================================================
-// CategoryConfig
+// RefCategoryConfig
 //===============================================================================================================
 
 //-Constructor--------------------------------------------------------------------------------------------------------
@@ -21,7 +24,7 @@ uint RefCategoryConfig::totalNominees() const { return mTotalNominees; }
 const QList<RefCategoryHeader>& RefCategoryConfig::headers() const { return mHeaders; }
 
 //===============================================================================================================
-// CategoryConfig::Reader
+// RefCategoryConfig::Reader
 //===============================================================================================================
 
 //-Constructor-----------------------------------------------------------------------------------------------------
@@ -92,4 +95,6 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
     mIniReader.endGroup();
 
     return Qx::GenericError();
+}
+
 }

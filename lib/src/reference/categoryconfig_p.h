@@ -9,6 +9,9 @@
 // Qx Includes
 #include <qx/core/qx-genericerror.h>
 
+namespace Star
+{
+
 struct RefCategoryHeader
 {
     QString name;
@@ -70,4 +73,5 @@ public:
     Qx::GenericError readInto();
 };
 
+}
 #endif // CATEGORYCONFIG_P_H

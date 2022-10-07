@@ -7,8 +7,14 @@
 // Project Includes
 #include "starcalc/election.h"
 
-//-Global-Functions--------------------------------------------------------------------------------
+namespace Star
+{
+
+//-Namespace-Functions--------------------------------------------------------------------------------
 Qx::GenericError electionsFromReferenceInput(QList<Election>& returnBuffer,
                                              const QString& categoryConfigPath,
                                              const QString& ballotBoxPath);
+
+}
+
 #endif // REFERENCE_H
