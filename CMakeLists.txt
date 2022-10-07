@@ -87,13 +87,16 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 include(OB/FetchQx)
 fetch_qx("v0.4")
 
-# Set main target name
-# Name here needs to be as unique as possible for when this project is inlcuded
-# in another via FetchContent or add_subdirectory (prevent target clashes)
-set(MAIN_TARGET_NAME ${PROJECT_NAME_LC}_${PROJECT_NAME_LC})
+# Process Targets
+set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_core)
+set(LIB_ALIAS_NAME ${PROJECT_NAME}::Core)
+set(LIB_ROOT_NAME ${PROJECT_NAME_LC})
+set(APP_TARGET_NAME ${PROJECT_NAME_LC}_frontend)
+set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)
 
 # Process source files and create target
-add_subdirectory(src)
+add_subdirectory(lib)
+add_subdirectory(app)
 
 #================= Install ==========================
 
