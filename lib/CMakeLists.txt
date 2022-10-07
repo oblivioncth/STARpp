@@ -38,11 +38,11 @@ endforeach()
 
 # Build pathed include file list
 foreach(api_header ${CXX_PUBLIC_HEADERS})
-    list(APPEND pathed_api_headers "include/${LIB_ROOT_NAME}/${api_header}")
+    list(APPEND pathed_api_headers "include/${LIB_INCLUDE_ROOT_NAME}/${api_header}")
 endforeach()
 
 # Group include files with their parent directories stripped
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/${LIB_ROOT_NAME}"
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/${LIB_INCLUDE_ROOT_NAME}"
     PREFIX "Include Files"
     FILES ${pathed_api_headers}
 )

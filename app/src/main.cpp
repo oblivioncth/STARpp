@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 
 // Core Includes
-#include "starcalc/reference.h"
+#include "star/reference.h"
 
 int main(int argc, char *argv[])
 {

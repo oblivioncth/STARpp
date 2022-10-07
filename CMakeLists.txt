@@ -90,7 +90,7 @@ fetch_qx("v0.4")
 # Process Targets
 set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_core)
 set(LIB_ALIAS_NAME ${PROJECT_NAME}::Core)
-set(LIB_ROOT_NAME ${PROJECT_NAME_LC})
+set(LIB_INCLUDE_ROOT_NAME star)
 set(APP_TARGET_NAME ${PROJECT_NAME_LC}_frontend)
 set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)
 

@@ -5,7 +5,7 @@
 #include <qx/core/qx-genericerror.h>
 
 // Project Includes
-#include "starcalc/election.h"
+#include "star/election.h"
 
 namespace Star
 {
