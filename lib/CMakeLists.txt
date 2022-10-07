@@ -9,21 +9,26 @@ add_library(${LIB_ALIAS_NAME} ALIAS ${LIB_TARGET_NAME})
 
 # Set app sources
 set(CXX_PUBLIC_HEADERS
+    calculator.h
     election.h
+    electionresult.h
     reference.h
 )
 
 set(CXX_PRIVATE_HEADERS
     dummy_p.h
-    reference/categoryconfig_p.h
     reference/ballotbox_p.h
+    reference/categoryconfig_p.h
+
 )
 
 set(CXX_IMPLEMENTATION
+    calculator.cpp
     election.cpp
+    electionresult.cpp
     reference.cpp
-    reference/categoryconfig_p.cpp
     reference/ballotbox_p.cpp
+    reference/categoryconfig_p.cpp
 )
 
 # Build pathed implementation file list
