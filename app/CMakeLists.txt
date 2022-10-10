@@ -15,6 +15,10 @@ add_executable(${APP_ALIAS_NAME} ALIAS ${APP_TARGET_NAME})
 
 # Set app sources
 set(CXX_SOURCES
+    src/core.h
+    src/core.cpp
+    src/errorcode.h
+    src/referenceelectionconfig.h
     src/main.cpp
 )
 
@@ -27,7 +31,17 @@ target_sources(${APP_TARGET_NAME}
 # Link target to libraries
 target_link_libraries(${APP_TARGET_NAME}
     PRIVATE
-        StarCalc::Core
+        StarCalc::Base
+        Qx::Core
+        Qx::Io
+)
+
+## Forward select project variables to C++ code
+include(OB/ProjectVars)
+set_cxx_project_vars(${APP_TARGET_NAME}
+    VERSION_STR "\"${PROJECT_VERSION}\""
+    SHORT_NAME "\"${PROJECT_NAME}\""
+    APP_NAME "\"${FORMAL_NAME}\""
 )
 
 ################# Windows Build #################

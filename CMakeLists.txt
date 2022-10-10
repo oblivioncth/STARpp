@@ -9,9 +9,9 @@ set(STAR_CALC_BASE_VERSION 0.1) # Required for CI/CD
 project(StarCalc
     VERSION ${STAR_CALC_BASE_VERSION}
     LANGUAGES CXX
-    DESCRIPTION "INSERT DESCRIPTION HERE"
+    DESCRIPTION "An application to determine the winner of an election using the STAR voting system"
 )
-set(FORMAL_NAME "FORMAL NAME")
+set(FORMAL_NAME "STAR Calculator")
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
@@ -85,11 +85,11 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
-fetch_qx("v0.4")
+fetch_qx("b44c8c233e9ce865830e89ec76ae98cfc86aaaa1")
 
 # Process Targets
-set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_core)
-set(LIB_ALIAS_NAME ${PROJECT_NAME}::Core)
+set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_base)
+set(LIB_ALIAS_NAME ${PROJECT_NAME}::Base)
 set(LIB_INCLUDE_ROOT_NAME star)
 set(APP_TARGET_NAME ${PROJECT_NAME_LC}_frontend)
 set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)

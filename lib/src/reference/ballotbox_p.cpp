@@ -152,6 +152,10 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QString& ballotRow)
 //Public:
 Qx::GenericError RefBallotBox::Reader::readInto()
 {
+    /* TODO: May want to add a check that makes sure they're aren't duplicate category names, or other redundancies that would break things.
+     * Unlikely to occur though as this would be an issue with input data collection
+     */
+
     // Error tracking
     Qx::GenericError errorStatus;
 
