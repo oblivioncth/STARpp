@@ -57,6 +57,11 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     cout << HEADING_OUTCOME << endl;
     cout << outcomeStr << endl << endl;
 
+    // Print raw scores
+    for(const QString& nom : nominees)
+        cout << RAW_SCORE_TEMPLATE.arg(nom, result.election()->totalScore(nom)) << endl;
+    cout << endl;
+
     // Wait on user confirm
     pause();
 }

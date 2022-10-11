@@ -52,6 +52,8 @@ private:
         "Winner (Tie): \"%2\""
     );
 
+    static inline const QString RAW_SCORE_TEMPLATE = QStringLiteral(R"("%1" [%2])");
+
     // Summary
     static inline const QString SUMMARY_WINNER_ITEM = QStringLiteral(R"("%1" (>) "%2")");
     static inline const QString SUMMARY_TIE_ITEM = QStringLiteral(R"("%1" (=) "%2")");
