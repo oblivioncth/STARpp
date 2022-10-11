@@ -85,7 +85,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
-fetch_qx("b44c8c233e9ce865830e89ec76ae98cfc86aaaa1")
+fetch_qx("9e4675254ff60e20c68fa8fa3a96ce824a9b63a2")
 
 # Process Targets
 set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_base)

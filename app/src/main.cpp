@@ -9,6 +9,7 @@
 // Project Includes
 #include "core.h"
 #include "project_vars.h"
+#include "resultspresenter.h"
 
 // Meta
 const QString NAME = QStringLiteral("Main");
@@ -52,7 +53,9 @@ int main(int argc, char *argv[])
     for(const Star::Election& election : elections)
         results.append(calculator.calculateResult(election));
 
-    // Display results...
+    // Display results
+    ResultPresenter presenter(&results);
+    presenter.present();
 
-    return 0;
+    return ErrorCode::NO_ERR;
 }

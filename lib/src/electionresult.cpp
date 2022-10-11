@@ -10,10 +10,27 @@ namespace Star
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 //Public:
-ElectionResult::ElectionResult() {}
+ElectionResult::ElectionResult() :
+    mElection(nullptr),
+    mWinner(),
+    mRunnerUp(),
+    mTie(false)
+{}
+
+ElectionResult::ElectionResult(const Election* election, const QString& winner, const QString& runnerUp, bool tie) :
+    mElection(election),
+    mWinner(winner),
+    mRunnerUp(runnerUp),
+    mTie(tie)
+{}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-const Election* ElectionResult::election() { return mElection; }
+bool ElectionResult::isNull() const { return !mElection; }
+
+const Election* ElectionResult::election() const { return mElection; }
+QString ElectionResult::winner() const { return mWinner; }
+QString ElectionResult::runnerUp() const { return mRunnerUp; }
+bool ElectionResult::isTie() const { return mTie; }
 
 }

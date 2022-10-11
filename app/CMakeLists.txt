@@ -19,6 +19,8 @@ set(CXX_SOURCES
     src/core.cpp
     src/errorcode.h
     src/referenceelectionconfig.h
+    src/resultspresenter.h
+    src/resultspresenter.cpp
     src/main.cpp
 )
 
