@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     core.logEvent(NAME, LOG_EVENT_ELECTION_COUNT.arg(elections.size()));
 
     // Create calculator
-    Star::Calculator calculator;
+    Star::Calculator calculator(rec.extraTiebreak);
     QObject::connect(&calculator, &Star::Calculator::calculationDetailDetermined, &core, &Core::logCalculatorDetail);
 
     // Result container

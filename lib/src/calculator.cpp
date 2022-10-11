@@ -10,10 +10,15 @@ namespace Star
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 //Public:
-Calculator::Calculator() {}
+Calculator::Calculator(bool extraTiebreak) :
+    mExtraTiebreak(extraTiebreak)
+{}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
+bool Calculator::isExtraTiebreak() const { return mExtraTiebreak; }
+void Calculator::setExtraTiebreak(bool extraTiebreak) { mExtraTiebreak = extraTiebreak; }
+
 ElectionResult Calculator::calculateResult(const Election& election)
 {
 

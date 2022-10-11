@@ -14,15 +14,23 @@ namespace Star
 class Calculator : public QObject
 {
     Q_OBJECT
+//-Class Variables------------------------------------------------------------------------------------------------------
+private:
+    static inline const QString LOG_EVENT_ = QStringLiteral();
+
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
+    bool mExtraTiebreak;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
-    Calculator();
+    Calculator(bool extraTiebreak = false);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
+    bool isExtraTiebreak() const;
+    void setExtraTiebreak(bool extraTiebreak);
+
     ElectionResult calculateResult(const Election& election);
 
 //-Signals & Slots-------------------------------------------------------------------------------------------------
