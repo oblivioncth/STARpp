@@ -71,6 +71,11 @@ void Core::showVersion()
     postMessage(CL_VERSION_MESSAGE);
 }
 
+void Core::logElectionData(const ReferenceElectionConfig data)
+{
+    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath).arg(data.extraTiebreak));
+}
+
 //Public:
 ErrorCode Core::initialize()
 {
@@ -114,6 +119,8 @@ ErrorCode Core::initialize()
             .bbPath = clParser.value(CL_OPTION_BOX),
             .extraTiebreak = clParser.isSet(CL_OPTION_TOP)
         };
+
+        logElectionData(mRefElectionCfg.value());
     }
     else
     {

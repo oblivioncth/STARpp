@@ -27,12 +27,14 @@ private:
     static inline const QString LOG_FILE_EXT = QStringLiteral("log");
 
     // Logging - Errors
-    static inline const QString LOG_ERR_INVALID_ARGS = "Invalid arguments provided";
+    static inline const QString LOG_ERR_INVALID_ARGS = QStringLiteral("Invalid arguments provided");
 
     // Logging - Messages
     static inline const QString LOG_EVENT_INIT = QStringLiteral("Initializing " PROJECT_SHORT_NAME "...");
-    static inline const QString LOG_EVENT_G_HELP_SHOWN = "Displayed general help information";
-    static inline const QString LOG_EVENT_VER_SHOWN = "Displayed version information";
+    static inline const QString LOG_EVENT_G_HELP_SHOWN = QStringLiteral("Displayed general help information");
+    static inline const QString LOG_EVENT_VER_SHOWN = QStringLiteral("Displayed version information");
+
+    static inline const QString LOG_EVENT_ELECTION_DATA_PROVIDED = QStringLiteral(R"(Election data provided: { .bbPath = "%1", .ccPath = "%2", .extraTiebreak = %3 })");
 
     // Global command line option strings
     static inline const QString CL_OPT_HELP_S_NAME = QStringLiteral("h");
@@ -57,6 +59,7 @@ private:
     static inline const QString CL_OPT_TOP_DESC = QStringLiteral("Performs a final tiebreaker, if necessary, by checking which candidate has the most 5 point scores.");
 
     // Global command line options
+    // TODO: Consider adding a "concise/express/minimal" mode where basically just the results summary is shown
     static inline const QCommandLineOption CL_OPTION_HELP{{CL_OPT_HELP_S_NAME, CL_OPT_HELP_L_NAME, CL_OPT_HELP_E_NAME}, CL_OPT_HELP_DESC}; // Boolean option
     static inline const QCommandLineOption CL_OPTION_VERSION{{CL_OPT_VERSION_S_NAME, CL_OPT_VERSION_L_NAME}, CL_OPT_VERSION_DESC}; // Boolean option
     static inline const QCommandLineOption CL_OPTION_CONFIG{{CL_OPT_CONFIG_S_NAME, CL_OPT_CONFIG_L_NAME}, CL_OPT_CONFIG_DESC, "config"}; // Takes value
@@ -98,6 +101,8 @@ private:
     void handleLogError(Qx::IoOpReport error);
     void showHelp();
     void showVersion();
+
+    void logElectionData(const ReferenceElectionConfig data);
 
 public:
     ErrorCode initialize();

@@ -15,7 +15,11 @@
 #include "resultspresenter.h"
 
 // Log
-const QString eee = QStringLiteral("");
+const QString LOG_EVENT_NO_ELECTION = QStringLiteral("No election data provided. Exiting...");
+const QString LOG_EVENT_LOADING_ELECTION = QStringLiteral("Loading reference election data.");
+const QString LOG_EVENT_ELECTION_COUNT = QStringLiteral("Loaded %1 elections.");
+const QString LOG_EVENT_CALCULATING_RESULTS = QStringLiteral("Calculating results of all elections...");
+const QString LOG_EVENT_DISPLAYING_RESULTS = QStringLiteral("Displaying results...");
 
 // Meta
 const QString NAME = QStringLiteral("Main");
@@ -39,9 +43,13 @@ int main(int argc, char *argv[])
 
     // Check if election was provided
     if(!core.hasActionableArguments())
+    {
+        core.logEvent(NAME, LOG_EVENT_NO_ELECTION);
         return core.logFinish(ErrorCode::NO_ERR);
+    }
 
     // Load reference election
+    core.logEvent(NAME, LOG_EVENT_LOADING_ELECTION);
     ReferenceElectionConfig rec = core.referenceElectionConfig();
 
     QList<Star::Election> elections;
@@ -51,6 +59,7 @@ int main(int argc, char *argv[])
         core.postError(NAME, electionLoadError);
         return core.logFinish(ErrorCode::INVALID_REF_ELECTION);
     }
+    core.logEvent(NAME, LOG_EVENT_ELECTION_COUNT.arg(elections.size()));
 
     // Create calculator
     Star::Calculator calculator;
@@ -60,12 +69,14 @@ int main(int argc, char *argv[])
     QList<Star::ElectionResult> results;
 
     // Calculate the results of each election
+    core.logEvent(NAME, LOG_EVENT_CALCULATING_RESULTS);
     for(const Star::Election& election : elections)
         results.append(calculator.calculateResult(election));
 
     // Display results
+    core.logEvent(NAME, LOG_EVENT_DISPLAYING_RESULTS);
     ResultPresenter presenter(&results);
     presenter.present();
 
-    return ErrorCode::NO_ERR;
+    return core.logFinish(ErrorCode::NO_ERR);
 }
