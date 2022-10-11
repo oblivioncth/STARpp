@@ -1,6 +1,9 @@
 // Qt Includes
 #include <QCoreApplication>
 
+// Qx Includes
+#include <qx/core/qx-iostream.h>
+
 // Base Includes
 #include "star/election.h"
 #include "star/reference.h"
@@ -11,6 +14,9 @@
 #include "project_vars.h"
 #include "resultspresenter.h"
 
+// Log
+const QString eee = QStringLiteral("");
+
 // Meta
 const QString NAME = QStringLiteral("Main");
 
@@ -20,6 +26,10 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
     app.setApplicationName(PROJECT_APP_NAME);
     app.setApplicationVersion(PROJECT_VERSION_STR);
+
+    // Disable console input echo since this application isn't interactive (prevents accidental console clutter)
+    Qx::setUserInputEchoEnabled(false);
+    QScopeGuard inputEchoGuard([]{ Qx::setUserInputEchoEnabled(true); }); // Re-enable before app finishes
 
     // Create core and initialize it
     Core core(&app);
