@@ -7,7 +7,7 @@
 class ResultPresenter
 {
 //-Class Variables------------------------------------------------------------------------------------------------------
-public:
+private:
     // Headings
     static inline const QString HEADING_RESULTS = QStringLiteral(
         "#########################################################\n"
@@ -60,7 +60,7 @@ public:
     static inline const QString USER_PAUSE_PROMPT = QStringLiteral("Press ENTER to continue...");
 
 //-Instance Variables------------------------------------------------------------------------------------------------------
-public:
+private:
     const QList<Star::ElectionResult>* mResults;
 
 //-Constructor----------------------------------------------------------------------------------------------------------
