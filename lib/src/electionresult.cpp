@@ -12,16 +12,14 @@ namespace Star
 //Public:
 ElectionResult::ElectionResult() :
     mElection(nullptr),
-    mWinner(),
-    mRunnerUp(),
-    mTie(false)
+    mWinners(),
+    mRunnerUps()
 {}
 
-ElectionResult::ElectionResult(const Election* election, const QString& winner, const QString& runnerUp, bool tie) :
+ElectionResult::ElectionResult(const Election* election, const QStringList& winners, const QStringList& runnerUps) :
     mElection(election),
-    mWinner(winner),
-    mRunnerUp(runnerUp),
-    mTie(tie)
+    mWinners(winners),
+    mRunnerUps(runnerUps)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
@@ -29,8 +27,7 @@ ElectionResult::ElectionResult(const Election* election, const QString& winner, 
 bool ElectionResult::isNull() const { return !mElection; }
 
 const Election* ElectionResult::election() const { return mElection; }
-QString ElectionResult::winner() const { return mWinner; }
-QString ElectionResult::runnerUp() const { return mRunnerUp; }
-bool ElectionResult::isTie() const { return mTie; }
+const QStringList& ElectionResult::winners() const { return mWinners; }
+const QStringList& ElectionResult::runnerUps() const { return mRunnerUps; }
 
 }

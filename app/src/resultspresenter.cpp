@@ -36,10 +36,12 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 {
     QString category = result.election()->name();
     QStringList nominees = result.election()->nominees();
-    QString winner = result.winner();
-    QString runnerUp = result.runnerUp();
-    const QString& outcomeStrTemplate = result.isTie() ? TIE_TEMPLATE : WINNER_TEMPLATE;
-    QString outcomeStr = outcomeStrTemplate.arg(winner, runnerUp);
+    QString winnerStr = result.winners().size() > 1 ?
+                        WINNER_MULTI_TEMPLATE.arg(result.winners().join(R"(", ")")) :
+                        WINNER_SINGLE_TEMPLATE.arg(result.winners().front());
+    QString runnerUpStr = result.winners().size() > 1 ?
+                          RUNNERUP_MULTI_TEMPLATE.arg(result.runnerUps().join(R"(", ")")) :
+                          RUNNERUP_SINGLE_TEMPLATE.arg(result.runnerUps().front());
 
     // Print category
     cout << HEADING_CATEGORY.arg(category) << endl << endl;
@@ -55,7 +57,7 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 
     // Print result
     cout << HEADING_OUTCOME << endl;
-    cout << outcomeStr << endl << endl;
+    cout << winnerStr << endl << runnerUpStr << endl << endl;
 
     // Print raw scores
     for(const QString& nom : nominees)
@@ -91,8 +93,7 @@ void ResultPresenter::printSummary()
     // Print result summaries
     for(const Star::ElectionResult& res : *mResults)
     {
-        const QString& summaryEntryTemplate = res.isTie() ? SUMMARY_TIE_ITEM : SUMMARY_WINNER_ITEM;
-        QString summaryEntry = summaryEntryTemplate.arg(res.winner(), res.runnerUp());
+        QString summaryEntry = SUMMARY_ITEM.arg(res.winners().join(R"(", ")"), res.runnerUps().join(R"(", ")"));
 
         cout << Qt::right << qSetFieldWidth(mcw);
         cout << res.election()->name() + ')';

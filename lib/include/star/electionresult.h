@@ -14,23 +14,21 @@ class ElectionResult
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
     const Election* mElection;
-    QString mWinner;
-    QString mRunnerUp;
-    bool mTie;
+    QStringList mWinners;
+    QStringList mRunnerUps;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     ElectionResult();
-    ElectionResult(const Election* election, const QString& winner, const QString& runnerUp, bool tie);
+    ElectionResult(const Election* election, const QStringList& winners, const QStringList& runnerUps);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     bool isNull() const;
 
     const Election* election() const;
-    QString winner() const;
-    QString runnerUp() const;
-    bool isTie() const;
+    const QStringList& winners() const;
+    const QStringList& runnerUps() const;
 };
 
 }

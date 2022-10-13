@@ -42,21 +42,15 @@ private:
     );
 
     // Result Templates
-    static inline const QString WINNER_TEMPLATE = QStringLiteral(
-        "Winner: \"%1\"\n"
-        "Runner Up: \"%2\""
-    );
-
-    static inline const QString TIE_TEMPLATE = QStringLiteral(
-        "Winner (Tie): \"%1\"\n"
-        "Winner (Tie): \"%2\""
-    );
+    static inline const QString WINNER_SINGLE_TEMPLATE = QStringLiteral(R"(Winner: "%1")");
+    static inline const QString WINNER_MULTI_TEMPLATE = QStringLiteral(R"(Winners: "%1")");
+    static inline const QString RUNNERUP_SINGLE_TEMPLATE = QStringLiteral(R"(Runner-Up: "%1")");
+    static inline const QString RUNNERUP_MULTI_TEMPLATE = QStringLiteral(R"(Runner-Ups: "%1")");
 
     static inline const QString RAW_SCORE_TEMPLATE = QStringLiteral(R"("%1" [%2])");
 
     // Summary
-    static inline const QString SUMMARY_WINNER_ITEM = QStringLiteral(R"("%1" (>) "%2")");
-    static inline const QString SUMMARY_TIE_ITEM = QStringLiteral(R"("%1" (=) "%2")");
+    static inline const QString SUMMARY_ITEM = QStringLiteral(R"("%1" (>) "%2")");
 
     // Pause
     static inline const QString USER_PAUSE_PROMPT = QStringLiteral("Press ENTER to continue...");
