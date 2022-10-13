@@ -90,6 +90,10 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
         mTargetConfig->mTotalNominees += categoryCount;
     }
 
+    // Check stream status
+    if(mIniReader.hasError())
+        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(mIniReader.status().outcomeInfo());
+
     // Fail if there are no categories
     if(mTargetConfig->mHeaders.isEmpty())
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_EMPTY);
