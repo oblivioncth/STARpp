@@ -28,28 +28,12 @@ tst_full_reference_election::tst_full_reference_election() {}
 
 void tst_full_reference_election::basic_election_sampler()
 {    
-    // Expected results
-    QList<QPair<QStringList, QStringList>> expectedResults
-    {
-        {{"Sixth film"},{"Eighth film"}},
-        {{"Fourth Director"},{"Fifth Director"}},
-        {{"Fifth Cheesesteak"},{"Fourth Cheesesteak"}},
-        {{"Sixth Actress"},{"Fifth Actress"}},
-        {{"Fifth Actor"},{"First Actor"}},
-        {{"First Supporting Actress"},{"Fourth Supporting Actress"}},
-        {{"First Supporting Actor"},{"Second Supporting Actor"}},
-        {{"Fifth Documentary"},{"Second Documentary"}},
-        {{"Third Script"},{"Second Script"}},
-        {{"Fifth Soundtrack"},{"Third Soundtrack"}},
-        {{"Fourth Directorial Debut"},{"Fifth Directorial Debut"}},
-        {{"Fourth Breakthrough"},{"First Breakthrough"}},
-        {{"Fourth Cinematography"},{"Fifth Cinematography"}},
-        {{"Second Foreign"},{"Fourth Foreign"}},
-        {{"Second Animated"},{"First Animated"}},
-        {{"Third Ensemble"},{"Second Ensemble"}},
-        {{"Second Friedman"},{"Third Friedman"}},
-        {{"Second May"},{"First May"}},
-    };
+    // Load expected results
+    const QString erPath = QStringLiteral(":/data/basic_election_sampler.json");
+
+    QList<Star::ExpectedElectionResult> expectedResults;
+    Qx::GenericError expectedResultsLoadError = Star::expectedResultsFromReferenceInput(expectedResults, erPath);
+    QVERIFY2(!expectedResultsLoadError.isValid(), expectedResultsLoadError.secondaryInfo().toStdString().c_str());
 
     // Load reference elections
     const QString ccPath = QStringLiteral(":/data/basic_election_sampler.ini");
@@ -69,8 +53,7 @@ void tst_full_reference_election::basic_election_sampler()
         const Star::Election& election = elections.at(i);
         calculator.setElection(&election);
         Star::ElectionResult result = calculator.calculateResult();
-        QPair<QStringList, QStringList> resultPair(result.winners(), result.runnerUps());
-        QCOMPARE(resultPair, expectedResults.at(i));
+        QCOMPARE(result, expectedResults.at(i));
     }
 }
 

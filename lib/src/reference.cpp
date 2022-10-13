@@ -2,6 +2,7 @@
 #include "star/reference.h"
 #include "reference/categoryconfig_p.h"
 #include "reference/ballotbox_p.h"
+#include "reference/resultset_p.h"
 
 namespace Star
 {
@@ -83,6 +84,17 @@ Qx::GenericError electionsFromReferenceInput(QList<Election>& returnBuffer,
     returnBuffer = electionTransform(bb);
 
     return errorStatus;
+}
+
+Qx::GenericError expectedResultsFromReferenceInput(QList<ExpectedElectionResult>& returnBuffer,
+                                                   const QString& resultSetPath)
+{
+    // Clear return buffer
+    returnBuffer.clear();
+
+    // Read file
+    ResultSetReader rsReader(&returnBuffer, resultSetPath);
+    return rsReader.readInto();
 }
 
 }

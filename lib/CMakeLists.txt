@@ -21,7 +21,7 @@ set(CXX_PRIVATE_HEADERS
     dummy_p.h
     reference/ballotbox_p.h
     reference/categoryconfig_p.h
-
+    reference/resultset_p.h
 )
 
 set(CXX_IMPLEMENTATION
@@ -33,6 +33,7 @@ set(CXX_IMPLEMENTATION
     reference.cpp
     reference/ballotbox_p.cpp
     reference/categoryconfig_p.cpp
+    reference/resultset_p.cpp
 )
 
 # Build pathed implementation file list
