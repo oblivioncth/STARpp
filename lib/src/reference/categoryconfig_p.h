@@ -4,10 +4,10 @@
 // Qt Includes
 #include <QString>
 #include <QList>
-#include <QSettings>
 
 // Qx Includes
 #include <qx/core/qx-genericerror.h>
+#include <qx/io/qx-textstreamreader.h>
 
 namespace Star
 {
@@ -26,7 +26,7 @@ public:
 
 //-Class Variables--------------------------------------------------------------------------------------------------
 private:
-    static inline const QString SECTION_HEADING = QStringLiteral("Categories");
+    static inline const QString SECTION_HEADING = QStringLiteral("[Categories]");
 
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
@@ -50,8 +50,6 @@ private:
     static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading the category configuration");
 
     static inline const QString ERR_DOES_NOT_EXIST = QStringLiteral("The specified file does not exist.");
-    static inline const QString ERR_ACCESS = QStringLiteral("Failed to access the file data.");
-    static inline const QString ERR_UNKNOWN = QStringLiteral("An unknown error occurred.");
     static inline const QString ERR_INVALID_INI = QStringLiteral("The provided file is not a valid INI format file.");
     static inline const QString ERR_INVALID_LAYOUT = QStringLiteral("The provided file does not follow the expected layout.");
     static inline const QString ERR_INVALID_VALUE = QStringLiteral("Category configuration contains a value that is not an unsigned integer greater than one.");
@@ -62,7 +60,7 @@ private:
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
     RefCategoryConfig* mTargetConfig;
-    QSettings mIniReader;
+    Qx::TextStreamReader mIniReader;
 
 //-Constructor--------------------------------------------------------------------------------------------------------
 public:
