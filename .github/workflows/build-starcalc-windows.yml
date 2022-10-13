@@ -85,15 +85,15 @@ jobs:
         CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.star_calc_src_dir}}" -B "${{ env.star_calc_build_dir }}" -D STARCALC_TESTS=ON
         echo "Changing to build directory..."
         cd "%star_calc_build_dir%"
-        echo "Building StarCalc release..."
+        echo "Building StarCalc Release..."
         cmake --build . --target all --config Release
+        echo "Running tests..."
+        ninja test
         echo "Installing StarCalc Release..."
         cmake --build . --target install --config Release
         echo "Packaging StarCalc..."
         cpack -C "Release"
         echo "Build complete."
-        echo "Running tests..."
-        ninja test
     - name: Get StarCalc artifact name
       id: get_artifact_name
       run: echo "::set-output name=${{ env.artifact_output_var }}::$((Get-ChildItem -Path "${{ env.star_calc_package_path }}" -Filter *.zip)[0].BaseName)"
