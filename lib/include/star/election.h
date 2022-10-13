@@ -26,7 +26,7 @@ private:
     QString mName;
     QList<Ballot> mBallots;
     QMap<QString, uint> mTotals;
-    QList<Rank> mRankings;
+    QList<Rank> mScoreRankings;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
@@ -41,7 +41,7 @@ public:
     const QList<Ballot>& ballots() const;
 
     uint totalScore(const QString& nominee) const;
-    const QList<Rank>& rankings() const;
+    const QList<Rank>& scoreRankings() const;
 };
 
 struct Election::Voter
