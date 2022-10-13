@@ -82,7 +82,7 @@ jobs:
         echo "Setup C++ Build Environment..."
         CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
         echo "Configure CMake using Qt wrapper..."
-        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.star_calc_src_dir}}" -B "${{ env.star_calc_build_dir }}"  
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.star_calc_src_dir}}" -B "${{ env.star_calc_build_dir }}" -D STARCALC_TESTS=ON
         echo "Changing to build directory..."
         cd "%star_calc_build_dir%"
         echo "Building StarCalc release..."
@@ -92,6 +92,8 @@ jobs:
         echo "Packaging StarCalc..."
         cpack -C "Release"
         echo "Build complete."
+        echo "Running tests..."
+        ninja test
     - name: Get StarCalc artifact name
       id: get_artifact_name
       run: echo "::set-output name=${{ env.artifact_output_var }}::$((Get-ChildItem -Path "${{ env.star_calc_package_path }}" -Filter *.zip)[0].BaseName)"
