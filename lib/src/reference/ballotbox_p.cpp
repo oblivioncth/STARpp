@@ -100,7 +100,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QString& ballotRow)
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_COLUMN_COUNT);
 
     // Read submission date
-    QDate submitted = QDate::fromString(ballotFields[SUBMISSION_DATE_INDEX], "d-MMM-yy");
+    QDate submitted = QDate::fromString(ballotFields[SUBMISSION_DATE_INDEX], "d-MMM-yy").addYears(100);
     if(!submitted.isValid())
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_DATE);
 
