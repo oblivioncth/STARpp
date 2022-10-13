@@ -61,7 +61,7 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 
     // Print raw scores
     for(const QString& nom : nominees)
-        cout << RAW_SCORE_TEMPLATE.arg(nom, result.election()->totalScore(nom)) << endl;
+        cout << RAW_SCORE_TEMPLATE.arg(nom).arg(result.election()->totalScore(nom)) << endl;
     cout << endl;
 
     // Wait on user confirm
