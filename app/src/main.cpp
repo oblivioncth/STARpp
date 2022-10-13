@@ -62,8 +62,9 @@ int main(int argc, char *argv[])
     core.logEvent(NAME, LOG_EVENT_ELECTION_COUNT.arg(elections.size()));
 
     // Create calculator
-    Star::Calculator calculator(rec.extraTiebreak);
-    QObject::connect(&calculator, &Star::Calculator::calculationDetailDetermined, &core, &Core::logCalculatorDetail);
+    Star::Calculator calculator;
+    calculator.setExtraTiebreak(rec.extraTiebreak);
+    QObject::connect(&calculator, &Star::Calculator::calculationDetail, &core, &Core::logCalculatorDetail);
 
     // Result container
     QList<Star::ElectionResult> results;
@@ -71,7 +72,10 @@ int main(int argc, char *argv[])
     // Calculate the results of each election
     core.logEvent(NAME, LOG_EVENT_CALCULATING_RESULTS);
     for(const Star::Election& election : elections)
-        results.append(calculator.calculateResult(election));
+    {
+        calculator.setElection(&election);
+        results.append(calculator.calculateResult());
+    }
 
     // Display results
     core.logEvent(NAME, LOG_EVENT_DISPLAYING_RESULTS);
