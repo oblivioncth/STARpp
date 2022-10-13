@@ -18,7 +18,7 @@ class Calculator : public QObject
 private:
     // Logging - Intro
     static inline const QString LOG_EVENT_INVALID_ELECTION = QStringLiteral("The provided election is invalid.");
-    static inline const QString LOG_EVENT_CALC_START = QStringLiteral(R"(Calculating results of election "%1".)");
+    static inline const QString LOG_EVENT_CALC_START = QStringLiteral("Calculating results of election - %1");
     static inline const QString LOG_EVENT_INPUT_COUNTS = QStringLiteral("There are %1 nominees and %2 ballots.");
     static inline const QString LOG_EVENT_INITAL_RAW_RANKINGS = QStringLiteral("Initial score rankings:");
 
@@ -79,6 +79,9 @@ private:
     // Logging - Final Results
     static inline const QString LOG_EVENT_FINAL_RESULT_WINNERS = QStringLiteral(R"(Final winners: { %1 })");
     static inline const QString LOG_EVENT_FINAL_RESULT_RUNNERUPS = QStringLiteral(R"(Final runner-ups: { %1 })");
+
+    // Logging - Finish
+    static inline const QString LOG_EVENT_CALC_FINISH = QStringLiteral("Calculation complete.");
 
     // Logging - Lists
     static inline const QString LIST_ITEM_NOMINEE_TOTAL_SCORE = QStringLiteral("\t- \"%1\" (%2)");

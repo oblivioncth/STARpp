@@ -376,7 +376,7 @@ ElectionResult Calculator::calculateResult()
     }
 
     // Log start
-    emit calculationDetail(LOG_EVENT_CALC_START.arg(mElection->name()));
+    emit calculationDetail(LOG_EVENT_CALC_START.arg(mElection->name()) + '\n' + QString(120,'#'));
 
     // Note counts
     emit calculationDetail(LOG_EVENT_INPUT_COUNTS.arg(mElection->nominees().size()).arg(mElection->ballots().size()));
@@ -409,6 +409,9 @@ ElectionResult Calculator::calculateResult()
     // Note final results
     emit calculationDetail(LOG_EVENT_FINAL_RESULT_WINNERS.arg(results.first.join(',')));
     emit calculationDetail(LOG_EVENT_FINAL_RESULT_RUNNERUPS.arg(results.second.join(',')));
+
+    // Log finish
+    emit calculationDetail(LOG_EVENT_CALC_FINISH + '\n' + QString(120,'-'));
 
     // Return final results
     return ElectionResult(mElection, results.first, results.second);
