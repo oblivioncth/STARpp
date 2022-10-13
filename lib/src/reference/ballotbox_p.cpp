@@ -126,7 +126,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QString& ballotRow)
             // If field is blank, treat it as a 0
             if(voteField.isEmpty())
             {
-                categoryVotes[i] = 0;
+                categoryVotes.append(0);
                 break;
             }
 
@@ -137,7 +137,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QString& ballotRow)
             if(!validValue || vote > 5)
                 return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VOTE);
 
-            categoryVotes[i] = vote;
+            categoryVotes.append(vote);
         }
 
         ballot.votes.append(categoryVotes);
