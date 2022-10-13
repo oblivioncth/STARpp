@@ -12,6 +12,7 @@ set(CXX_PUBLIC_HEADERS
     calculator.h
     election.h
     electionresult.h
+    rank.h
     reference.h
 )
 
@@ -26,6 +27,7 @@ set(CXX_IMPLEMENTATION
     calculator.cpp
     election.cpp
     electionresult.cpp
+    rank.cpp
     reference.cpp
     reference/ballotbox_p.cpp
     reference/categoryconfig_p.cpp

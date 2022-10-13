@@ -28,7 +28,7 @@ uint Election::totalScore(const QString& nominee) const
     return mTotals[nominee];
 }
 
-const QList<Election::Rank>& Election::rankings() const { return mRankings; }
+const QList<Rank>& Election::scoreRankings() const { return mScoreRankings; }
 
 //===============================================================================================================
 // Election::Ballot
@@ -79,52 +79,6 @@ Election::Builder::Builder(const QString& name)
     mConstruct.mName = name;
 }
 
-//-Class Functions-------------------------------------------------------------------------------------------------
-//Private:
-QList<Election::Rank> Election::Builder::formRankings(const QMap<QString, uint>& totalScores)
-{
-    QList<Rank> rankings;
-
-    /* Insert all nominees into a multi-map, keyed by total score. Because maps are naturally sorted
-     * key (ascending), this will create a ranking list from lowest rank to highest rank with all
-     * nominees at a given rank (> 1 if there are ties) tied to its corresponding score as the key.
-     */
-    QMultiMap<uint, QStringView> reverseRankings;
-    for(auto [nominee, totalScore] : totalScores.asKeyValueRange())
-        reverseRankings.insert(totalScore, nominee);
-
-    /* QMultiMap stores multiple values for the same key sequentially, requiring awkward iteration
-     * over the map in which one must keep checking if the key has changed since there is no way
-     * to iterate by key "group". So, transform the rankings into a more convenient form that
-     * uses a list for nominees.
-     */
-    uint currentKey = reverseRankings.firstKey();
-    Rank currentRank = {.totalScore = currentKey, .nominees = {}};
-    for(auto [totalScore, nominee] : reverseRankings.asKeyValueRange())
-    {
-        // Check if key/rank has changed
-        if(totalScore != currentKey)
-        {
-            // Finish current rank
-            rankings.prepend(currentRank); // Prepend to flip the order so that index '0' is 1st place
-
-            // Prepare next rank
-            currentRank = {.totalScore = totalScore, .nominees = {}};
-
-            // Update current key
-            currentKey = totalScore;
-        }
-
-        // Add nominee to rank
-        currentRank.nominees.append(nominee.toString());
-    }
-
-    // Finish last rank (necessary since the loop stops before doing this since it uses look-behind)
-    rankings.prepend(currentRank);
-
-    return rankings;
-}
-
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
 Election::Builder& Election::Builder::wBallot(const Voter& voter, const QList<Vote>& votes)
@@ -150,7 +104,7 @@ Election::Builder& Election::Builder::wBallot(const Voter& voter, const QList<Vo
 Election Election::Builder::build()
 {
     // Form rankings
-    mConstruct.mRankings = formRankings(mConstruct.mTotals);
+    mConstruct.mScoreRankings = Rank::rankSort(mConstruct.mTotals);
 
     // Return completed construct
     return mConstruct;

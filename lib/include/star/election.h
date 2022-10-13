@@ -6,6 +6,9 @@
 #include <QString>
 #include <QList>
 
+// Project Includes
+#include "star/rank.h"
+
 namespace Star
 {
 
@@ -13,7 +16,6 @@ class Election
 {
 //-Inner Classes----------------------------------------------------------------------------------------------------
 public:
-    struct Rank;
     struct Vote;
     struct Voter;
     class Ballot;
@@ -52,13 +54,6 @@ struct Election::Vote
     uint score = 0;
 };
 
-
-struct Election::Rank
-{
-    uint totalScore;
-    QList<QString> nominees;
-};
-
 class Election::Ballot
 {
     friend class Election::Builder;
@@ -88,10 +83,6 @@ private:
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     Builder(const QString& name);
-
-//-Class Functions-------------------------------------------------------------------------------------------------
-private:
-   static QList<Rank> formRankings(const QMap<QString, uint>& totalScores);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
