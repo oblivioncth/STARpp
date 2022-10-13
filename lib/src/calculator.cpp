@@ -379,7 +379,7 @@ ElectionResult Calculator::calculateResult()
     emit calculationDetail(LOG_EVENT_CALC_START.arg(mElection->name()));
 
     // Note counts
-    emit calculationDetail(LOG_EVENT_INPUT_COUNTS.arg(mElection->nominees().size(), mElection->ballots().size()));
+    emit calculationDetail(LOG_EVENT_INPUT_COUNTS.arg(mElection->nominees().size()).arg(mElection->ballots().size()));
 
     // Print out raw score rankings
     emit calculationDetail(LOG_EVENT_INITAL_RAW_RANKINGS + '\n' + createNomineeRankListString(mElection->scoreRankings()));
