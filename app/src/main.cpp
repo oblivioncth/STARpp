@@ -21,6 +21,9 @@ const QString LOG_EVENT_ELECTION_COUNT = QStringLiteral("Loaded %1 elections.");
 const QString LOG_EVENT_CALCULATING_RESULTS = QStringLiteral("Calculating results of all elections...");
 const QString LOG_EVENT_DISPLAYING_RESULTS = QStringLiteral("Displaying results...");
 
+// Msg
+const QString MSG_CALCULING_ELECTION_RESULTS = QStringLiteral("Calculating election results...");
+
 // Meta
 const QString NAME = QStringLiteral("Main");
 
@@ -71,6 +74,7 @@ int main(int argc, char *argv[])
 
     // Calculate the results of each election
     core.logEvent(NAME, LOG_EVENT_CALCULATING_RESULTS);
+    core.postMessage(MSG_CALCULING_ELECTION_RESULTS);
     for(const Star::Election& election : elections)
     {
         calculator.setElection(&election);
