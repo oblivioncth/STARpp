@@ -405,6 +405,8 @@ ElectionResult Calculator::calculateResult()
         else
             emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_DISABLED);
     }
+    else
+        emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_SKIP);
 
     // Note final results
     emit calculationDetail(LOG_EVENT_FINAL_RESULT_WINNERS.arg(results.first.join(", ")));

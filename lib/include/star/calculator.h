@@ -42,6 +42,7 @@ private:
     static inline const QString LOG_EVENT_PRIMARY_TIEBREAK_FAIL_NO_FALLBACK = QStringLiteral(R"(No preference second place available.)");
 
     // Logging - Extended Tiebreak
+    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_SKIP = QStringLiteral("Skipping extended tiebreak consideration as there are no ties after the primary runoff.");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_FAIL = QStringLiteral(R"(Extended tiebreak still left a full tie. Taking runner-up from pre-tiebreak second place...)");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_WINNERS = QStringLiteral(R"(Extended tiebreak winners: { %1 })");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_RUNNERUPS = QStringLiteral(R"(Extended tiebreak runner-ups: { %1 })");
