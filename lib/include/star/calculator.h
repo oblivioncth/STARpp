@@ -71,7 +71,7 @@ private:
 
     // Logging - Initial Results
     static inline const QString LOG_EVENT_INITIAL_RESULT_WINNERS = QStringLiteral(R"(Initial winners: { %1 })");
-    static inline const QString LOG_EVENT_INITIAL_RESULT_RUNNERUPS = QStringLiteral(R"(Initial runner-up: { %1 })");
+    static inline const QString LOG_EVENT_INITIAL_RESULT_RUNNERUPS = QStringLiteral(R"(Initial runner-ups: { %1 })");
     static inline const QString LOG_EVENT_INITIAL_RESULT_WINNER_TIE = QStringLiteral("There is still a tie for first place, checking effect of extended tiebreak...");
     static inline const QString LOG_EVENT_INITIAL_RESULT_RUNNERUP_TIE = QStringLiteral("There is still a tie for second place, checking effect of extended tiebreak...");
     static inline const QString LOG_EVENT_INITIAL_RESULT_NO_TIE = QStringLiteral("There is no final tie for first or second.");
