@@ -34,6 +34,8 @@ public:
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
+    bool isValid() const;
+
     QString name() const;
     QStringList nominees() const;
     const QList<Ballot>& ballots() const;
