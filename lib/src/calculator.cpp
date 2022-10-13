@@ -158,8 +158,8 @@ QPair<QStringList, QStringList> Calculator::performPrimaryRunoff(const QStringLi
     }
 
     // Note initial results
-    emit calculationDetail(LOG_EVENT_INITIAL_RESULT_WINNERS.arg(winners.join(',')));
-    emit calculationDetail(LOG_EVENT_INITIAL_RESULT_RUNNERUPS.arg(runnerUps.join(',')));
+    emit calculationDetail(LOG_EVENT_INITIAL_RESULT_WINNERS.arg(winners.join(", ")));
+    emit calculationDetail(LOG_EVENT_INITIAL_RESULT_RUNNERUPS.arg(runnerUps.join(", ")));
 
     // Return result
     return {winners, runnerUps};
@@ -199,8 +199,8 @@ QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList 
         emit calculationDetail(LOG_EVENT_INITIAL_RESULT_NO_TIE);
 
     // Note results
-    emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_WINNERS.arg(winners.join(',')));
-    emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_RUNNERUPS.arg(runnerUps.join(',')));
+    emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_WINNERS.arg(winners.join(", ")));
+    emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_RUNNERUPS.arg(runnerUps.join(", ")));
 
     // Return the result
     return {winners, runnerUps};
@@ -288,7 +288,7 @@ QPair<QStringList, QStringList> Calculator::breakScoreTie(const QStringList& nom
     QList<Rank> prefRanks = rankByPreference(nominees);
     QPair<QStringList, QStringList> tieBreak(prefRanks.front().nominees, prefRanks.size() > 1 ? prefRanks.at(1).nominees : QStringList());
 
-    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(','), tieBreak.second.join(',')));
+    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
     return tieBreak;
 }
 
@@ -299,7 +299,7 @@ QPair<QStringList, QStringList> Calculator::breakPreferenceTie(const QStringList
     QList<Rank> scoreRanks = rankByScore(nominees);
     QPair<QStringList, QStringList> tieBreak(scoreRanks.front().nominees, scoreRanks.size() > 1 ? scoreRanks.at(1).nominees : QStringList());
 
-    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(','), tieBreak.second.join(',')));
+    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
     return tieBreak;
 }
 
@@ -310,7 +310,7 @@ QPair<QStringList, QStringList> Calculator::breakExtendedTie(const QStringList& 
     QList<Rank> maxVoteRanks = rankByVotesOfMaxScore(nominees);
     QPair<QStringList, QStringList> tieBreak(maxVoteRanks.front().nominees, maxVoteRanks.size() > 1 ? maxVoteRanks.at(1).nominees : QStringList());
 
-    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(','), tieBreak.second.join(',')));
+    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
     return tieBreak;
 }
 
@@ -407,8 +407,8 @@ ElectionResult Calculator::calculateResult()
     }
 
     // Note final results
-    emit calculationDetail(LOG_EVENT_FINAL_RESULT_WINNERS.arg(results.first.join(',')));
-    emit calculationDetail(LOG_EVENT_FINAL_RESULT_RUNNERUPS.arg(results.second.join(',')));
+    emit calculationDetail(LOG_EVENT_FINAL_RESULT_WINNERS.arg(results.first.join(", ")));
+    emit calculationDetail(LOG_EVENT_FINAL_RESULT_RUNNERUPS.arg(results.second.join(", ")));
 
     // Log finish
     emit calculationDetail(LOG_EVENT_CALC_FINISH + '\n' + QString(120,'-'));
