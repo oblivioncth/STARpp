@@ -73,7 +73,7 @@ void Core::showVersion()
 
 void Core::logElectionData(const ReferenceElectionConfig data)
 {
-    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath).arg(data.extraTiebreak));
+    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath, data.extraTiebreak ? "true" : "false"));
 }
 
 //Public:
