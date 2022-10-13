@@ -30,4 +30,6 @@ const Election* ElectionResult::election() const { return mElection; }
 const QStringList& ElectionResult::winners() const { return mWinners; }
 const QStringList& ElectionResult::runnerUps() const { return mRunnerUps; }
 
+
+
 }

@@ -3,6 +3,9 @@
 # CMake
 cmake_minimum_required(VERSION 3.24.0)
 
+# Configuration options
+option(STARCALC_TESTS "Build StarCalc tests" OFF)
+
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
 set(STAR_CALC_BASE_VERSION 0.1) # Required for CI/CD
@@ -74,11 +77,17 @@ set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
 include(OB/VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
-
 #================= Build =========================
 
 # Import Qt
-find_package(Qt6 REQUIRED COMPONENTS Core)
+set(QT_COMPONENTS
+    Core
+)
+if(STARCALC_TESTS)
+    list(APPEND QT_COMPONENTS Test)
+endif()
+
+find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 # Disable deprecated code
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
@@ -91,12 +100,17 @@ fetch_qx("9d3e2caf89745b84539c033e66866785e44aff59")
 set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_base)
 set(LIB_ALIAS_NAME ${PROJECT_NAME}::Base)
 set(LIB_INCLUDE_ROOT_NAME star)
+add_subdirectory(lib)
+
 set(APP_TARGET_NAME ${PROJECT_NAME_LC}_frontend)
 set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)
-
-# Process source files and create target
-add_subdirectory(lib)
 add_subdirectory(app)
+
+if(STARCALC_TESTS)
+    enable_testing()
+    set(TESTS_TARGET_PREFIX ${PROJECT_NAME_LC})
+    add_subdirectory(tests)
+endif()
 
 #================= Install ==========================
 
