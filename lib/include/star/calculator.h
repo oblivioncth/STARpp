@@ -24,19 +24,19 @@ private:
 
     // Logging - Determine Preliminary Leaders
     static inline const QString LOG_EVENT_DETERMINE_PRELIMINARY_LEADERS = QStringLiteral("Determining preliminary score leaders...");
-    static inline const QString LOG_EVENT_PRELIMINARY_FIRST_TIE_BENIGN = QStringLiteral("There is a benign 2-way tie for preliminary first place (%1):");
-    static inline const QString LOG_EVENT_PRELIMINARY_FIRST_TIE = QStringLiteral("There is a %1-way tie for preliminary first place (%2):");
+    static inline const QString LOG_EVENT_PRELIMINARY_FIRST_TIE_BENIGN = QStringLiteral("There is a benign 2-way tie for preliminary first place <%1>:");
+    static inline const QString LOG_EVENT_PRELIMINARY_FIRST_TIE = QStringLiteral("There is a %1-way tie for preliminary first place <%2>:");
     static inline const QString LOG_EVENT_PRELIMINARY_FIRST_NO_TIE = QStringLiteral(R"(Preliminary first place is uncontested: "%1")");
-    static inline const QString LOG_EVENT_PRELIMINARY_SECOND_TIE = QStringLiteral("There is a %1-way tie for preliminary second place (%2):");
+    static inline const QString LOG_EVENT_PRELIMINARY_SECOND_TIE = QStringLiteral("There is a %1-way tie for preliminary second place <%2>:");
     static inline const QString LOG_EVENT_PRELIMINARY_SECOND_NO_TIE = QStringLiteral(R"(Preliminary second place is uncontested: "%1")");
     static inline const QString LOG_EVENT_PRELIMINARY_LEADERS = QStringLiteral("Preliminary leaders are:");
 
     // Logging - Main Runoff
     static inline const QString LOG_EVENT_PERFORM_PRIMARY_RUNOFF = QStringLiteral("Performing primary runoff...");
     static inline const QString LOG_EVENT_PRIMARY_PREF_RANK_SORT = QStringLiteral("Sorting by preference rank to determine winner(s).");
-    static inline const QString LOG_EVENT_PRIMARY_FIRST_TIE = QStringLiteral("There is a %1-way tie for primary first place (%2):");
+    static inline const QString LOG_EVENT_PRIMARY_FIRST_TIE = QStringLiteral("There is a %1-way tie for primary first place <%2>:");
     static inline const QString LOG_EVENT_PRIMARY_FIRST_NO_TIE = QStringLiteral(R"(Primary first place is uncontested: "%1")");
-    static inline const QString LOG_EVENT_PRIMARY_SECOND_TIE = QStringLiteral("There is a %1-way tie for primary second place (%2):");
+    static inline const QString LOG_EVENT_PRIMARY_SECOND_TIE = QStringLiteral("There is a %1-way tie for primary second place <%2>:");
     static inline const QString LOG_EVENT_PRIMARY_SECOND_NO_TIE = QStringLiteral(R"(Primary second place is uncontested: "%1")");
     static inline const QString LOG_EVENT_PRIMARY_TIEBREAK_FAIL = QStringLiteral(R"(Primary tiebreak still left a full tie. Taking runner-up from pre-tiebreak second place...)");
     static inline const QString LOG_EVENT_PRIMARY_TIEBREAK_FAIL_NO_FALLBACK = QStringLiteral(R"(No preference second place available.)");
@@ -84,8 +84,8 @@ private:
     static inline const QString LOG_EVENT_CALC_FINISH = QStringLiteral("Calculation complete.");
 
     // Logging - Lists
-    static inline const QString LIST_ITEM_NOMINEE_TOTAL_SCORE = QStringLiteral("\t- \"%1\" (%2)");
-    static inline const QString LIST_ITEM_RANK = QStringLiteral("\t%1) { \"%2\" } (%3)");
+    static inline const QString LIST_ITEM_NOMINEE_TOTAL_SCORE = QStringLiteral("\t- \"%1\" <%2>");
+    static inline const QString LIST_ITEM_RANK = QStringLiteral("\t%1) { \"%2\" } <%3>");
 
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
