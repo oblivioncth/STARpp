@@ -24,7 +24,7 @@ ElectionResult::ElectionResult(const Election* election, const QStringList& winn
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-bool ElectionResult::isNull() const { return !mElection; }
+bool ElectionResult::isNull() const { return !mElection || mWinners.isEmpty(); }
 
 const Election* ElectionResult::election() const { return mElection; }
 const QStringList& ElectionResult::winners() const { return mWinners; }
