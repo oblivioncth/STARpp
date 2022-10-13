@@ -87,12 +87,12 @@ jobs:
         cd "%star_calc_build_dir%"
         echo "Building StarCalc Release..."
         cmake --build . --target all --config Release
-        echo "Running tests..."
-        ninja test
         echo "Installing StarCalc Release..."
         cmake --build . --target install --config Release
         echo "Packaging StarCalc..."
         cpack -C "Release"
+        echo "Running tests..."
+        cmake --build . --target test --config Release
         echo "Build complete."
     - name: Get StarCalc artifact name
       id: get_artifact_name
