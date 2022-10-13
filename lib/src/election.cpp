@@ -43,17 +43,29 @@ Election::Ballot::Ballot() {}
 const Election::Voter& Election::Ballot::voter() const { return mVoter; }
 uint Election::Ballot::score(const QString& nominee) const { return mVotes.value(nominee, 0); }
 
-QString Election::Ballot::preference(const QString& first, const QString& second) const
+QString Election::Ballot::preference(const QStringList& nominees) const
 {
-    uint firstPoints = score(first);
-    uint secondPoints = score(second);
+    QString pref;
+    uint prefScore = 0;
 
-    if(firstPoints == secondPoints)
-        return QString();
-    else if(firstPoints > secondPoints)
-        return first;
-    else
-        return second;
+    // Check for highest score
+    for(const QString& nominee : nominees)
+    {
+        uint nomScore = score(nominee);
+        if(nomScore == prefScore)
+        {
+            pref = QString(); // Score ties prevent preference
+            if(nomScore == 5) // A score tie of 5 means a preference is impossible
+                break;
+        }
+        else if(nomScore > prefScore)
+        {
+            pref = nominee;
+            prefScore = nomScore;
+        }
+    }
+
+    return pref;
 }
 
 //===============================================================================================================
