@@ -23,7 +23,7 @@ ResultPresenter::ResultPresenter(const QList<Star::ElectionResult>* results) :
 void ResultPresenter::pause()
 {
     // Print prompt
-    cout << USER_PAUSE_PROMPT;
+    cout << USER_PAUSE_PROMPT << Qt::flush;
 
     // Wait for ENTER key
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
