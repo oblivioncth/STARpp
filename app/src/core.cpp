@@ -18,7 +18,8 @@ Core::Core(QCoreApplication* app) :
     mLogger(QFileInfo(QCoreApplication::applicationFilePath()).baseName() + '.' + LOG_FILE_EXT, app),
     mLogErrorOccurred(false),
     mArguments(app->arguments()),
-    mRefElectionCfg(std::nullopt)
+    mRefElectionCfg(std::nullopt),
+    mMinimal(false)
 {
     // Logger tweaks
     mLogger.setMaximumEntries(50);
@@ -121,6 +122,12 @@ ErrorCode Core::initialize()
         };
 
         logElectionData(mRefElectionCfg.value());
+
+        if(clParser.isSet(CL_OPTION_MINIMAL))
+        {
+            mMinimal = true;
+            logEvent(NAME, LOG_EVENT_MINIMAL_MODE);
+        }
     }
     else
     {
@@ -138,6 +145,8 @@ ReferenceElectionConfig Core::referenceElectionConfig()
 {
     return mRefElectionCfg.has_value() ? mRefElectionCfg.value() : ReferenceElectionConfig();
 }
+
+bool Core::isMinimalPresentation() { return mMinimal; }
 
 //-Signals & Slots------------------------------------------------------------------------------------------------------------
 //Public slots:

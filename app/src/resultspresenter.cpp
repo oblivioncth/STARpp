@@ -14,8 +14,9 @@ using Qt::endl;
 //===============================================================================================================
 
 //-Constructor-------------------------------------------------------------
-ResultPresenter::ResultPresenter(const QList<Star::ElectionResult>* results) :
-    mResults(results)
+ResultPresenter::ResultPresenter(const QList<Star::ElectionResult>* results, bool summaryOnly) :
+    mResults(results),
+    mSummaryOnly(summaryOnly)
 {}
 
 //-Instance Functions-------------------------------------------------------------
@@ -106,7 +107,11 @@ void ResultPresenter::printSummary()
 //Public:
 void ResultPresenter::present()
 {
-    printMainHeading();
-    printResults();
+    if(!mSummaryOnly)
+    {
+        printMainHeading();
+        printResults();
+    }
+
     printSummary();
 }

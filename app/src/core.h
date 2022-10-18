@@ -35,6 +35,7 @@ private:
     static inline const QString LOG_EVENT_VER_SHOWN = QStringLiteral("Displayed version information");
 
     static inline const QString LOG_EVENT_ELECTION_DATA_PROVIDED = QStringLiteral(R"(Election data provided: { .bbPath = "%1", .ccPath = "%2", .extraTiebreak = %3 })");
+    static inline const QString LOG_EVENT_MINIMAL_MODE = QStringLiteral("Minimal presentation mode enabled.");
 
     // Global command line option strings
     static inline const QString CL_OPT_HELP_S_NAME = QStringLiteral("h");
@@ -58,15 +59,20 @@ private:
     static inline const QString CL_OPT_TOP_L_NAME = QStringLiteral("top");
     static inline const QString CL_OPT_TOP_DESC = QStringLiteral("Performs a final tiebreaker, if necessary, by checking which candidate has the most 5 point scores.");
 
+    static inline const QString CL_OPT_MINIMAL_S_NAME = QStringLiteral("m");
+    static inline const QString CL_OPT_MINIMAL_L_NAME = QStringLiteral("minimal");
+    static inline const QString CL_OPT_MINIMAL_DESC = QStringLiteral("Only presents the results summary.");
+
     // Global command line options
-    // TODO: Consider adding a "concise/express/minimal" mode where basically just the results summary is shown
     static inline const QCommandLineOption CL_OPTION_HELP{{CL_OPT_HELP_S_NAME, CL_OPT_HELP_L_NAME, CL_OPT_HELP_E_NAME}, CL_OPT_HELP_DESC}; // Boolean option
     static inline const QCommandLineOption CL_OPTION_VERSION{{CL_OPT_VERSION_S_NAME, CL_OPT_VERSION_L_NAME}, CL_OPT_VERSION_DESC}; // Boolean option
     static inline const QCommandLineOption CL_OPTION_CONFIG{{CL_OPT_CONFIG_S_NAME, CL_OPT_CONFIG_L_NAME}, CL_OPT_CONFIG_DESC, "config"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_BOX{{CL_OPT_BOX_S_NAME, CL_OPT_BOX_L_NAME}, CL_OPT_BOX_DESC, "box"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_TOP{{CL_OPT_TOP_S_NAME, CL_OPT_TOP_L_NAME}, CL_OPT_TOP_DESC}; // Boolean option
+    static inline const QCommandLineOption CL_OPTION_MINIMAL{{CL_OPT_MINIMAL_S_NAME, CL_OPT_MINIMAL_L_NAME}, CL_OPT_MINIMAL_DESC}; // Boolean option
 
-    static inline const QList<const QCommandLineOption*> CL_OPTIONS_ALL{&CL_OPTION_HELP, &CL_OPTION_VERSION, &CL_OPTION_CONFIG, &CL_OPTION_BOX, &CL_OPTION_TOP};
+    static inline const QList<const QCommandLineOption*> CL_OPTIONS_ALL{&CL_OPTION_HELP, &CL_OPTION_VERSION, &CL_OPTION_CONFIG, &CL_OPTION_BOX, &CL_OPTION_TOP,
+                                                                        &CL_OPTION_MINIMAL};
 
     // Help template
     static inline const QString HELP_TEMPL = "<u>Usage:</u><br>"
@@ -91,6 +97,7 @@ private:
     // Processing
     QStringList mArguments;
     std::optional<ReferenceElectionConfig> mRefElectionCfg;
+    bool mMinimal;
 
 //-Constructor----------------------------------------------------------------------------------------------------------
 public:
@@ -108,6 +115,7 @@ public:
     ErrorCode initialize();
     bool hasActionableArguments();
     ReferenceElectionConfig referenceElectionConfig();
+    bool isMinimalPresentation();
 
 //-Signals & Slots------------------------------------------------------------------------------------------------------------
 public slots:

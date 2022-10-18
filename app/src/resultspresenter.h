@@ -58,10 +58,11 @@ private:
 //-Instance Variables------------------------------------------------------------------------------------------------------
 private:
     const QList<Star::ElectionResult>* mResults;
+    bool mSummaryOnly;
 
 //-Constructor----------------------------------------------------------------------------------------------------------
 public:
-    ResultPresenter(const QList<Star::ElectionResult>* results);
+    ResultPresenter(const QList<Star::ElectionResult>* results, bool summaryOnly = false);
 
 //-Instance Functions--------------------------------------------------------------------------------------------------
 private:

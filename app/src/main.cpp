@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     // Display results
     core.logEvent(NAME, LOG_EVENT_DISPLAYING_RESULTS);
-    ResultPresenter presenter(&results);
+    ResultPresenter presenter(&results, core.isMinimalPresentation());
     presenter.present();
 
     return core.logFinish(ErrorCode::NO_ERR);
