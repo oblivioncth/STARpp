@@ -57,6 +57,9 @@ Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& he
             if(nomineeField.isEmpty())
                 return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_BLANK_VALUE);
 
+            if(nominees.contains(nomineeField))
+                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE_NOMINEE);
+
             nominees += nomineeField;
         }
 
@@ -136,10 +139,6 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
 //Public:
 Qx::GenericError RefBallotBox::Reader::readInto()
 {
-    /* TODO: May want to add a check that makes sure they're aren't duplicate category names, or other redundancies that would break things.
-     * Unlikely to occur though as this would be an issue with input data collection
-     */
-
     // Error tracking
     Qx::GenericError errorStatus;
 

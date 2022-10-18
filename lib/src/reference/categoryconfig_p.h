@@ -54,6 +54,7 @@ private:
     static inline const QString ERR_INVALID_LAYOUT = QStringLiteral("The provided file does not follow the expected layout.");
     static inline const QString ERR_INVALID_VALUE = QStringLiteral("Category configuration contains a value that is not an unsigned integer greater than one.");
     static inline const QString ERR_EMPTY = QStringLiteral("The provided file contains no categories.");
+    static inline const QString ERR_DUPLICATE = QStringLiteral("The provided file contains duplicate categories.");
 
     static inline const Qx::GenericError ERROR_TEMPLATE = Qx::GenericError(Qx::GenericError::Critical, MAIN_ERR_MSG);
 

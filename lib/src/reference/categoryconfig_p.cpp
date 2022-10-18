@@ -82,6 +82,16 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
         if(!validValue || categoryCount < 2)
             return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VALUE);
 
+        // Make sure this isn't a duplicate
+        auto start = mTargetConfig->headers().constBegin();
+        auto end = mTargetConfig->headers().constEnd();
+        bool dupe = (std::find_if(start, end, [&key](const RefCategoryHeader& header){
+            return header.name == key;
+        }) != end);
+
+        if(dupe)
+            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE);
+
         // Add header to target config
         RefCategoryHeader ch{.name = key, .nomineeCount = categoryCount};
         mTargetConfig->mHeaders.append(ch);
