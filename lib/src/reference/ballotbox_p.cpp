@@ -2,6 +2,7 @@
 #include "ballotbox_p.h"
 
 // Qx Includes
+#include <qx/core/qx-dsvtable.h>
 #include <qx/io/qx-common-io.h>
 
 // Project Includes
@@ -38,14 +39,8 @@ RefBallotBox::Reader::Reader(RefBallotBox* targetBox, const QString& filePath, c
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Private:
-Qx::GenericError RefBallotBox::Reader::parseCategories(const QString& headingsRow)
+Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& headingsRow)
 {
-    // Split row into fields
-    QStringList headingFields = headingsRow.split(',');
-
-    // Ensure field count is as expected
-    if(headingFields.size() != mExpectedFieldCount)
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_COLUMN_COUNT);
 
     // Fill out categories
     qsizetype cIdx = STATIC_FIELD_COUNT; // Skip known headings
@@ -58,7 +53,7 @@ Qx::GenericError RefBallotBox::Reader::parseCategories(const QString& headingsRo
 
         for(uint i = 0; i < ch.nomineeCount; i++, cIdx++)
         {
-            QString nomineeField = headingFields.at(cIdx);
+            QString nomineeField = headingsRow[i].toString();
             if(nomineeField.isEmpty())
                 return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_BLANK_VALUE);
 
@@ -72,20 +67,13 @@ Qx::GenericError RefBallotBox::Reader::parseCategories(const QString& headingsRo
     return Qx::GenericError();
 }
 
-Qx::GenericError RefBallotBox::Reader::parseBallot(const QString& ballotRow)
+Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballotRow)
 {
-    // Ignore empty lines
-    if(ballotRow.isEmpty())
-        return Qx::GenericError();
-
-    // Split row into fields
-    QStringList ballotFields = ballotRow.split(',');
-
     // Ignore lines with all empty fields
     bool allEmpty = true;
-    for(const QString& field : ballotFields)
+    for(const QVariant& field : ballotRow)
     {
-        if(!field.isEmpty())
+        if(!field.toString().isEmpty())
         {
             allEmpty = false;
             break;
@@ -95,17 +83,13 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QString& ballotRow)
     if(allEmpty)
         return Qx::GenericError();
 
-    // Ensure field count is as expected
-    if(ballotFields.size() != mExpectedFieldCount)
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_COLUMN_COUNT);
-
     // Read submission date
-    QDate submitted = QDate::fromString(ballotFields[SUBMISSION_DATE_INDEX], "d-MMM-yy").addYears(100);
+    QDate submitted = QDate::fromString(ballotRow[SUBMISSION_DATE_INDEX].toString(), "d-MMM-yy").addYears(100);
     if(!submitted.isValid())
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_DATE);
 
     // Read voter name
-    QString voterName = ballotFields[MEMBER_NAME_INDEX];
+    QString voterName = ballotRow[MEMBER_NAME_INDEX].toString();
     if(voterName.isEmpty())
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_BLANK_VALUE);
 
@@ -121,7 +105,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QString& ballotRow)
 
         for(uint i = 0; i < ch.nomineeCount; i++, cIdx++)
         {
-            QString voteField = ballotFields.at(cIdx);
+            QString voteField = ballotRow[cIdx].toString();
 
             // If field is blank, treat it as a 0
             if(voteField.isEmpty())
@@ -163,27 +147,37 @@ Qx::GenericError RefBallotBox::Reader::readInto()
     if(Qx::fileIsEmpty(mCsvFile))
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_EMPTY);
 
-    // Read whole CSV into memory as line list
-    QStringList csvRows;
-    Qx::IoOpReport readReport = Qx::readTextFromFile(csvRows, mCsvFile, Qx::Index32::FIRST, Qx::Index32::LAST, Qx::IgnoreTrailingBreak);
+    // Read whole CSV into memory as raw data
+    QByteArray csv;
+    Qx::IoOpReport readReport = Qx::readBytesFromFile(csv, mCsvFile);
     if(readReport.isFailure())
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(readReport.outcomeInfo());
 
+    // Parse into DsvTable
+    Qx::DsvParseError dsvError;
+    Qx::DsvTable csvTable = Qx::DsvTable::fromDsv(csv, ',', '"', &dsvError);
+    if(dsvError.error() != Qx::DsvParseError::NoError)
+        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(dsvError.errorString());
+
     // Ensure the minimum amount of rows are present
-    if(csvRows.size() < 3)
+    if(csvTable.rowCount() < 3)
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_ROW_COUNT);
 
+    // Ensure the column count is correct
+    if(csvTable.columnCount() != mExpectedFieldCount)
+        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_COLUMN_COUNT);
+
     // Separate headings from ballot rows
-    QString headingRow = csvRows.takeFirst();
+    QList<QVariant> headingRow = csvTable.takeFirstRow();
 
     // Process headings
     if((errorStatus = parseCategories(headingRow)).isValid())
         return errorStatus;
 
     // Process ballots
-    for(const QString& ballotRow : csvRows)
+    for(auto itr = csvTable.rowBegin(); itr != csvTable.rowEnd(); itr++)
     {
-        if((errorStatus = parseBallot(ballotRow)).isValid())
+        if((errorStatus = parseBallot(*itr)).isValid())
             return errorStatus;
     }
 

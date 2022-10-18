@@ -58,7 +58,7 @@ private:
     static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading the ballot box");
 
     static inline const QString ERR_INVALID_ROW_COUNT = QStringLiteral("The ballot box has less than the minimum required row count (headings + 2 voters).");
-    static inline const QString ERR_INVALID_COLUMN_COUNT = QStringLiteral("A row had a different number of columns than specified by the category configuration.");
+    static inline const QString ERR_INVALID_COLUMN_COUNT = QStringLiteral("The ballot box has a different number of columns than specified by the category configuration.");
     static inline const QString ERR_INVALID_DATE = QStringLiteral("The format of a submission date was invalid.");
     static inline const QString ERR_EMPTY = QStringLiteral("The provided file contains no ballots.");
     static inline const QString ERR_BLANK_VALUE = QStringLiteral("A field expected to have a value was blank.");
@@ -84,8 +84,8 @@ public:
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
-    Qx::GenericError parseCategories(const QString& headingsRow);
-    Qx::GenericError parseBallot(const QString& ballotRow);
+    Qx::GenericError parseCategories(const QList<QVariant>& headingsRow);
+    Qx::GenericError parseBallot(const QList<QVariant>& ballotRow);
 
 public:
     Qx::GenericError readInto();
