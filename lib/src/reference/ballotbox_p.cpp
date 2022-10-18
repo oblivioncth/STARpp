@@ -53,7 +53,7 @@ Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& he
 
         for(uint i = 0; i < ch.nomineeCount; i++, cIdx++)
         {
-            QString nomineeField = headingsRow[i].toString();
+            QString nomineeField = headingsRow[cIdx].toString();
             if(nomineeField.isEmpty())
                 return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_BLANK_VALUE);
 
