@@ -81,6 +81,10 @@ jobs:
     - name: Extract Qt Install
       if: steps.cache-qt.outputs.cache-hit != 'true'
       run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
+    - name: Install OpenGL lib
+      run: sudo apt-get install libglu1-mesa-dev
+    - name: Install XCB Related libs
+      run: sudo apt-get install libx11-xcb-dev libxkbcommon-dev libxkbcommon-x11-dev libxcb-*-dev
     - name: Install Ninja
       run: sudo apt-get install ninja-build
     - name: Install Harfbuzz
