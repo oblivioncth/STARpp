@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     // Calculate the results of each election
     core.logEvent(NAME, LOG_EVENT_CALCULATING_RESULTS);
-    core.postMessage(MSG_CALCULING_ELECTION_RESULTS);
+    core.postMessage(MSG_CALCULING_ELECTION_RESULTS + '\n');
     for(const Star::Election& election : elections)
     {
         calculator.setElection(&election);

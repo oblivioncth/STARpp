@@ -1,9 +1,12 @@
 // Unit Include
 #include "resultspresenter.h"
 
+// Standard Library Includes
+#include <iostream>
+
 // Qx Includes
 #include <qx/core/qx-iostream.h>
-#include <iostream>
+#include <qx/core/qx-table.h>
 
 // Using
 using Qx::cout;
@@ -60,9 +63,9 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     cout << HEADING_OUTCOME << endl;
     cout << winnerStr << endl << runnerUpStr << endl << endl;
 
-    // Print raw scores
-    for(const QString& nom : nominees)
-        cout << RAW_SCORE_TEMPLATE.arg(nom).arg(result.election()->totalScore(nom)) << endl;
+    // Print raw score rankings
+    for(const Rank& rank : result.election()->scoreRankings())
+        cout << RAW_SCORE_TEMPLATE.arg(rank.nominees.join(R"(", ")")).arg(rank.value) << endl;
     cout << endl;
 
     // Wait on user confirm
@@ -82,25 +85,60 @@ void ResultPresenter::printResults()
 
 void ResultPresenter::printSummary()
 {
-    // Determine field width
-    qsizetype mcw = 0;
-    for(const Star::ElectionResult& res : *mResults)
-        mcw = std::max(mcw, res.election()->name().size());
-    mcw += 1; // Account for ')'
+    //-Create results summary table---------------------------
+    Qx::Table<QString> summaryTable(QSize(3, mResults->size() + 1)); // +1 for heading
 
-    // Print heading
+    // Add headings
+    summaryTable.at(0, 0) = SUMMARY_HEADING_CATEGORY;
+    summaryTable.at(0, 1) = SUMMARY_HEADING_WINNER;
+    summaryTable.at(0, 2) = SUMMARY_HEADING_RUNNER_UP;
+
+    // Add results
+    for(int res = 0, row = 1; res < mResults->size(); res++, row++)
+    {
+        // Result
+        const Star::ElectionResult& result = mResults->at(res);
+
+        // Category, winner, runner-up
+        summaryTable.at(row, 0) = ' ' + result.election()->name() + ' ';
+        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(result.winners().join(R"(", ")"));
+        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(result.runnerUps().join(R"(", ")"));
+    }
+
+    // Determine field widths
+    std::array<qsizetype, 3> fieldWidths{0, 0, 0};
+    for(auto itr = summaryTable.rowBegin(); itr != summaryTable.rowEnd(); itr++)
+    {
+        for(qsizetype c = 0; c < 3; c++)
+            fieldWidths[c] = std::max(fieldWidths[c], itr->at(c).size());
+    }
+
+    //-Print summaries---------------------------------------
+    cout << Qt::left;
+
+    auto printTableRow = [&fieldWidths](const QList<QString>& row){
+        for(qsizetype i = 0; i < 3; i++)
+            cout << SUMMARY_VERTICAL_SEP << qSetFieldWidth(fieldWidths[i]) << row[i] << qSetFieldWidth(0);
+        cout << SUMMARY_VERTICAL_SEP << endl;
+    };
+
+    // Print section heading
     cout << HEADING_SUMMARY << endl << endl;
 
-    // Print result summaries
-    for(const Star::ElectionResult& res : *mResults)
-    {
-        QString summaryEntry = SUMMARY_ITEM.arg(res.winners().join(R"(", ")"), res.runnerUps().join(R"(", ")"));
+    // Print table heading row
+    printTableRow(summaryTable.takeFirstRow());
 
-        cout << Qt::right << qSetFieldWidth(mcw);
-        cout << res.election()->name() + ')';
-        cout << Qt::left << qSetFieldWidth(0);
-        cout << ' ' << summaryEntry << endl;
-    }
+    // Print horizontal divider
+    QString div;
+    for(qsizetype i = 0; i < 3; i++)
+        div += SUMMARY_VERTICAL_SEP + QString(fieldWidths[i], SUMMARY_HORIZONTAL_SEP);
+    div += SUMMARY_VERTICAL_SEP;
+
+    cout << div << endl;
+
+    // Print category rows
+    for(auto itr = summaryTable.rowBegin(); itr != summaryTable.rowEnd(); itr++)
+        printTableRow(*itr);
     cout << endl;
 }
 
