@@ -90,12 +90,15 @@ private:
                                                                         &CL_OPTION_MINIMAL};
 
     // Help template
-    static inline const QString HELP_TEMPL = "<u>Usage:</u><br>"
-                                             PROJECT_SHORT_NAME "&lt;options&gt;<br>"
-                                             "<br>"
-                                             "<u>Options:</u>%1<br>"
-                                             "<br>";
-    static inline const QString HELP_OPT_TEMPL = "<br><b>%1:</b> &nbsp;%2";
+    static inline const QString HELP_TEMPL = "Usage:\n"
+                                             "------\n"
+                                             PROJECT_SHORT_NAME " <options>\n"
+                                             "\n"
+                                             "Options:\n"
+                                             "--------\n"
+                                             "%1"
+                                             "\n";
+    static inline const QString HELP_OPT_TEMPL = "\n%1: %2";
 
     // Command line messages
     static inline const QString CL_VERSION_MESSAGE = PROJECT_APP_NAME " " PROJECT_VERSION_STR ", reference application for the STAR voting method calculator";
