@@ -14,8 +14,14 @@ namespace Star
 class Calculator : public QObject
 {
     Q_OBJECT
+//-Class Enums------------------------------------------------------------------------------------------------------
+public:
+    enum ExtendedTiebreakMethod { FiveStar }; //, Condorcet
+
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
+
+
     // Logging - Intro
     static inline const QString LOG_EVENT_INVALID_ELECTION = QStringLiteral("The provided election is invalid.");
     static inline const QString LOG_EVENT_CALC_START = QStringLiteral("Calculating results of election - %1");
@@ -41,14 +47,17 @@ private:
     static inline const QString LOG_EVENT_PRIMARY_TIEBREAK_FAIL = QStringLiteral(R"(Primary tiebreak still left a full tie. Taking runner-up from pre-tiebreak second place...)");
     static inline const QString LOG_EVENT_PRIMARY_TIEBREAK_FAIL_NO_FALLBACK = QStringLiteral(R"(No preference second place available.)");
 
-    // Logging - Extended Tiebreak
-    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_SKIP = QStringLiteral("Skipping extended tiebreak consideration as there are no ties after the primary runoff.");
+    // Logging - Perform Extended Tiebreak
+    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_EVAL = QStringLiteral("Evaluating extended tiebreak via the %1 method...");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_FAIL = QStringLiteral(R"(Extended tiebreak still left a full tie. Taking runner-up from pre-tiebreak second place...)");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_WINNERS = QStringLiteral(R"(Extended tiebreak winners: { %1 })");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_RUNNERUPS = QStringLiteral(R"(Extended tiebreak runner-ups: { %1 })");
-    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_ENABLED = QStringLiteral(R"(Extended tiebreak is enabled, using extended results.)");
+
+    // Logging - Consider Extended Tiebreak
+    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_SKIP = QStringLiteral("Skipping extended tiebreak consideration as there are no ties after the primary runoff.");
+    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_ENABLED = QStringLiteral(R"(Extended tiebreak with selected method altered outcome, using extended results.)");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_DISABLED = QStringLiteral(R"(Extended tiebreak is not enabled, using original results.)");
-    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_IRRELAVENT = QStringLiteral(R"(Extended tiebreak resulted in no change.)");
+    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_IRRELAVENT = QStringLiteral(R"(Extended tiebreak with selected method resulted in no change.)");
 
     // Logging - Preference
     static inline const QString LOG_EVENT_RANK_BY_PREF = QStringLiteral("Ranking relevant nominees by preference...");
@@ -67,7 +76,7 @@ private:
     // Logging - Tiebreak
     static inline const QString LOG_EVENT_BREAK_SCORE_TIE = QStringLiteral("Breaking %1-way score tie...");
     static inline const QString LOG_EVENT_BREAK_PREF_TIE = QStringLiteral("Breaking %1-way preference tie...");
-    static inline const QString LOG_EVENT_BREAK_EXTENDED_TIE = QStringLiteral("Breaking %1-way extended tie...");
+    static inline const QString LOG_EVENT_BREAK_EXTENDED_TIE = QStringLiteral("Breaking %1-way extended tie (%2 method)...");
     static inline const QString LOG_EVENT_BREAK_RESULT = QStringLiteral("Tie Break - First Place { %1 } | Second Place: { %2 }");
 
     // Logging - Initial Results
@@ -90,7 +99,7 @@ private:
 
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
-    bool mExtraTiebreak;
+    std::optional<ExtendedTiebreakMethod> mExtraTiebreakMethod;
     const Election* mElection;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
@@ -102,7 +111,7 @@ private:
     // Main steps
     QStringList determinePreliminaryLeaders();
     QPair<QStringList, QStringList> performPrimaryRunoff(const QStringList& preliminaryLeaders);
-    QPair<QStringList, QStringList> performExtendedTiebreak(QStringList initialWinners, QStringList initialRunnerUps);
+    QPair<QStringList, QStringList> performExtendedTiebreak(QStringList initialWinners, QStringList initialRunnerUps, ExtendedTiebreakMethod method);
 
     // Utility
     QList<Rank> rankByPreference(const QStringList& nominees);
@@ -110,7 +119,7 @@ private:
     QList<Rank> rankByVotesOfMaxScore(const QStringList& nominees);
     QPair<QStringList, QStringList> breakScoreTie(const QStringList& nominees);
     QPair<QStringList, QStringList> breakPreferenceTie(const QStringList& nominees);
-    QPair<QStringList, QStringList> breakExtendedTie(const QStringList& nominees);
+    QPair<QStringList, QStringList> breakExtendedTieFiveStar(const QStringList& nominees);
 
     // Logging
     QString createNomineeGeneralListString(const QStringList& nominees);
@@ -119,16 +128,18 @@ private:
 
 public:
     const Election* election() const;
+    std::optional<ExtendedTiebreakMethod> extraTiebreakMethod() const;
     bool isExtraTiebreak() const;
 
     void setElection(const Election* election);
-    void setExtraTiebreak(bool extraTiebreak);
+    void setExtraTiebreakMethod(std::optional<ExtendedTiebreakMethod> method);
 
     ElectionResult calculateResult();
 
 //-Signals & Slots-------------------------------------------------------------------------------------------------
 signals:
     void calculationDetail(const QString& detail);
+
 };
 
 }

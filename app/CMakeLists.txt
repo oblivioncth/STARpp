@@ -36,6 +36,7 @@ target_link_libraries(${APP_TARGET_NAME}
         StarCalc::Base
         Qx::Core
         Qx::Io
+        magic_enum::magic_enum
 )
 
 ## Forward select project variables to C++ code

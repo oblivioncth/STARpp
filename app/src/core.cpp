@@ -8,6 +8,9 @@
 #include <qx/core/qx-iostream.h>
 #include <qx/utility/qx-helpers.h>
 
+// Macros
+#define ENUM_NAME(eenum) QString(magic_enum::enum_name(eenum).data())
+
 //===============================================================================================================
 // CORE
 //===============================================================================================================
@@ -66,7 +69,6 @@ void Core::showHelp()
     postMessage(helpStr);
 }
 
-
 void Core::showVersion()
 {
     postMessage(CL_VERSION_MESSAGE);
@@ -74,7 +76,9 @@ void Core::showVersion()
 
 void Core::logElectionData(const ReferenceElectionConfig data)
 {
-    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath, data.extraTiebreak ? "true" : "false"));
+    auto tbMethod = data.extraTiebreakMethod;
+    QString tbStr = tbMethod.has_value() ? ENUM_NAME(tbMethod.value()) : "*None*";
+    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath, tbStr));
 }
 
 //Public:
@@ -115,14 +119,29 @@ ErrorCode Core::initialize()
     }
     else if(clParser.isSet(CL_OPTION_CONFIG) && clParser.isSet(CL_OPTION_BOX))
     {
+        // Check extra tiebreak parameter
+        std::optional<Star::Calculator::ExtendedTiebreakMethod> tbm;
+        if(clParser.isSet(CL_OPTION_EXTRA))
+        {
+            // Try to get enum value
+            tbm = magic_enum::enum_cast<Star::Calculator::ExtendedTiebreakMethod>(clParser.value(CL_OPTION_EXTRA).toStdString());
+            if(!tbm.has_value())
+            {
+                logError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_ARGS, LOG_ERR_INVALID_EXTRA));
+                return ErrorCode::INVALID_ARGS;
+            }
+        }
+
+        // Setup options container
         mRefElectionCfg = ReferenceElectionConfig{
             .ccPath = clParser.value(CL_OPTION_CONFIG),
             .bbPath = clParser.value(CL_OPTION_BOX),
-            .extraTiebreak = clParser.isSet(CL_OPTION_TOP)
+            .extraTiebreakMethod = tbm
         };
 
         logElectionData(mRefElectionCfg.value());
 
+        // Handle minimal option
         if(clParser.isSet(CL_OPTION_MINIMAL))
         {
             mMinimal = true;

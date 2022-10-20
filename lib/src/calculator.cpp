@@ -4,6 +4,12 @@
 // Qx Includes
 #include <qx/core/qx-string.h>
 
+// magic_enum Includes
+#include <magic_enum.hpp>
+
+//-Macros----------------------------------------
+#define ENUM_NAME(eenum) QString(magic_enum::enum_name(eenum).data())
+
 namespace Star
 {
 
@@ -15,7 +21,7 @@ namespace Star
 //Public:
 Calculator::Calculator() :
     mElection(nullptr),
-    mExtraTiebreak(false)
+    mExtraTiebreakMethod(std::nullopt)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
@@ -164,15 +170,28 @@ QPair<QStringList, QStringList> Calculator::performPrimaryRunoff(const QStringLi
     // Return result
     return {winners, runnerUps};
 }
-QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList winners, QStringList runnerUps)
+
+QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList winners, QStringList runnerUps, ExtendedTiebreakMethod method)
 {
+    // Determine method function
+    std::function<QPair<QStringList, QStringList>(QStringList)> methodFn;
+    switch(method)
+    {
+        case FiveStar:
+            methodFn = [this](QStringList nominees){ return breakExtendedTieFiveStar(nominees); };
+            break;
+
+        default:
+            qFatal((std::string(Q_FUNC_INFO) + " unhandled extended tiebreak method").c_str());
+    }
+
     // If there is still a tie, check effect of extended tiebreak
     if(winners.size() > 1)
     {
         emit calculationDetail(LOG_EVENT_INITIAL_RESULT_WINNER_TIE);
 
         // Tiebreak
-        QPair<QStringList, QStringList> firstPlaceTiebreak = breakExtendedTie(winners);
+        QPair<QStringList, QStringList> firstPlaceTiebreak = methodFn(winners);
 
         // Determine winners/runner-ups
         winners = firstPlaceTiebreak.first;
@@ -183,7 +202,7 @@ QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList 
             emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_FAIL);
 
             // Get second place from original second place
-            runnerUps = runnerUps.size() > 1 ? breakExtendedTie(runnerUps).first : runnerUps;
+            runnerUps = runnerUps.size() > 1 ? methodFn(runnerUps).first : runnerUps;
         }
 
     }
@@ -192,7 +211,7 @@ QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList 
         emit calculationDetail(LOG_EVENT_INITIAL_RESULT_RUNNERUP_TIE);
 
         // Tiebreak
-        QPair<QStringList, QStringList> secondPlaceTiebreak = breakExtendedTie(winners);
+        QPair<QStringList, QStringList> secondPlaceTiebreak = methodFn(winners);
         runnerUps = secondPlaceTiebreak.first;
     }
     else
@@ -303,10 +322,10 @@ QPair<QStringList, QStringList> Calculator::breakPreferenceTie(const QStringList
     return tieBreak;
 }
 
-QPair<QStringList, QStringList> Calculator::breakExtendedTie(const QStringList& nominees)
+QPair<QStringList, QStringList> Calculator::breakExtendedTieFiveStar(const QStringList& nominees)
 {
     // Check number of times a nominee was given the maximum score possible to break tie
-    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()));
+    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(FiveStar)));
     QList<Rank> maxVoteRanks = rankByVotesOfMaxScore(nominees);
     QPair<QStringList, QStringList> tieBreak(maxVoteRanks.front().nominees, maxVoteRanks.size() > 1 ? maxVoteRanks.at(1).nominees : QStringList());
 
@@ -361,10 +380,11 @@ QString Calculator::createNomineeRankListString(const QList<Rank>& ranks)
 }
 
 //Public:
-bool Calculator::isExtraTiebreak() const { return mExtraTiebreak; }
+std::optional<Calculator::ExtendedTiebreakMethod> Calculator::extraTiebreakMethod() const { return mExtraTiebreakMethod; }
+bool Calculator::isExtraTiebreak() const { return mExtraTiebreakMethod.has_value(); }
 const Election* Calculator::election() const { return mElection; }
 void Calculator::setElection(const Election* election) { mElection = election; }
-void Calculator::setExtraTiebreak(bool extraTiebreak) { mExtraTiebreak = extraTiebreak; }
+void Calculator::setExtraTiebreakMethod(std::optional<ExtendedTiebreakMethod> method) { mExtraTiebreakMethod = method; }
 
 ElectionResult Calculator::calculateResult()
 {
@@ -393,17 +413,31 @@ ElectionResult Calculator::calculateResult()
     // Check if extended tiebreak could matter
     if(results.first.size() > 1 || results.second.size() > 1)
     {
-        QPair<QStringList, QStringList> extendedResults = performExtendedTiebreak(results.first, results.second);
+        // Test outcome with each method (for analysis purposes)
+        QHash<ExtendedTiebreakMethod, QPair<QStringList, QStringList>> extendedResults;
 
-        if(extendedResults == results)
-            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_IRRELAVENT);
-        else if(mExtraTiebreak)
+        constexpr auto methods = magic_enum::enum_values<ExtendedTiebreakMethod>();
+        for(ExtendedTiebreakMethod method : methods)
         {
-            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_ENABLED);
-            results = extendedResults;
+            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_EVAL.arg(ENUM_NAME(method)));
+            extendedResults[method] = performExtendedTiebreak(results.first, results.second, method);
         }
-        else
+
+        if(!mExtraTiebreakMethod.has_value())
             emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_DISABLED);
+        else
+        {
+            ExtendedTiebreakMethod selectedMethod = mExtraTiebreakMethod.value();
+            auto selectedMethodResults = extendedResults[selectedMethod];
+
+            if(selectedMethodResults == results)
+                emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_IRRELAVENT);
+            else
+            {
+                emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_ENABLED);
+                results = selectedMethodResults;
+            }
+        }
     }
     else
         emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_SKIP);

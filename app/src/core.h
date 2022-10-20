@@ -8,6 +8,13 @@
 // Qx Includes
 #include <qx/io/qx-applicationlogger.h>
 #include <qx/core/qx-iostream.h>
+#include <qx/core/qx-string.h>
+
+// magic_enum Includes
+#include <magic_enum.hpp>
+
+// Base Includes
+#include "star/calculator.h"
 
 // Project Includes
 #include "errorcode.h"
@@ -27,7 +34,8 @@ private:
     static inline const QString LOG_FILE_EXT = QStringLiteral("log");
 
     // Logging - Errors
-    static inline const QString LOG_ERR_INVALID_ARGS = QStringLiteral("Invalid arguments provided");
+    static inline const QString LOG_ERR_INVALID_ARGS = QStringLiteral("Invalid arguments provided.");
+    static inline const QString LOG_ERR_INVALID_EXTRA = QStringLiteral("Invalid extra tiebreak method.");
 
     // Logging - Messages
     static inline const QString LOG_EVENT_INIT = QStringLiteral("Initializing " PROJECT_SHORT_NAME "...");
@@ -55,9 +63,16 @@ private:
     static inline const QString CL_OPT_BOX_L_NAME = QStringLiteral("box");
     static inline const QString CL_OPT_BOX_DESC = QStringLiteral("Specifies the path to the ballot box CSV file.");
 
-    static inline const QString CL_OPT_TOP_S_NAME = QStringLiteral("t");
-    static inline const QString CL_OPT_TOP_L_NAME = QStringLiteral("top");
-    static inline const QString CL_OPT_TOP_DESC = QStringLiteral("Performs a final tiebreaker, if necessary, by checking which candidate has the most 5 point scores.");
+    static inline const QString CL_OPT_EXTRA_S_NAME = QStringLiteral("e");
+    static inline const QString CL_OPT_EXTRA_L_NAME = QStringLiteral("extra");
+    static inline const QString CL_OPT_EXTRA_DESC_TEMPLATE = QStringLiteral("Performs an extra tiebreaker, if necessary. One of {%1}");
+    static inline const QString CL_OPT_EXTRA_DESC = [](){
+        constexpr auto choices = magic_enum::enum_names<Star::Calculator::ExtendedTiebreakMethod>();
+        QStringList qChoices;
+        for(const std::string_view& sv : choices)
+            qChoices << QString(sv.data());
+        return CL_OPT_EXTRA_DESC_TEMPLATE.arg(qChoices.join(", "));
+    }();
 
     static inline const QString CL_OPT_MINIMAL_S_NAME = QStringLiteral("m");
     static inline const QString CL_OPT_MINIMAL_L_NAME = QStringLiteral("minimal");
@@ -68,10 +83,10 @@ private:
     static inline const QCommandLineOption CL_OPTION_VERSION{{CL_OPT_VERSION_S_NAME, CL_OPT_VERSION_L_NAME}, CL_OPT_VERSION_DESC}; // Boolean option
     static inline const QCommandLineOption CL_OPTION_CONFIG{{CL_OPT_CONFIG_S_NAME, CL_OPT_CONFIG_L_NAME}, CL_OPT_CONFIG_DESC, "config"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_BOX{{CL_OPT_BOX_S_NAME, CL_OPT_BOX_L_NAME}, CL_OPT_BOX_DESC, "box"}; // Takes value
-    static inline const QCommandLineOption CL_OPTION_TOP{{CL_OPT_TOP_S_NAME, CL_OPT_TOP_L_NAME}, CL_OPT_TOP_DESC}; // Boolean option
+    static inline const QCommandLineOption CL_OPTION_EXTRA{{CL_OPT_EXTRA_S_NAME, CL_OPT_EXTRA_L_NAME}, CL_OPT_EXTRA_DESC, "extra"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_MINIMAL{{CL_OPT_MINIMAL_S_NAME, CL_OPT_MINIMAL_L_NAME}, CL_OPT_MINIMAL_DESC}; // Boolean option
 
-    static inline const QList<const QCommandLineOption*> CL_OPTIONS_ALL{&CL_OPTION_HELP, &CL_OPTION_VERSION, &CL_OPTION_CONFIG, &CL_OPTION_BOX, &CL_OPTION_TOP,
+    static inline const QList<const QCommandLineOption*> CL_OPTIONS_ALL{&CL_OPTION_HELP, &CL_OPTION_VERSION, &CL_OPTION_CONFIG, &CL_OPTION_BOX, &CL_OPTION_EXTRA,
                                                                         &CL_OPTION_MINIMAL};
 
     // Help template

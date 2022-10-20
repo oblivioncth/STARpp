@@ -45,7 +45,7 @@ void tst_full_reference_election::basic_election_sampler()
 
     // Create calculator
     Star::Calculator calculator;
-    calculator.setExtraTiebreak(false);
+    calculator.setExtraTiebreakMethod(std::nullopt);
 
     // Check the results of each election
     for(qsizetype i = 0; i < elections.size(); i++)

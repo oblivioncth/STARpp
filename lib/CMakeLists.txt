@@ -76,6 +76,7 @@ target_include_directories(${LIB_TARGET_NAME} PUBLIC
 target_link_libraries(${LIB_TARGET_NAME}
     PRIVATE
         Qx::Io
+        magic_enum::magic_enum
     PUBLIC
         Qt6::Core
         Qx::Core

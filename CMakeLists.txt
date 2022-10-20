@@ -96,6 +96,10 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 include(OB/FetchQx)
 fetch_qx("f6f0d573622d1a712b4aa809f21b5d8b291d83fb")
 
+# Fetch Neargye's Magic Enum
+include(OB/FetchMagicEnum)
+fetch_magicenum("v0.8.0")
+
 # Process Targets
 set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_base)
 set(LIB_ALIAS_NAME ${PROJECT_NAME}::Base)
