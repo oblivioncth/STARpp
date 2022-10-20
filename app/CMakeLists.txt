@@ -49,13 +49,17 @@ set_cxx_project_vars(${APP_TARGET_NAME}
 
 ################# Windows Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-
+    set_target_properties(${MAIN_TARGET_NAME} PROPERTIES
+        OUTPUT_NAME "${PROJECT_NAME}"
+    )
 endif()
 
 
 ################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-
+    set_target_properties(${MAIN_TARGET_NAME} PROPERTIES
+        OUTPUT_NAME "${PROJECT_NAME_LC}"
+    )
 endif()
 
 #================= Install ==========================
