@@ -16,7 +16,7 @@ class Calculator : public QObject
     Q_OBJECT
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:
-    enum ExtendedTiebreakMethod { FiveStar }; //, Condorcet
+    enum ExtendedTiebreakMethod { FiveStar, Condorcet };
 
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
@@ -73,6 +73,13 @@ private:
     static inline const QString LOG_EVENT_RANK_BY_VOTES_OF_MAX_SCORE = QStringLiteral("Ranking relevant nominees by votes of max score...");
     static inline const QString LOG_EVENT_RANKINGS_VOTES_OF_MAX_SCORE = QStringLiteral("Votes of Max Score Rankings:");
 
+    // Logging - Head-to-head wins
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS = QStringLiteral("Ranking relevant nominees by head-to-head wins...");
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF = QStringLiteral("Using preference ranking to determine winner of %1 vs %2.");
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER = QStringLiteral("%1 won the head-to-head.");
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_TIE = QStringLiteral("The head to head resulted in a tie, no win assigned to either participant.");
+    static inline const QString LOG_EVENT_RANKINGS_HEAD_TO_HEAD_WINS = QStringLiteral("Head-to-head wins Rankings:");
+
     // Logging - Tiebreak
     static inline const QString LOG_EVENT_BREAK_SCORE_TIE = QStringLiteral("Breaking %1-way score tie...");
     static inline const QString LOG_EVENT_BREAK_PREF_TIE = QStringLiteral("Breaking %1-way preference tie...");
@@ -117,9 +124,11 @@ private:
     QList<Rank> rankByPreference(const QStringList& nominees);
     QList<Rank> rankByScore(const QStringList& nominees);
     QList<Rank> rankByVotesOfMaxScore(const QStringList& nominees);
+    QList<Rank> rankByHeadToHeadWins(const QStringList& nominees);
     QPair<QStringList, QStringList> breakScoreTie(const QStringList& nominees);
     QPair<QStringList, QStringList> breakPreferenceTie(const QStringList& nominees);
     QPair<QStringList, QStringList> breakExtendedTieFiveStar(const QStringList& nominees);
+    QPair<QStringList, QStringList> breakExtendedTieCondorcet(const QStringList& nominees);
 
     // Logging
     QString createNomineeGeneralListString(const QStringList& nominees);

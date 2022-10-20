@@ -180,6 +180,9 @@ QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList 
         case FiveStar:
             methodFn = [this](QStringList nominees){ return breakExtendedTieFiveStar(nominees); };
             break;
+        case Condorcet:
+            methodFn = [this](QStringList nominees){ return breakExtendedTieCondorcet(nominees); };
+            break;
 
         default:
             qFatal((std::string(Q_FUNC_INFO) + " unhandled extended tiebreak method").c_str());
@@ -299,6 +302,48 @@ QList<Rank> Calculator::rankByVotesOfMaxScore(const QStringList& nominees)
     emit calculationDetail(LOG_EVENT_RANKINGS_VOTES_OF_MAX_SCORE + '\n' + createNomineeRankListString(maxVoteRanks));
     return maxVoteRanks;
 }
+QList<Rank> Calculator::rankByHeadToHeadWins(const QStringList& nominees)
+{
+    // Determine aggregate face-off wins of nominees list
+    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS);
+    QMap<QString, uint> headToHeadWinsMap;
+
+    /* Add all nominees with an initial win count of 0, since some might not win even
+     * once, and therefore be missed by the next loop
+     */
+    for(const QString& nominee : nominees)
+        headToHeadWinsMap[nominee] = 0;
+
+    // Perform face-offs
+    for(auto itrA = nominees.constBegin(); itrA != nominees.constEnd() - 1; itrA++)
+    {
+        QString opponentA = *itrA;
+
+        for(auto itrB = itrA + 1; itrB != nominees.constEnd(); itrB++)
+        {
+            QString opponentB = *itrB;
+
+            emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF.arg(opponentA, opponentB));
+            QList<Rank> prefRanks = rankByPreference({opponentA, opponentB});
+
+            const QStringList& prefRankWinners = prefRanks.first().nominees;
+            if(prefRankWinners.size() != 1)
+                emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_TIE);
+            else
+            {
+                QString headToHeadWinner = prefRankWinners.first();
+                emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER.arg(headToHeadWinner));
+                headToHeadWinsMap[headToHeadWinner];
+            }
+        }
+    }
+
+    // Create sorted wins list
+    QList<Rank> headToHeadWinsRanks =  Rank::rankSort(headToHeadWinsMap);
+
+    emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_WINS + '\n' + createNomineeRankListString(headToHeadWinsRanks));
+    return headToHeadWinsRanks;
+}
 
 QPair<QStringList, QStringList> Calculator::breakScoreTie(const QStringList& nominees)
 {
@@ -328,6 +373,18 @@ QPair<QStringList, QStringList> Calculator::breakExtendedTieFiveStar(const QStri
     emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(FiveStar)));
     QList<Rank> maxVoteRanks = rankByVotesOfMaxScore(nominees);
     QPair<QStringList, QStringList> tieBreak(maxVoteRanks.front().nominees, maxVoteRanks.size() > 1 ? maxVoteRanks.at(1).nominees : QStringList());
+
+    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
+    return tieBreak;
+}
+
+QPair<QStringList, QStringList> Calculator::breakExtendedTieCondorcet(const QStringList& nominees)
+{
+    // Perform a face-off of each nominee and see which one has the most head-to-head wins
+    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Condorcet)));
+
+    QList<Rank> headToHeadRanks = rankByHeadToHeadWins(nominees);
+    QPair<QStringList, QStringList> tieBreak(headToHeadRanks.front().nominees, headToHeadRanks.size() > 1 ? headToHeadRanks.at(1).nominees : QStringList());
 
     emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
     return tieBreak;
