@@ -345,49 +345,38 @@ QList<Rank> Calculator::rankByHeadToHeadWins(const QStringList& nominees)
     return headToHeadWinsRanks;
 }
 
-QPair<QStringList, QStringList> Calculator::breakScoreTie(const QStringList& nominees)
+QPair<QStringList, QStringList> Calculator::rankBasedTiebreak(const QList<Rank>& rankings, const QString& note)
 {
     // Check number of times a nominee is preferred to break tie
-    emit calculationDetail(LOG_EVENT_BREAK_SCORE_TIE.arg(nominees.size()));
-    QList<Rank> prefRanks = rankByPreference(nominees);
-    QPair<QStringList, QStringList> tieBreak(prefRanks.front().nominees, prefRanks.size() > 1 ? prefRanks.at(1).nominees : QStringList());
+    emit calculationDetail(note);
+    QPair<QStringList, QStringList> tieBreak(rankings.front().nominees, rankings.size() > 1 ? rankings.at(1).nominees : QStringList());
 
     emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
     return tieBreak;
+}
+
+QPair<QStringList, QStringList> Calculator::breakScoreTie(const QStringList& nominees)
+{
+    // Check number of times a nominee is preferred to break tie
+    return rankBasedTiebreak(rankByPreference(nominees), LOG_EVENT_BREAK_SCORE_TIE.arg(nominees.size()));
 }
 
 QPair<QStringList, QStringList> Calculator::breakPreferenceTie(const QStringList& nominees)
 {
     // Check score to break tie
-    emit calculationDetail(LOG_EVENT_BREAK_PREF_TIE.arg(nominees.size()));
-    QList<Rank> scoreRanks = rankByScore(nominees);
-    QPair<QStringList, QStringList> tieBreak(scoreRanks.front().nominees, scoreRanks.size() > 1 ? scoreRanks.at(1).nominees : QStringList());
-
-    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
-    return tieBreak;
+    return rankBasedTiebreak(rankByScore(nominees), LOG_EVENT_BREAK_PREF_TIE.arg(nominees.size()));
 }
 
 QPair<QStringList, QStringList> Calculator::breakExtendedTieFiveStar(const QStringList& nominees)
 {
     // Check number of times a nominee was given the maximum score possible to break tie
-    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(FiveStar)));
-    QList<Rank> maxVoteRanks = rankByVotesOfMaxScore(nominees);
-    QPair<QStringList, QStringList> tieBreak(maxVoteRanks.front().nominees, maxVoteRanks.size() > 1 ? maxVoteRanks.at(1).nominees : QStringList());
-
-    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
-    return tieBreak;
+    return rankBasedTiebreak(rankByVotesOfMaxScore(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(FiveStar)));
 }
 
 QPair<QStringList, QStringList> Calculator::breakExtendedTieCondorcet(const QStringList& nominees)
 {
     // Perform a face-off of each nominee and see which one has the most head-to-head wins
-    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Condorcet)));
-
-    QList<Rank> headToHeadRanks = rankByHeadToHeadWins(nominees);
-    QPair<QStringList, QStringList> tieBreak(headToHeadRanks.front().nominees, headToHeadRanks.size() > 1 ? headToHeadRanks.at(1).nominees : QStringList());
-
-    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(tieBreak.first.join(", "), tieBreak.second.join(", ")));
-    return tieBreak;
+    return rankBasedTiebreak(rankByHeadToHeadWins(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Condorcet)));
 }
 
 QString Calculator::createNomineeGeneralListString(const QStringList& nominees)

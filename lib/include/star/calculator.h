@@ -125,6 +125,8 @@ private:
     QList<Rank> rankByScore(const QStringList& nominees);
     QList<Rank> rankByVotesOfMaxScore(const QStringList& nominees);
     QList<Rank> rankByHeadToHeadWins(const QStringList& nominees);
+
+    QPair<QStringList, QStringList> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note);
     QPair<QStringList, QStringList> breakScoreTie(const QStringList& nominees);
     QPair<QStringList, QStringList> breakPreferenceTie(const QStringList& nominees);
     QPair<QStringList, QStringList> breakExtendedTieFiveStar(const QStringList& nominees);
