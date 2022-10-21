@@ -92,7 +92,7 @@ Election::Builder& Election::Builder::wBallot(const Voter& voter, const QList<Vo
     for(const Vote& vote : votes)
     {
         const QString& nominee = vote.nominee;
-        uint score = std::max(vote.score, uint(5));
+        uint score = std::min(vote.score, uint(5));
         ballot.mVotes[nominee] = score;
         mConstruct.mTotals[nominee] += score;
     }
