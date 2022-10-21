@@ -70,6 +70,7 @@ endif()
 
 # Package
 set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
+set(FILE_TEMPLATES_PATH "${PROJ_SCRIPTS_PATH}/file_templates")
 
 #------------Set Global Build Rules----------------
 
@@ -103,6 +104,7 @@ fetch_magicenum("v0.8.0")
 # Process Targets
 set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_base)
 set(LIB_ALIAS_NAME ${PROJECT_NAME}::Base)
+set(LIB_EXPORT_NAME Base)
 set(LIB_INCLUDE_ROOT_NAME star)
 add_subdirectory(lib)
 
@@ -116,6 +118,22 @@ if(STARCALC_TESTS)
     add_subdirectory(tests)
 endif()
 
+#--------------------Package Config-----------------------
+
+# Create config file
+configure_file("${FILE_TEMPLATES_PATH}/${PROJECT_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
+    @ONLY
+)
+
+# Create version config file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY ExactVersion
+)
+
 #================= Install ==========================
 
 set(TOP_LEVEL_INSTALL_COMPONENT ${PROJECT_NAME_LC})
@@ -126,6 +144,15 @@ install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
     COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
     DESTINATION .
+    ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
+)
+
+# Install Package Config
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+    COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
+    DESTINATION cmake
     ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
 )
 

@@ -54,7 +54,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL Windows)
     )
 endif()
 
-
 ################# Linux Build #################
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     set_target_properties(${MAIN_TARGET_NAME} PROPERTIES
