@@ -112,7 +112,7 @@ target_link_libraries(${LIB_TARGET_NAME}
 )
 
 #---------- Configure Target Properties------------------
-set_target_properties(${TARGET_NAME} PROPERTIES
+set_target_properties(${LIB_TARGET_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
     DEBUG_POSTFIX "d"
     EXPORT_NAME "${LIB_EXPORT_NAME}"
