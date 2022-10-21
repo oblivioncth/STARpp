@@ -3,15 +3,18 @@
 # CMake
 cmake_minimum_required(VERSION 3.24.0)
 
+# Configuration options
+option(STARCALC_TESTS "Build StarCalc tests" OFF)
+
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
-set(STAR_CALC_BASE_VERSION 0.1) # Required for CI/CD
+set(STAR_CALC_BASE_VERSION 0.0.9) # Required for CI/CD
 project(StarCalc
     VERSION ${STAR_CALC_BASE_VERSION}
     LANGUAGES CXX
-    DESCRIPTION "INSERT DESCRIPTION HERE"
+    DESCRIPTION "An application to determine the winner of an election using the STAR voting system"
 )
-set(FORMAL_NAME "FORMAL NAME")
+set(FORMAL_NAME "STAR Calculator")
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
@@ -67,6 +70,7 @@ endif()
 
 # Package
 set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
+set(FILE_TEMPLATES_PATH "${PROJ_SCRIPTS_PATH}/file_templates")
 
 #------------Set Global Build Rules----------------
 
@@ -74,26 +78,61 @@ set(PACKAGE_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/out/dist")
 include(OB/VerboseVersioning)
 setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 
-
 #================= Build =========================
 
 # Import Qt
-find_package(Qt6 REQUIRED COMPONENTS Core)
+set(QT_COMPONENTS
+    Core
+)
+if(STARCALC_TESTS)
+    list(APPEND QT_COMPONENTS Test)
+endif()
+
+find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 # Disable deprecated code
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
-fetch_qx("v0.4")
+fetch_qx("f6f0d573622d1a712b4aa809f21b5d8b291d83fb")
 
-# Set main target name
-# Name here needs to be as unique as possible for when this project is inlcuded
-# in another via FetchContent or add_subdirectory (prevent target clashes)
-set(MAIN_TARGET_NAME ${PROJECT_NAME_LC}_${PROJECT_NAME_LC})
+# Fetch Neargye's Magic Enum
+include(OB/FetchMagicEnum)
+fetch_magicenum("v0.8.0")
 
-# Process source files and create target
-add_subdirectory(src)
+# Process Targets
+set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_base)
+set(LIB_ALIAS_NAME ${PROJECT_NAME}::Base)
+set(LIB_EXPORT_NAME Base)
+set(LIB_INCLUDE_ROOT_NAME star)
+add_subdirectory(lib)
+
+set(APP_TARGET_NAME ${PROJECT_NAME_LC}_frontend)
+set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)
+add_subdirectory(app)
+
+if(STARCALC_TESTS)
+    enable_testing()
+    set(TESTS_TARGET_PREFIX ${PROJECT_NAME_LC})
+    add_subdirectory(tests)
+endif()
+
+#--------------------Package Config-----------------------
+
+# Create config file
+configure_file("${FILE_TEMPLATES_PATH}/${PROJECT_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
+    @ONLY
+)
+
+# Create version config file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY ExactVersion
+)
 
 #================= Install ==========================
 
@@ -105,6 +144,15 @@ install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
     COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
     DESTINATION .
+    ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
+)
+
+# Install Package Config
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+    COMPONENT ${TOP_LEVEL_INSTALL_COMPONENT}
+    DESTINATION cmake
     ${SUB_PROJ_EXCLUDE_FROM_ALL} # "EXCLUDE_FROM_ALL" if project is not top-level
 )
 

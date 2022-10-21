@@ -7,8 +7,8 @@ on:
 env:
   ci_bot_username: ObyBotCI
   ci_bot_email: 104651589+ObyBotCI@users.noreply.github.com
-  star_calc_qts_win_artifact_path: ${{ github.workspace }}/StarCalcQtSWin
-  star_calc_qts_linux_artifact_path: ${{ github.workspace }}/StarCalcQtSLinux
+  starcalc_qts_win_artifact_path: ${{ github.workspace }}/StarCalcQtSWin
+  starcalc_qts_linux_artifact_path: ${{ github.workspace }}/StarCalcQtSLinux
   
 jobs:
   tag_master_and_sync_dev:
@@ -17,7 +17,6 @@ jobs:
     runs-on: windows-latest
     outputs:
       version_tag: ${{ steps.tag_master.outputs.new_tag }}
-      target_fp_version: ${{ steps.check_target_fp.outputs.fp_version }}
     steps:
     - name: Checkout StarCalc Master
       uses: actions/checkout@v3
@@ -27,18 +26,6 @@ jobs:
       run: |
         git config --global user.name "${{ env.ci_bot_username }}"
         git config --global user.email "${{ env.ci_bot_email }}"
-    - name: Get target FP version
-      id: check_target_fp
-      env:
-        match_start: set\(TARGET_FP_VERSION_PREFIX
-        match_end: \)
-      run: |
-        $project_lists = Get-Content -Raw CMakeLists.txt
-        if(!($project_lists -match '(?<=${{ env.match_start }})(.*)(?=${{ env.match_end }})')){
-          throw "Could not get target FP version!"
-        }
-        $target_version = "v$($Matches[1].Trim())"
-        echo "::set-output name=fp_version::$target_version"
     - name: Tag master with new version tag
       id: tag_master
       env:
@@ -50,7 +37,7 @@ jobs:
           throw "Could not get base version!"
         }
         $new_tag = "v$($Matches[1].Trim())"
-        echo "::set-output name=new_tag::$new_tag"
+        echo "new_tag=$new_tag" >> $Env:GITHUB_OUTPUT
         git tag -a $new_tag -m "Release $new_tag"
         git push --tags
     - name: Move 'latest' tag
@@ -73,50 +60,50 @@ jobs:
         git merge master --ff-only
         git push
   
-  build_star_calc_release_windows:
+  build_starcalc_release_windows:
     name: Build StarCalc Release (Windows)
     needs: tag_master_and_sync_dev
     if: github.event.pull_request.merged == true
-    uses: ./.github/workflows/build-star_calc-windows.yml
+    uses: ./.github/workflows/build-starcalc-windows.yml
     secrets:
       qt_static_url: ${{ secrets.QT_WINDOWS_STATIC_URL }}
       
-  build_star_calc_release_linux:
+  build_starcalc_release_linux:
     name: Build StarCalc Release (Linux)
     needs: tag_master_and_sync_dev
     if: github.event.pull_request.merged == true
-    uses: ./.github/workflows/build-star_calc-linux.yml
+    uses: ./.github/workflows/build-starcalc-linux.yml
     secrets:
       qt_static_url: ${{ secrets.QT_LINUX_STATIC_URL }}
 
   create-release:
     name: Create GitHub release
-    needs: [build_star_calc_release_windows, build_star_calc_release_linux, tag_master_and_sync_dev]
+    needs: [build_starcalc_release_windows, build_starcalc_release_linux, tag_master_and_sync_dev]
     if: github.event.pull_request.merged == true
     runs-on: windows-latest
     steps:
     - name: Set release artifact names
       run: |
-        echo "release_qts_win_package_name=${{ needs.build_star_calc_release_windows.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
-        echo "release_qts_linux_package_name=${{ needs.build_star_calc_release_linux.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
+        echo "release_qts_win_package_name=${{ needs.build_starcalc_release_windows.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
+        echo "release_qts_linux_package_name=${{ needs.build_starcalc_release_linux.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
     - name: Download built static StarCalc artifact (Windows)
       uses: actions/download-artifact@v3
       with:
         name: ${{ env.release_qts_win_package_name }}
-        path: ${{ env.star_calc_qts_win_artifact_path }}
+        path: ${{ env.starcalc_qts_win_artifact_path }}
     - name: Download built static StarCalc artifact (Linux)
       uses: actions/download-artifact@v3
       with:
         name: ${{ env.release_qts_linux_package_name }}
-        path: ${{ env.star_calc_qts_linux_artifact_path }}
+        path: ${{ env.starcalc_qts_linux_artifact_path }}
     - name: Zip up release artifacts
       run: |
-        7z a "${{ env.release_qts_win_package_name }}.zip" "${{ env.star_calc_qts_win_artifact_path }}/*"
-        7z a "${{ env.release_qts_linux_package_name }}.zip" "${{ env.star_calc_qts_linux_artifact_path }}/*"
+        7z a "${{ env.release_qts_win_package_name }}.zip" "${{ env.starcalc_qts_win_artifact_path }}/*"
+        7z a "${{ env.release_qts_linux_package_name }}.zip" "${{ env.starcalc_qts_linux_artifact_path }}/*"
     - name: Generate release
       uses: softprops/action-gh-release@v1
       with:
-        name: "StarCalc Release ${{ needs.tag_master_and_sync_dev.outputs.version_tag }} (Targets FP ${{ needs.tag_master_and_sync_dev.outputs.target_fp_version }})"
+        name: "StarCalc Release ${{ needs.tag_master_and_sync_dev.outputs.version_tag }}"
         tag_name: "${{ needs.tag_master_and_sync_dev.outputs.version_tag }}"
         fail_on_unmatched_files: true
         generate_release_notes: true
