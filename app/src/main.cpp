@@ -56,10 +56,10 @@ int main(int argc, char *argv[])
     ReferenceElectionConfig rec = core.referenceElectionConfig();
 
     QList<Star::Election> elections;
-    Qx::GenericError electionLoadError = Star::electionsFromReferenceInput(elections, rec.ccPath, rec.bbPath);
-    if(electionLoadError.isValid())
+    Star::ReferenceError refError = Star::electionsFromReferenceInput(elections, rec.ccPath, rec.bbPath);
+    if(refError.isValid())
     {
-        core.postError(NAME, electionLoadError);
+        core.postError(NAME, Qx::GenericError(Qx::GenericError::Critical, refError.error, refError.errorDetails));
         return core.logFinish(ErrorCode::INVALID_REF_ELECTION);
     }
     core.logEvent(NAME, LOG_EVENT_ELECTION_COUNT.arg(elections.size()));

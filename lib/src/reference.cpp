@@ -55,10 +55,18 @@ namespace
 
         return views;
     }
+
+    ReferenceError qxGenErrToRefError(ReferenceErrorType type, const Qx::GenericError& error)
+    {
+        if(!error.isValid())
+            return ReferenceError();
+
+        return ReferenceError{ .type = type, .error = error.primaryInfo(), .errorDetails = error.secondaryInfo() };
+    }
 }
 
 //-Namespace-Functions--------------------------------------------------------------------------------
-Qx::GenericError electionsFromReferenceInput(QList<Election>& returnBuffer,
+ReferenceError electionsFromReferenceInput(QList<Election>& returnBuffer,
                                             const QString& categoryConfigPath,
                                             const QString& ballotBoxPath)
 {
@@ -72,21 +80,21 @@ Qx::GenericError electionsFromReferenceInput(QList<Election>& returnBuffer,
     RefCategoryConfig cc;
     RefCategoryConfig::Reader ccReader(&cc, categoryConfigPath);
     if((errorStatus = ccReader.readInto()).isValid())
-        return errorStatus;
+        return qxGenErrToRefError(ReferenceErrorType::CategoryConfig, errorStatus);
 
     // Read ballot box
     RefBallotBox bb;
     RefBallotBox::Reader bbReader(&bb, ballotBoxPath, &cc);
     if((errorStatus = bbReader.readInto()).isValid())
-        return errorStatus;
+        return qxGenErrToRefError(ReferenceErrorType::BallotBox, errorStatus);
 
     // Create elections from standard ballot box
     returnBuffer = electionTransform(bb);
 
-    return errorStatus;
+    return ReferenceError();
 }
 
-Qx::GenericError expectedResultsFromReferenceInput(QList<ExpectedElectionResult>& returnBuffer,
+ReferenceError expectedResultsFromReferenceInput(QList<ExpectedElectionResult>& returnBuffer,
                                                    const QString& resultSetPath)
 {
     // Clear return buffer
@@ -94,7 +102,7 @@ Qx::GenericError expectedResultsFromReferenceInput(QList<ExpectedElectionResult>
 
     // Read file
     ResultSetReader rsReader(&returnBuffer, resultSetPath);
-    return rsReader.readInto();
+    return qxGenErrToRefError(ReferenceErrorType::ExpectedResult, rsReader.readInto());
 }
 
 }

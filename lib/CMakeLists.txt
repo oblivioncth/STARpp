@@ -104,11 +104,11 @@ target_include_directories(${LIB_TARGET_NAME} PUBLIC
 # Link target to libraries
 target_link_libraries(${LIB_TARGET_NAME}
     PRIVATE
+        Qx::Core
         Qx::Io
         $<BUILD_INTERFACE:magic_enum::magic_enum>
     PUBLIC
         Qt6::Core
-        Qx::Core
 )
 
 #---------- Configure Target Properties------------------

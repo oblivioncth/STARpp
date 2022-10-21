@@ -32,16 +32,16 @@ void tst_full_reference_election::basic_election_sampler()
     const QString erPath = QStringLiteral(":/data/basic_election_sampler.json");
 
     QList<Star::ExpectedElectionResult> expectedResults;
-    Qx::GenericError expectedResultsLoadError = Star::expectedResultsFromReferenceInput(expectedResults, erPath);
-    QVERIFY2(!expectedResultsLoadError.isValid(), expectedResultsLoadError.secondaryInfo().toStdString().c_str());
+    Star::ReferenceError expectedResultsLoadError = Star::expectedResultsFromReferenceInput(expectedResults, erPath);
+    QVERIFY2(!expectedResultsLoadError.isValid(), expectedResultsLoadError.errorDetails.toStdString().c_str());
 
     // Load reference elections
     const QString ccPath = QStringLiteral(":/data/basic_election_sampler.ini");
     const QString bbPath = QStringLiteral(":/data/basic_election_sampler.csv");
 
     QList<Star::Election> elections;
-    Qx::GenericError electionLoadError = Star::electionsFromReferenceInput(elections, ccPath, bbPath);
-    QVERIFY2(!electionLoadError.isValid(), electionLoadError.secondaryInfo().toStdString().c_str());
+    Star::ReferenceError electionLoadError = Star::electionsFromReferenceInput(elections, ccPath, bbPath);
+    QVERIFY2(!electionLoadError.isValid(), electionLoadError.errorDetails.toStdString().c_str());
 
     // Create calculator
     Star::Calculator calculator;
