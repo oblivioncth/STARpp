@@ -19,7 +19,7 @@ namespace Star
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 //Public:
-Calculator::Calculator(const Election* election = nullptr) :
+Calculator::Calculator(const Election* election) :
     mElection(election),
     mExtraTiebreakMethod(std::nullopt)
 {}
