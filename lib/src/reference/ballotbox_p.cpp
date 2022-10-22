@@ -88,8 +88,9 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
 
     // Read submission date
     QDate submitted = QDate::fromString(ballotRow[SUBMISSION_DATE_INDEX].toString(), "d-MMM-yy").addYears(100);
-    if(!submitted.isValid())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_DATE);
+//    Since this value isn't actually used as part of the election, it doesn't really matter if this is valid
+//    if(!submitted.isValid())
+//        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_DATE);
 
     // Read voter name
     QString voterName = ballotRow[MEMBER_NAME_INDEX].toString();
