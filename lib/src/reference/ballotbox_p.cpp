@@ -41,7 +41,6 @@ RefBallotBox::Reader::Reader(RefBallotBox* targetBox, const QString& filePath, c
 //Private:
 Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& headingsRow)
 {
-
     // Fill out categories
     qsizetype cIdx = STATIC_FIELD_COUNT; // Skip known headings
 
@@ -53,7 +52,7 @@ Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& he
 
         for(uint i = 0; i < ch.nomineeCount; i++, cIdx++)
         {
-            QString nomineeField = headingsRow[cIdx].toString();
+            QString nomineeField = headingsRow[cIdx].toString().trimmed();
             if(nomineeField.isEmpty())
                 return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_BLANK_VALUE.arg(0).arg(cIdx));
 
@@ -109,7 +108,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
 
         for(uint i = 0; i < ch.nomineeCount; i++, cIdx++)
         {
-            QString voteField = ballotRow[cIdx].toString();
+            QString voteField = ballotRow[cIdx].toString().trimmed();
 
             // If field is blank, treat it as a 0
             if(voteField.isEmpty())
