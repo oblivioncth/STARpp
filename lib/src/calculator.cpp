@@ -185,7 +185,7 @@ QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList 
             break;
 
         default:
-            qFatal((std::string(Q_FUNC_INFO) + " unhandled extended tiebreak method").c_str());
+            qFatal("Unhandled extended tiebreak method");
     }
 
     // If there is still a tie, check effect of extended tiebreak

@@ -58,11 +58,11 @@ private:
     static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading the ballot box");
 
     static inline const QString ERR_INVALID_ROW_COUNT = QStringLiteral("The ballot box has less than the minimum required row count (headings + 2 voters).");
-    static inline const QString ERR_INVALID_COLUMN_COUNT = QStringLiteral("The ballot box has a different number of columns than specified by the category configuration.");
+    static inline const QString ERR_INVALID_COLUMN_COUNT = QStringLiteral("The ballot box has a different number of columns than specified by the category configuration (%1 vs %2).");
     static inline const QString ERR_INVALID_DATE = QStringLiteral("The format of a submission date was invalid.");
     static inline const QString ERR_EMPTY = QStringLiteral("The provided file contains no ballots.");
-    static inline const QString ERR_BLANK_VALUE = QStringLiteral("A field expected to have a value was blank.");
-    static inline const QString ERR_INVALID_VOTE = QStringLiteral("A vote value was not a valid unsigned integer between 0 and 5.");
+    static inline const QString ERR_BLANK_VALUE = QStringLiteral("A field expected to have a value was blank (r: %1, c: %2).");
+    static inline const QString ERR_INVALID_VOTE = QStringLiteral("A vote value was not a valid unsigned integer between 0 and 5 (r: %1, c: %2).");
     static inline const QString ERR_DUPLICATE_NOMINEE = QStringLiteral("The ballot box contained duplicate nominees within the same category.");
 
     static inline const Qx::GenericError ERROR_TEMPLATE = Qx::GenericError(Qx::GenericError::Critical, MAIN_ERR_MSG);
@@ -86,7 +86,7 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
     Qx::GenericError parseCategories(const QList<QVariant>& headingsRow);
-    Qx::GenericError parseBallot(const QList<QVariant>& ballotRow);
+    Qx::GenericError parseBallot(const QList<QVariant>& ballotRow, qsizetype ballotNum);
 
 public:
     Qx::GenericError readInto();
