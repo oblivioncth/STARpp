@@ -59,9 +59,11 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_LAYOUT);
 
     // Read each key/value
+    uint line = -1;
     while(!mIniReader.atEnd())
     {
         QString keyValueStr = mIniReader.readLine();
+        line++;
 
         // Skip blank lines
         if(keyValueStr.isEmpty())
@@ -70,7 +72,7 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
         // Split key/value
         QStringList keyValueList = keyValueStr.split('=');
         if(keyValueList.size() != 2)
-            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_INI);
+            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_INI.arg(line));
 
         QString key = keyValueList.at(0).trimmed();
         QString valueStr = keyValueList.at(1).trimmed();
@@ -80,7 +82,7 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
         uint categoryCount = valueStr.toUInt(&validValue);
 
         if(!validValue || categoryCount < 2)
-            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VALUE);
+            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VALUE.arg(line));
 
         // Make sure this isn't a duplicate
         auto start = mTargetConfig->headers().constBegin();
@@ -90,7 +92,7 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
         }) != end);
 
         if(dupe)
-            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE);
+            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE.arg(line));
 
         // Add header to target config
         RefCategoryHeader ch{.name = key, .nomineeCount = categoryCount};
