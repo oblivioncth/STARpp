@@ -114,7 +114,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
             if(voteField.isEmpty())
             {
                 categoryVotes.append(0);
-                break;
+                continue;
             }
 
             // Get value from field
