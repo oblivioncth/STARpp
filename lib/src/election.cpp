@@ -103,6 +103,13 @@ Election::Builder& Election::Builder::wBallot(const Voter& voter, const QList<Vo
     return *this;
 }
 
+void Election::Builder::reset()
+{
+    QString name = mConstruct.mName;
+    mConstruct = Election();
+    mConstruct.mName = name;
+}
+
 Election Election::Builder::build()
 {
     // Form rankings
