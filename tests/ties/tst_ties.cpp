@@ -2,7 +2,6 @@
 #include <QtTest>
 
 // Base Includes
-#include <star/reference.h>
 #include <star/calculator.h>
 
 // Test Includes
