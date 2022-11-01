@@ -39,10 +39,10 @@ void tst_ties::all_tie_cases_data()
     QTest::addColumn<std::optional<Star::Calculator::ExtendedTiebreakMethod>>("extended_method");
 
     // Candidates
-    QString candidateOne = "CanOne";
-    QString candidateTwo = "CanTwo";
-    QString candidateThree = "CanThree";
-    QString candidateFour = "CanFour";
+    QString candidate1 = "CanOne";
+    QString candidate2 = "CanTwo";
+    QString candidate3 = "CanThree";
+    QString candidate4 = "CanFour";
 
     // Helper
     auto addTestRow = [&](const QString& testName,
@@ -63,28 +63,53 @@ void tst_ties::all_tie_cases_data()
 
     //-Populate test table rows with each case-----------------------------
 
-    addTestRow("Preliminary - First 2-way place tie",
+    addTestRow("Preliminary - First place 2-way tie",
                {
                    {
-                       {.nominee = candidateOne, .score = 0},
-                       {.nominee = candidateTwo, .score = 4},
-                       {.nominee = candidateThree, .score = 0},
-                       {.nominee = candidateFour, .score = 0}
+                       {.nominee = candidate1, .score = 0},
+                       {.nominee = candidate2, .score = 4},
+                       {.nominee = candidate3, .score = 0},
+                       {.nominee = candidate4, .score = 0}
                    },
                    {
-                       {.nominee = candidateOne, .score = 2},
-                       {.nominee = candidateTwo, .score = 1},
-                       {.nominee = candidateThree, .score = 3},
-                       {.nominee = candidateFour, .score = 0}
+                       {.nominee = candidate1, .score = 2},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 0}
                    },
                    {
-                       {.nominee = candidateOne, .score = 3},
-                       {.nominee = candidateTwo, .score = 0},
-                       {.nominee = candidateThree, .score = 1},
-                       {.nominee = candidateFour, .score = 0}
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 0},
+                       {.nominee = candidate3, .score = 1},
+                       {.nominee = candidate4, .score = 0}
                    }
                },
-               Star::ExpectedElectionResult({candidateOne}, {candidateTwo}),
+               Star::ExpectedElectionResult({candidate1}, {candidate2}),
+               std::nullopt
+    );
+
+    addTestRow("Preliminary - First place N-way tie, successful break,",
+               {
+                   {
+                       {.nominee = candidate1, .score = 0},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 1},
+                       {.nominee = candidate4, .score = 5}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 2},
+                       {.nominee = candidate4, .score = 1}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 4},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 4}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate1}, {candidate4}),
                std::nullopt
     );
 }
