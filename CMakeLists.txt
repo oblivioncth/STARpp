@@ -115,6 +115,7 @@ add_subdirectory(app)
 if(STARCALC_TESTS)
     enable_testing()
     set(TESTS_TARGET_PREFIX ${PROJECT_NAME_LC})
+    set(TESTS_COMMON_ALIAS_NAME ${PROJECT_NAME}::TestCommon)
     add_subdirectory(tests)
 endif()
 

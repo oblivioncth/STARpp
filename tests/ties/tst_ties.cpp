@@ -5,9 +5,10 @@
 #include <star/reference.h>
 #include <star/calculator.h>
 
-// Macros
-#define C_STR(q_str) q_str.toStdString().c_str()
+// Test Includes
+#include <star_test_common.h>
 
+// Test
 class tst_ties : public QObject
 {
     Q_OBJECT

@@ -12,6 +12,7 @@ target_link_libraries(${target_name}
 	PRIVATE 
 		Qt6::Test
 		StarCalc::Base
+                StarCalc::TestCommon
 )
 
 # Bundle test data
