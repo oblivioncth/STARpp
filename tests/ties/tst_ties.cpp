@@ -42,6 +42,7 @@ void tst_ties::all_tie_cases_data()
     QString candidate2 = "CanTwo";
     QString candidate3 = "CanThree";
     QString candidate4 = "CanFour";
+    QString candidate5 = "CanFive";
 
     // Helper
     auto addTestRow = [&](const QString& testName,
@@ -184,6 +185,253 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate3}, {candidate1}),
+               std::nullopt
+    );
+
+    addTestRow("Runoff - First place N-way tie, successful break,",
+               {
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 5},
+                       {.nominee = candidate4, .score = 5}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 4},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 1}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 3}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate3}, {candidate1}),
+               std::nullopt
+    );
+
+    addTestRow("Runoff - First place N-way tie, unsuccessful break, single fallback for second",
+               {
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 2}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 2},
+                       {.nominee = candidate2, .score = 5},
+                       {.nominee = candidate3, .score = 2},
+                       {.nominee = candidate4, .score = 2}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 5},
+                       {.nominee = candidate4, .score = 1}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 1},
+                       {.nominee = candidate4, .score = 5}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 0},
+                       {.nominee = candidate2, .score = 5},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 5}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3}),
+               std::nullopt
+    );
+
+    addTestRow("Runoff - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
+               {
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 3},
+                       {.nominee = candidate5, .score = 3}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 2},
+                       {.nominee = candidate2, .score = 5},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 3},
+                       {.nominee = candidate5, .score = 2}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 2},
+                       {.nominee = candidate3, .score = 5},
+                       {.nominee = candidate4, .score = 3},
+                       {.nominee = candidate5, .score = 3}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 2},
+                       {.nominee = candidate3, .score = 2},
+                       {.nominee = candidate4, .score = 5},
+                       {.nominee = candidate5, .score = 2}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 2},
+                       {.nominee = candidate5, .score = 5}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 2},
+                       {.nominee = candidate2, .score = 5},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 4},
+                       {.nominee = candidate5, .score = 5}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3}),
+               std::nullopt
+    );
+
+    addTestRow("Runoff - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
+               {
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 3},
+                       {.nominee = candidate5, .score = 3}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 2},
+                       {.nominee = candidate2, .score = 5},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 3},
+                       {.nominee = candidate5, .score = 2}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 2},
+                       {.nominee = candidate3, .score = 5},
+                       {.nominee = candidate4, .score = 3},
+                       {.nominee = candidate5, .score = 3}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 2},
+                       {.nominee = candidate3, .score = 2},
+                       {.nominee = candidate4, .score = 5},
+                       {.nominee = candidate5, .score = 2}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 2},
+                       {.nominee = candidate5, .score = 5}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 2},
+                       {.nominee = candidate2, .score = 5},
+                       {.nominee = candidate3, .score = 2},
+                       {.nominee = candidate4, .score = 4},
+                       {.nominee = candidate5, .score = 5}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3, candidate4}),
+               std::nullopt
+    );
+
+    addTestRow("Runoff - First place N-way tie, unsuccessful break, no fallback for second",
+               {
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 5},
+                       {.nominee = candidate4, .score = 5}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 4},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 3}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 4}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate3, candidate4}, {}),
+               std::nullopt
+    );
+
+    addTestRow("Runoff - Second place N-way tie, successful break",
+               {
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 3}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 2},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 1}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 2},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 3}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 1},
+                       {.nominee = candidate4, .score = 4}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate3}, {candidate1}),
+               std::nullopt
+    );
+
+    addTestRow("Runoff - Second place N-way tie, unsuccessful break",
+               {
+                   {
+                       {.nominee = candidate1, .score = 4},
+                       {.nominee = candidate2, .score = 5},
+                       {.nominee = candidate3, .score = 1},
+                       {.nominee = candidate4, .score = 3}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 4},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 1}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 4},
+                       {.nominee = candidate2, .score = 0},
+                       {.nominee = candidate3, .score = 2},
+                       {.nominee = candidate4, .score = 2}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 2},
+                       {.nominee = candidate3, .score = 4},
+                       {.nominee = candidate4, .score = 4}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate1}, {candidate3, candidate4}),
                std::nullopt
     );
 }
