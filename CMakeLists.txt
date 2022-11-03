@@ -95,7 +95,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
-fetch_qx("f6f0d573622d1a712b4aa809f21b5d8b291d83fb")
+fetch_qx("a67682b6e94c7dd686df7e475eb91406f92efbfa")
 
 # Fetch Neargye's Magic Enum
 include(OB/FetchMagicEnum)
@@ -115,6 +115,7 @@ add_subdirectory(app)
 if(STARCALC_TESTS)
     enable_testing()
     set(TESTS_TARGET_PREFIX ${PROJECT_NAME_LC})
+    set(TESTS_COMMON_ALIAS_NAME ${PROJECT_NAME}::TestCommon)
     add_subdirectory(tests)
 endif()
 
