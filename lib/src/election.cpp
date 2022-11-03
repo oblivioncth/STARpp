@@ -45,7 +45,7 @@ Election::Ballot::Ballot() {}
 const Election::Voter& Election::Ballot::voter() const { return mVoter; }
 uint Election::Ballot::score(const QString& nominee) const { return mVotes.value(nominee, 0); }
 
-QString Election::Ballot::preference(const QStringList& nominees) const
+QString Election::Ballot::preference(const QSet<QString>& nominees) const
 {
     QString pref;
     uint prefScore = 0;

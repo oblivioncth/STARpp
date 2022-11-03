@@ -45,7 +45,7 @@ QList<Rank> Rank::rankSort(const QMap<QString, uint>& valueMap)
         }
 
         // Add nominee to rank
-        currentRank.nominees.append(nominee.toString());
+        currentRank.nominees.insert(nominee.toString());
     }
 
     // Finish last rank (necessary since the loop stops before doing this since it uses look-behind)
