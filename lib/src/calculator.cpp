@@ -309,17 +309,24 @@ QList<Rank> Calculator::rankByHeadToHeadWins(const QStringList& nominees)
     QMap<QString, uint> headToHeadWinsMap;
 
     /* Add all nominees with an initial win count of 0, since some might not win even
-     * once, and therefore be missed by the next loop
+     * once, and therefore be missed by the main loop
      */
     for(const QString& nominee : nominees)
         headToHeadWinsMap[nominee] = 0;
 
-    // Perform face-offs
-    for(auto itrA = nominees.constBegin(); itrA != nominees.constEnd() - 1; itrA++)
+    // Create a full nominees list with the nominees under consideration at the top
+    QStringList otherNominees = mElection->nominees();
+    for(const QString n : nominees)
+        otherNominees.removeAll(n);
+    QStringList faceOffQueue = nominees + otherNominees;
+
+    // Perform face-offs (restricted to only those involving nominees under consideration)
+    QString test = *(faceOffQueue.constEnd() - 1);
+    for(auto itrA = faceOffQueue.constBegin(); itrA != faceOffQueue.constEnd() - otherNominees.size(); itrA++)
     {
         QString opponentA = *itrA;
 
-        for(auto itrB = itrA + 1; itrB != nominees.constEnd(); itrB++)
+        for(auto itrB = itrA + 1; itrB != faceOffQueue.constEnd(); itrB++)
         {
             QString opponentB = *itrB;
 
@@ -332,14 +339,20 @@ QList<Rank> Calculator::rankByHeadToHeadWins(const QStringList& nominees)
             else
             {
                 QString headToHeadWinner = prefRankWinners.first();
-                emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER.arg(headToHeadWinner));
-                headToHeadWinsMap[headToHeadWinner];
+
+                if(nominees.contains(headToHeadWinner))
+                {
+                    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER.arg(headToHeadWinner));
+                    headToHeadWinsMap[headToHeadWinner]++;
+                }
+                else
+                    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER_IRREL.arg(headToHeadWinner));
             }
         }
     }
 
     // Create sorted wins list
-    QList<Rank> headToHeadWinsRanks =  Rank::rankSort(headToHeadWinsMap);
+    QList<Rank> headToHeadWinsRanks = Rank::rankSort(headToHeadWinsMap);
 
     emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_WINS + '\n' + createNomineeRankListString(headToHeadWinsRanks));
     return headToHeadWinsRanks;
