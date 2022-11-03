@@ -77,6 +77,7 @@ private:
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS = QStringLiteral("Ranking relevant nominees by head-to-head wins...");
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF = QStringLiteral("Using preference ranking to determine winner of %1 vs %2.");
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER = QStringLiteral("%1 won the head-to-head.");
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER_IRREL = QStringLiteral("%1 won the head-to-head, but they are not under consideration.");
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_TIE = QStringLiteral("The head to head resulted in a tie, no win assigned to either participant.");
     static inline const QString LOG_EVENT_RANKINGS_HEAD_TO_HEAD_WINS = QStringLiteral("Head-to-head wins Rankings:");
 
