@@ -12,6 +12,7 @@ The original motivation for this project was to facilitate automated election re
 
  - Reference command-line application for running elections
  - Full implementation of the STAR voting system
+ - Determination of election winner, as well as runner-up
  - Ability to select a final tiebreak method:
 	 - None
 	 - FiveStar
@@ -111,7 +112,7 @@ The application uses the following syntax scheme:
  - **-e | --extra:** Performs an extra tiebreaker, if necessary. Select from (FiveStar | Condorcet)
  - **-m | --minimal:** Only show the results summary
 
-** Example:**
+**Example:**
 
     StarCalc -c path/to/cat_config.ini -b path/to/ballot_box.csv
 

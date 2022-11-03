@@ -7,6 +7,7 @@
 // Qx Includes
 #include <qx/core/qx-iostream.h>
 #include <qx/core/qx-table.h>
+#include <qx/core/qx-string.h>
 
 // Using
 using Qx::cout;
@@ -41,11 +42,11 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     QString category = result.election()->name();
     QStringList nominees = result.election()->nominees();
     QString winnerStr = result.winners().size() > 1 ?
-                        WINNER_MULTI_TEMPLATE.arg(result.winners().join(R"(", ")")) :
-                        WINNER_SINGLE_TEMPLATE.arg(result.winners().front());
+                        WINNER_MULTI_TEMPLATE.arg(Qx::String::join(result.winners(), R"(", ")")) :
+                        WINNER_SINGLE_TEMPLATE.arg(*result.winners().constBegin());
     QString runnerUpStr = result.winners().size() > 1 ?
-                          RUNNERUP_MULTI_TEMPLATE.arg(result.runnerUps().join(R"(", ")")) :
-                          RUNNERUP_SINGLE_TEMPLATE.arg(result.runnerUps().front());
+                          RUNNERUP_MULTI_TEMPLATE.arg(Qx::String::join(result.runnerUps(), R"(", ")")) :
+                          RUNNERUP_SINGLE_TEMPLATE.arg(*result.runnerUps().constBegin());
 
     // Print category
     cout << HEADING_CATEGORY.arg(category) << endl << endl;
@@ -65,7 +66,7 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 
     // Print raw score rankings
     for(const Rank& rank : result.election()->scoreRankings())
-        cout << RAW_SCORE_TEMPLATE.arg(rank.nominees.join(R"(", ")")).arg(rank.value) << endl;
+        cout << RAW_SCORE_TEMPLATE.arg(Qx::String::join(rank.nominees, R"(", ")")).arg(rank.value) << endl;
     cout << endl;
 
     // Wait on user confirm
@@ -101,8 +102,8 @@ void ResultPresenter::printSummary()
 
         // Category, winner, runner-up
         summaryTable.at(row, 0) = ' ' + result.election()->name() + ' ';
-        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(result.winners().join(R"(", ")"));
-        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(result.runnerUps().join(R"(", ")"));
+        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(Qx::String::join(result.winners(), R"(", ")"));
+        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(Qx::String::join(result.runnerUps(), R"(", ")"));
     }
 
     // Determine field widths

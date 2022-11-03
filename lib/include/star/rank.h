@@ -2,12 +2,12 @@
 #define RANK_H
 
 // Qt Includes
-#include <QStringList>
+#include <QSet>
 
 struct Rank
 {
     uint value;
-    QStringList nominees;
+    QSet<QString> nominees;
 
     static QList<Rank> rankSort(const QMap<QString, uint>& valueMap);
 };

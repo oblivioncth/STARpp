@@ -77,6 +77,7 @@ private:
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS = QStringLiteral("Ranking relevant nominees by head-to-head wins...");
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF = QStringLiteral("Using preference ranking to determine winner of %1 vs %2.");
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER = QStringLiteral("%1 won the head-to-head.");
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER_IRREL = QStringLiteral("%1 won the head-to-head, but they are not under consideration.");
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_TIE = QStringLiteral("The head to head resulted in a tie, no win assigned to either participant.");
     static inline const QString LOG_EVENT_RANKINGS_HEAD_TO_HEAD_WINS = QStringLiteral("Head-to-head wins Rankings:");
 
@@ -91,7 +92,6 @@ private:
     static inline const QString LOG_EVENT_INITIAL_RESULT_RUNNERUPS = QStringLiteral(R"(Initial runner-ups: { %1 })");
     static inline const QString LOG_EVENT_INITIAL_RESULT_WINNER_TIE = QStringLiteral("There is still a tie for first place, checking effect of extended tiebreak...");
     static inline const QString LOG_EVENT_INITIAL_RESULT_RUNNERUP_TIE = QStringLiteral("There is still a tie for second place, checking effect of extended tiebreak...");
-    static inline const QString LOG_EVENT_INITIAL_RESULT_NO_TIE = QStringLiteral("There is no final tie for first or second.");
 
     // Logging - Final Results
     static inline const QString LOG_EVENT_FINAL_RESULT_WINNERS = QStringLiteral(R"(Final winners: { %1 })");
@@ -116,25 +116,25 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
     // Main steps
-    QStringList determinePreliminaryLeaders();
-    QPair<QStringList, QStringList> performPrimaryRunoff(const QStringList& preliminaryLeaders);
-    QPair<QStringList, QStringList> performExtendedTiebreak(QStringList initialWinners, QStringList initialRunnerUps, ExtendedTiebreakMethod method);
+    QSet<QString> determinePreliminaryLeaders();
+    QPair<QSet<QString>, QSet<QString>> performPrimaryRunoff(const QSet<QString>& preliminaryLeaders);
+    QPair<QSet<QString>, QSet<QString>> performExtendedTiebreak(QSet<QString> initialWinners, QSet<QString> initialRunnerUps, ExtendedTiebreakMethod method);
 
     // Utility
-    QList<Rank> rankByPreference(const QStringList& nominees);
-    QList<Rank> rankByScore(const QStringList& nominees);
-    QList<Rank> rankByVotesOfMaxScore(const QStringList& nominees);
-    QList<Rank> rankByHeadToHeadWins(const QStringList& nominees);
+    QList<Rank> rankByPreference(const QSet<QString>& nominees);
+    QList<Rank> rankByScore(const QSet<QString>& nominees);
+    QList<Rank> rankByVotesOfMaxScore(const QSet<QString>& nominees);
+    QList<Rank> rankByHeadToHeadWins(const QSet<QString>& nominees);
 
-    QPair<QStringList, QStringList> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note);
-    QPair<QStringList, QStringList> breakScoreTie(const QStringList& nominees);
-    QPair<QStringList, QStringList> breakPreferenceTie(const QStringList& nominees);
-    QPair<QStringList, QStringList> breakExtendedTieFiveStar(const QStringList& nominees);
-    QPair<QStringList, QStringList> breakExtendedTieCondorcet(const QStringList& nominees);
+    QPair<QSet<QString>, QSet<QString>> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note);
+    QPair<QSet<QString>, QSet<QString>> breakScoreTie(const QSet<QString>& nominees);
+    QPair<QSet<QString>, QSet<QString>> breakPreferenceTie(const QSet<QString>& nominees);
+    QPair<QSet<QString>, QSet<QString>> breakExtendedTieFiveStar(const QSet<QString>& nominees);
+    QPair<QSet<QString>, QSet<QString>> breakExtendedTieCondorcet(const QSet<QString>& nominees);
 
     // Logging
-    QString createNomineeGeneralListString(const QStringList& nominees);
-    QString createNomineeToalScoreListString(const QStringList& nominees);
+    QString createNomineeGeneralSetString(const QSet<QString>& nominees);
+    QString createNomineeToalScoreSetString(const QSet<QString>& nominees);
     QString createNomineeRankListString(const QList<Rank>& ranks);
 
 public:
