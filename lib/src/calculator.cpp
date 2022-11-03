@@ -173,6 +173,8 @@ QPair<QStringList, QStringList> Calculator::performPrimaryRunoff(const QStringLi
 
 QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList winners, QStringList runnerUps, ExtendedTiebreakMethod method)
 {
+    Q_ASSERT(winners.size() > 1 || runnerUps.size() > 1);
+
     // Determine method function
     std::function<QPair<QStringList, QStringList>(QStringList)> methodFn;
     switch(method)
@@ -217,8 +219,6 @@ QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList 
         QPair<QStringList, QStringList> secondPlaceTiebreak = methodFn(winners);
         runnerUps = secondPlaceTiebreak.first;
     }
-    else
-        emit calculationDetail(LOG_EVENT_INITIAL_RESULT_NO_TIE);
 
     // Note results
     emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_WINNERS.arg(winners.join(", ")));
