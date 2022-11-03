@@ -16,7 +16,7 @@ ElectionResult::ElectionResult() :
     mRunnerUps()
 {}
 
-ElectionResult::ElectionResult(const Election* election, const QStringList& winners, const QStringList& runnerUps) :
+ElectionResult::ElectionResult(const Election* election, const QSet<QString>& winners, const QSet<QString>& runnerUps) :
     mElection(election),
     mWinners(winners),
     mRunnerUps(runnerUps)
@@ -27,8 +27,8 @@ ElectionResult::ElectionResult(const Election* election, const QStringList& winn
 bool ElectionResult::isNull() const { return !mElection || mWinners.isEmpty(); }
 
 const Election* ElectionResult::election() const { return mElection; }
-const QStringList& ElectionResult::winners() const { return mWinners; }
-const QStringList& ElectionResult::runnerUps() const { return mRunnerUps; }
+const QSet<QString>& ElectionResult::winners() const { return mWinners; }
+const QSet<QString>& ElectionResult::runnerUps() const { return mRunnerUps; }
 
 
 

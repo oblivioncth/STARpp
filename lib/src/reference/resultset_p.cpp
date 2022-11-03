@@ -74,8 +74,12 @@ Qx::GenericError ResultSetReader::readInto()
         if((convError = Qx::Json::checkedArrayConversion(runnerUps, jRunnerUpArray)).isValid())
             return convError;
 
+        // Convert to sets
+        QSet<QString> winnerSet = QSet<QString>(winners.constBegin(), winners.constEnd());
+        QSet<QString> runnerUpSet = QSet<QString>(runnerUps.constBegin(), runnerUps.constEnd());
+
         // Add expected result to list
-        mTargetList->append(ExpectedElectionResult(winners, runnerUps));
+        mTargetList->append(ExpectedElectionResult(winnerSet, runnerUpSet));
     }
 
     return Qx::GenericError();

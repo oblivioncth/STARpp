@@ -73,7 +73,7 @@ public:
     const Voter& voter() const;
 
     uint score(const QString& nominee) const;
-    QString preference(const QStringList& nominees) const;
+    QString preference(const QSet<QString>& nominees) const;
 };
 
 class Election::Builder

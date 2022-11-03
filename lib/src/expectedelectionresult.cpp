@@ -15,7 +15,7 @@ ExpectedElectionResult::ExpectedElectionResult() :
     mRunnerUps()
 {}
 
-ExpectedElectionResult::ExpectedElectionResult(const QStringList& winners, const QStringList& runnerUps) :
+ExpectedElectionResult::ExpectedElectionResult(const QSet<QString>& winners, const QSet<QString>& runnerUps) :
     mWinners(winners),
     mRunnerUps(runnerUps)
 {}
@@ -24,8 +24,8 @@ ExpectedElectionResult::ExpectedElectionResult(const QStringList& winners, const
 //Public:
 bool ExpectedElectionResult::isNull() const { return mWinners.isEmpty(); }
 
-const QStringList& ExpectedElectionResult::winners() const { return mWinners; }
-const QStringList& ExpectedElectionResult::runnerUps() const { return mRunnerUps; }
+const QSet<QString>& ExpectedElectionResult::winners() const { return mWinners; }
+const QSet<QString>& ExpectedElectionResult::runnerUps() const { return mRunnerUps; }
 
 bool ExpectedElectionResult::operator==(const ElectionResult& result) const
 {

@@ -116,25 +116,25 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
     // Main steps
-    QStringList determinePreliminaryLeaders();
-    QPair<QStringList, QStringList> performPrimaryRunoff(const QStringList& preliminaryLeaders);
-    QPair<QStringList, QStringList> performExtendedTiebreak(QStringList initialWinners, QStringList initialRunnerUps, ExtendedTiebreakMethod method);
+    QSet<QString> determinePreliminaryLeaders();
+    QPair<QSet<QString>, QSet<QString>> performPrimaryRunoff(const QSet<QString>& preliminaryLeaders);
+    QPair<QSet<QString>, QSet<QString>> performExtendedTiebreak(QSet<QString> initialWinners, QSet<QString> initialRunnerUps, ExtendedTiebreakMethod method);
 
     // Utility
-    QList<Rank> rankByPreference(const QStringList& nominees);
-    QList<Rank> rankByScore(const QStringList& nominees);
-    QList<Rank> rankByVotesOfMaxScore(const QStringList& nominees);
-    QList<Rank> rankByHeadToHeadWins(const QStringList& nominees);
+    QList<Rank> rankByPreference(const QSet<QString>& nominees);
+    QList<Rank> rankByScore(const QSet<QString>& nominees);
+    QList<Rank> rankByVotesOfMaxScore(const QSet<QString>& nominees);
+    QList<Rank> rankByHeadToHeadWins(const QSet<QString>& nominees);
 
-    QPair<QStringList, QStringList> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note);
-    QPair<QStringList, QStringList> breakScoreTie(const QStringList& nominees);
-    QPair<QStringList, QStringList> breakPreferenceTie(const QStringList& nominees);
-    QPair<QStringList, QStringList> breakExtendedTieFiveStar(const QStringList& nominees);
-    QPair<QStringList, QStringList> breakExtendedTieCondorcet(const QStringList& nominees);
+    QPair<QSet<QString>, QSet<QString>> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note);
+    QPair<QSet<QString>, QSet<QString>> breakScoreTie(const QSet<QString>& nominees);
+    QPair<QSet<QString>, QSet<QString>> breakPreferenceTie(const QSet<QString>& nominees);
+    QPair<QSet<QString>, QSet<QString>> breakExtendedTieFiveStar(const QSet<QString>& nominees);
+    QPair<QSet<QString>, QSet<QString>> breakExtendedTieCondorcet(const QSet<QString>& nominees);
 
     // Logging
-    QString createNomineeGeneralListString(const QStringList& nominees);
-    QString createNomineeToalScoreListString(const QStringList& nominees);
+    QString createNomineeGeneralSetString(const QSet<QString>& nominees);
+    QString createNomineeToalScoreSetString(const QSet<QString>& nominees);
     QString createNomineeRankListString(const QList<Rank>& ranks);
 
 public:
