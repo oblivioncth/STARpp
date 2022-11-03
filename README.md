@@ -111,7 +111,7 @@ The application uses the following syntax scheme:
  - **-e | --extra:** Performs an extra tiebreaker, if necessary. Select from (FiveStar | Condorcet)
  - **-m | --minimal:** Only show the results summary
 
-** Example:**
+**Example:**
 
     StarCalc -c path/to/cat_config.ini -b path/to/ballot_box.csv
 
