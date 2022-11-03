@@ -216,7 +216,7 @@ QPair<QStringList, QStringList> Calculator::performExtendedTiebreak(QStringList 
         emit calculationDetail(LOG_EVENT_INITIAL_RESULT_RUNNERUP_TIE);
 
         // Tiebreak
-        QPair<QStringList, QStringList> secondPlaceTiebreak = methodFn(winners);
+        QPair<QStringList, QStringList> secondPlaceTiebreak = methodFn(runnerUps);
         runnerUps = secondPlaceTiebreak.first;
     }
 
