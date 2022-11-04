@@ -700,7 +700,7 @@ void tst_ties::all_tie_cases_data()
                Star::Calculator::FiveStar
     );
 
-    addTestRow("Extended [Condorcet] - First place N-way tie, successful break",
+    addTestRow("Extended [HTHWins] - First place N-way tie, successful break",
                {
                    {
                        {.nominee = candidate1, .score = 5},
@@ -746,10 +746,10 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate1}, {candidate2}),
-               Star::Calculator::Condorcet
+               Star::Calculator::HTHWins
     );
 
-    addTestRow("Extended [Condorcet] - First place N-way tie, unsuccessful break, single fallback for second",
+    addTestRow("Extended [HTHWins] - First place N-way tie, unsuccessful break, single fallback for second",
                {
                    {
                        {.nominee = candidate1, .score = 5},
@@ -783,10 +783,10 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3}),
-               Star::Calculator::Condorcet
+               Star::Calculator::HTHWins
     );
 
-    addTestRow("Extended [Condorcet] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
+    addTestRow("Extended [HTHWins] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
                {
                    {
                        {.nominee = candidate1, .score = 5},
@@ -832,10 +832,10 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate2, candidate1}, {candidate5}),
-               Star::Calculator::Condorcet
+               Star::Calculator::HTHWins
     );
 
-    addTestRow("Extended [Condorcet] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
+    addTestRow("Extended [HTHWins] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
                {
                    {
                        {.nominee = candidate1, .score = 5},
@@ -881,10 +881,10 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3, candidate5}),
-               Star::Calculator::Condorcet
+               Star::Calculator::HTHWins
     );
 
-    addTestRow("Extended [Condorcet] - First place N-way tie, unsuccessful break, no fallback for second",
+    addTestRow("Extended [HTHWins] - First place N-way tie, unsuccessful break, no fallback for second",
                {
                    {
                        {.nominee = candidate1, .score = 5},
@@ -906,10 +906,10 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate2, candidate3, candidate1}, {}),
-               Star::Calculator::Condorcet
+               Star::Calculator::HTHWins
     );
 
-    addTestRow("Extended [Condorcet] - Second place N-way tie, successful break",
+    addTestRow("Extended [HTHWins] - Second place N-way tie, successful break",
                {
                    {
                        {.nominee = candidate1, .score = 1},
@@ -931,10 +931,10 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate3}, {candidate1}),
-               Star::Calculator::Condorcet
+               Star::Calculator::HTHWins
     );
 
-    addTestRow("Extended [Condorcet] - Second place N-way tie, unsuccessful break",
+    addTestRow("Extended [HTHWins] - Second place N-way tie, unsuccessful break",
                {
                    {
                        {.nominee = candidate1, .score = 4},
@@ -962,7 +962,7 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate1}, {candidate3, candidate4}),
-               Star::Calculator::Condorcet
+               Star::Calculator::HTHWins
     );
 }
 

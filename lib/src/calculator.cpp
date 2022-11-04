@@ -182,8 +182,8 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performExtendedTiebreak(QSet<QSt
         case FiveStar:
             methodFn = [this](QSet<QString> nominees){ return breakExtendedTieFiveStar(nominees); };
             break;
-        case Condorcet:
-            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieCondorcet(nominees); };
+        case HTHWins:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadWins(nominees); };
             break;
 
         default:
@@ -386,10 +386,10 @@ QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieFiveStar(const Q
     return rankBasedTiebreak(rankByVotesOfMaxScore(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(FiveStar)));
 }
 
-QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieCondorcet(const QSet<QString>& nominees)
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieHeadToHeadWins(const QSet<QString>& nominees)
 {
     // Perform a face-off of each nominee and see which one has the most head-to-head wins
-    return rankBasedTiebreak(rankByHeadToHeadWins(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Condorcet)));
+    return rankBasedTiebreak(rankByHeadToHeadWins(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHWins)));
 }
 
 QString Calculator::createNomineeGeneralSetString(const QSet<QString>& nominees)
