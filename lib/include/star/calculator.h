@@ -18,10 +18,17 @@ class Calculator : public QObject
 public:
     enum ExtendedTiebreakMethod { FiveStar, HTHWins };
 
+//-Class Structs----------------------------------------------------------------------------------------------------
+private:
+    struct HeadToHeadMaps
+    {
+        QMap<QString, int> wins;
+        QMap<QString, int> prefCounts;
+        QMap<QString, int> margins;
+    };
+
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
-
-
     // Logging - Intro
     static inline const QString LOG_EVENT_INVALID_ELECTION = QStringLiteral("The provided election is invalid.");
     static inline const QString LOG_EVENT_CALC_START = QStringLiteral("Calculating results of election - %1");
@@ -73,12 +80,14 @@ private:
     static inline const QString LOG_EVENT_RANK_BY_VOTES_OF_MAX_SCORE = QStringLiteral("Ranking relevant nominees by votes of max score...");
     static inline const QString LOG_EVENT_RANKINGS_VOTES_OF_MAX_SCORE = QStringLiteral("Votes of Max Score Rankings:");
 
+    // Logging - Head-to-head
+    static inline const QString LOG_EVENT_CREATE_HEAD_TO_HEAD_MAPS = QStringLiteral("Creating head-to-head maps for relevant nominees...");
+    static inline const QString LOG_EVENT_CREATE_HEAD_TO_HEAD_PREF = QStringLiteral("Using preference ranking to determine facilitate head-to-head of %1 vs %2.");
+    static inline const QString LOG_EVENT_LOG_EVENT_CREATE_HEAD_TO_HEAD_PREF_TIE = QStringLiteral("The head-to-head resulted in a tie (%1).");
+    static inline const QString LOG_EVENT_LOG_EVENT_CREATE_HEAD_TO_HEAD_PREF_WIN = QStringLiteral("The head-to-head resulted in: %1 (%2) > %3 (%4)");
+
     // Logging - Head-to-head wins
     static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS = QStringLiteral("Ranking relevant nominees by head-to-head wins...");
-    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF = QStringLiteral("Using preference ranking to determine winner of %1 vs %2.");
-    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER = QStringLiteral("%1 won the head-to-head.");
-    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER_IRREL = QStringLiteral("%1 won the head-to-head, but they are not under consideration.");
-    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_TIE = QStringLiteral("The head to head resulted in a tie, no win assigned to either participant.");
     static inline const QString LOG_EVENT_RANKINGS_HEAD_TO_HEAD_WINS = QStringLiteral("Head-to-head wins Rankings:");
 
     // Logging - Tiebreak
@@ -108,6 +117,7 @@ private:
 private:
     std::optional<ExtendedTiebreakMethod> mExtraTiebreakMethod;
     const Election* mElection;
+    HeadToHeadMaps mHeadToHeadMaps;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
@@ -121,6 +131,8 @@ private:
     QPair<QSet<QString>, QSet<QString>> performExtendedTiebreak(QSet<QString> initialWinners, QSet<QString> initialRunnerUps, ExtendedTiebreakMethod method);
 
     // Utility
+    HeadToHeadMaps createHeadToHeadMaps(const QSet<QString>& nominees);
+
     QList<Rank> rankByPreference(const QSet<QString>& nominees);
     QList<Rank> rankByScore(const QSet<QString>& nominees);
     QList<Rank> rankByVotesOfMaxScore(const QSet<QString>& nominees);
