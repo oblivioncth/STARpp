@@ -1,6 +1,9 @@
 // Unit Include
 #include "star/calculator.h"
 
+// Qt Includes
+#include <QRandomGenerator>
+
 // Qx Includes
 #include <qx/core/qx-string.h>
 #include <qx/core/qx-algorithm.h>
@@ -194,6 +197,9 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performExtendedTiebreak(QSet<QSt
             break;
         case HTHMargin:
             methodFn = [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadMargin(nominees); };
+            break;
+        case Random:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieRandom(nominees); };
             break;
 
         default:
@@ -482,6 +488,28 @@ QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieHeadToHeadMargin
 {
     // Perform a face-off of each nominee and see which one has the most head-to-head wins
     return rankBasedTiebreak(rankByHeadToHeadMargin(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHMargin)));
+}
+
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieRandom(const QSet<QString>& nominees)
+{
+    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Random)));
+
+    /* Randomly select a winner of the tiebreak
+     *
+     * There is already some level of randomness since the iteration order of a set is undefined, but this is not enough on its own.
+     */
+    QPair<QSet<QString>, QSet<QString>> brokenTie{{}, nominees};
+
+    quint32 selection = QRandomGenerator::global()->bounded(nominees.size());
+
+    auto itr = nominees.constBegin();
+    for(qsizetype i = 0; i < selection; i++)
+        itr ++;
+
+    brokenTie.first.insert(*itr);
+    brokenTie.second.remove(*itr);
+
+    return brokenTie;
 }
 
 QString Calculator::createNomineeGeneralSetString(const QSet<QString>& nominees)

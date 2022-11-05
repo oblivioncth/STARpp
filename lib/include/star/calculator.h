@@ -16,7 +16,7 @@ class Calculator : public QObject
     Q_OBJECT
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:
-    enum ExtendedTiebreakMethod { FiveStar, HTHWins, HTHCount, HTHMargin };
+    enum ExtendedTiebreakMethod { FiveStar, HTHWins, HTHCount, HTHMargin, Random };
 
 //-Class Structs----------------------------------------------------------------------------------------------------
 private:
@@ -155,6 +155,7 @@ private:
     QPair<QSet<QString>, QSet<QString>> breakExtendedTieHeadToHeadWins(const QSet<QString>& nominees);
     QPair<QSet<QString>, QSet<QString>> breakExtendedTieHeadToHeadPrefCount(const QSet<QString>& nominees);
     QPair<QSet<QString>, QSet<QString>> breakExtendedTieHeadToHeadMargin(const QSet<QString>& nominees);
+    QPair<QSet<QString>, QSet<QString>> breakExtendedTieRandom(const QSet<QString>& nominees);
 
     // Logging
     QString createNomineeGeneralSetString(const QSet<QString>& nominees);
