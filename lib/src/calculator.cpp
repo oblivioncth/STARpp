@@ -201,6 +201,9 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performExtendedTiebreak(QSet<QSt
         case Random:
             methodFn = [this](QSet<QString> nominees){ return breakExtendedTieRandom(nominees); };
             break;
+        case Condorcet:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedCondorcet(nominees); };
+            break;
 
         default:
             qFatal("Unhandled extended tiebreak method");
@@ -510,6 +513,50 @@ QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieRandom(const QSe
     brokenTie.second.remove(*itr);
 
     return brokenTie;
+}
+
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedCondorcet(const QSet<QString>& nominees)
+{
+    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Condorcet)));
+    emit calculationDetail(LOG_EVENT_CONDORCET_START_STAGES);
+
+    // This applies other tiebreaks in a specific order, matching the official STAR Condorcet protocol
+    static QList<std::function<QPair<QSet<QString>, QSet<QString>>(QSet<QString>)>> methods{
+        [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadWins(nominees); },
+        [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadPrefCount(nominees); },
+        [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadMargin(nominees); },
+        [this](QSet<QString> nominees){ return breakExtendedTieRandom(nominees); }
+    };
+
+    QPair<QSet<QString>, QSet<QString>> result{nominees, {}};
+
+    for(auto methodFn : methods)
+    {
+        // Save previous runner-up
+        QSet<QString> runnerUpFallback = result.second;
+
+        // Use current breaker
+        result = methodFn(result.first);
+
+        if(result.first.count() == 1)
+        {
+            emit calculationDetail(LOG_EVENT_CONDORCET_TIE_RESOLVED.arg(*result.first.constBegin()));
+            return result;
+        }
+        else
+        {
+            if(result.second.isEmpty())
+            {
+                emit calculationDetail(LOG_EVENT_CONDORCET_TIE_MITIGATION_FAIL);
+                result.second = runnerUpFallback.size() > 1 ? methodFn(runnerUpFallback).first : runnerUpFallback;
+            }
+
+            emit calculationDetail(LOG_EVENT_CONDORCET_TIE_REMAINS);
+        }
+    }
+
+    qFatal("This method did not produce a clear winner despite ending with a random tiebreak.");
+    return {};
 }
 
 QString Calculator::createNomineeGeneralSetString(const QSet<QString>& nominees)

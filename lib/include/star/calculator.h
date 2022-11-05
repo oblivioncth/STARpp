@@ -16,7 +16,7 @@ class Calculator : public QObject
     Q_OBJECT
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:
-    enum ExtendedTiebreakMethod { FiveStar, HTHWins, HTHCount, HTHMargin, Random };
+    enum ExtendedTiebreakMethod { FiveStar, HTHWins, HTHCount, HTHMargin, Random, Condorcet };
 
 //-Class Structs----------------------------------------------------------------------------------------------------
 private:
@@ -104,6 +104,12 @@ private:
     static inline const QString LOG_EVENT_BREAK_EXTENDED_TIE = QStringLiteral("Breaking %1-way extended tie (%2 method)...");
     static inline const QString LOG_EVENT_BREAK_RESULT = QStringLiteral("Tie Break - First Place { %1 } | Second Place: { %2 }");
 
+    // Logging - Condorcet
+    static inline const QString LOG_EVENT_CONDORCET_START_STAGES = QStringLiteral("Following STAR Condorcet protocol methodology...");
+    static inline const QString LOG_EVENT_CONDORCET_TIE_REMAINS = QStringLiteral("A tie remains, proceeding to next stage...");
+    static inline const QString LOG_EVENT_CONDORCET_TIE_RESOLVED = QStringLiteral("Tie resolved, returning result (%1)...");
+    static inline const QString LOG_EVENT_CONDORCET_TIE_MITIGATION_FAIL = QStringLiteral("Tie was not mitigated, carrying previous runner-up(s) forward, tie-breaking if needed...");
+
     // Logging - Initial Results
     static inline const QString LOG_EVENT_INITIAL_RESULT_WINNERS = QStringLiteral(R"(Initial winners: { %1 })");
     static inline const QString LOG_EVENT_INITIAL_RESULT_RUNNERUPS = QStringLiteral(R"(Initial runner-ups: { %1 })");
@@ -156,6 +162,7 @@ private:
     QPair<QSet<QString>, QSet<QString>> breakExtendedTieHeadToHeadPrefCount(const QSet<QString>& nominees);
     QPair<QSet<QString>, QSet<QString>> breakExtendedTieHeadToHeadMargin(const QSet<QString>& nominees);
     QPair<QSet<QString>, QSet<QString>> breakExtendedTieRandom(const QSet<QString>& nominees);
+    QPair<QSet<QString>, QSet<QString>> breakExtendedCondorcet(const QSet<QString>& nominees);
 
     // Logging
     QString createNomineeGeneralSetString(const QSet<QString>& nominees);
