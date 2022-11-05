@@ -189,6 +189,12 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performExtendedTiebreak(QSet<QSt
         case HTHWins:
             methodFn = [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadWins(nominees); };
             break;
+        case HTHCount:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadPrefCount(nominees); };
+            break;
+        case HTHMargin:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadMargin(nominees); };
+            break;
 
         default:
             qFatal("Unhandled extended tiebreak method");
@@ -377,6 +383,7 @@ QList<Rank> Calculator::rankByVotesOfMaxScore(const QSet<QString>& nominees)
     emit calculationDetail(LOG_EVENT_RANKINGS_VOTES_OF_MAX_SCORE + '\n' + createNomineeRankListString(maxVoteRanks));
     return maxVoteRanks;
 }
+
 QList<Rank> Calculator::rankByHeadToHeadWins(const QSet<QString>& nominees)
 {
     // Determine aggregate face-off wins of nominees list
@@ -393,6 +400,42 @@ QList<Rank> Calculator::rankByHeadToHeadWins(const QSet<QString>& nominees)
 
     emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_WINS + '\n' + createNomineeRankListString(headToHeadWinsRanks));
     return headToHeadWinsRanks;
+}
+
+QList<Rank> Calculator::rankByHeadToHeadPrefCount(const QSet<QString>& nominees)
+{
+    // Determine aggregate face-off wins of nominees list
+    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_PREF_COUNT);
+
+    // Copy pref counts map, remove all but the specified nominees
+    QMap<QString, int> prefCounts = mHeadToHeadMaps.prefCounts;
+    prefCounts.removeIf([&nominees](QMap<QString, int>::iterator itr){
+        return !nominees.contains(itr.key());
+    });
+
+    // Create scoped & sorted wins list
+    QList<Rank> headToHeadPrefCountRanks = Rank::rankSort(prefCounts);
+
+    emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_PREF_COUNT + '\n' + createNomineeRankListString(headToHeadPrefCountRanks));
+    return headToHeadPrefCountRanks;
+}
+
+QList<Rank> Calculator::rankByHeadToHeadMargin(const QSet<QString>& nominees)
+{
+    // Determine aggregate face-off wins of nominees list
+    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_MARGIN);
+
+    // Copy margins map, remove all but the specified nominees
+    QMap<QString, int> margins = mHeadToHeadMaps.margins;
+    margins.removeIf([&nominees](QMap<QString, int>::iterator itr){
+        return !nominees.contains(itr.key());
+    });
+
+    // Create scoped & sorted wins list
+    QList<Rank> headToHeadMarginRanks = Rank::rankSort(margins);
+
+    emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_MARGIN + '\n' + createNomineeRankListString(headToHeadMarginRanks));
+    return headToHeadMarginRanks;
 }
 
 QPair<QSet<QString>, QSet<QString>> Calculator::rankBasedTiebreak(const QList<Rank>& rankings, const QString& note)
@@ -427,6 +470,18 @@ QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieHeadToHeadWins(c
 {
     // Perform a face-off of each nominee and see which one has the most head-to-head wins
     return rankBasedTiebreak(rankByHeadToHeadWins(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHWins)));
+}
+
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieHeadToHeadPrefCount(const QSet<QString>& nominees)
+{
+    // Perform a face-off of each nominee and see which one has the most head-to-head wins
+    return rankBasedTiebreak(rankByHeadToHeadPrefCount(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHCount)));
+}
+
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieHeadToHeadMargin(const QSet<QString>& nominees)
+{
+    // Perform a face-off of each nominee and see which one has the most head-to-head wins
+    return rankBasedTiebreak(rankByHeadToHeadMargin(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHMargin)));
 }
 
 QString Calculator::createNomineeGeneralSetString(const QSet<QString>& nominees)
