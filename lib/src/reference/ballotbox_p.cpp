@@ -104,7 +104,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
 
     for(const RefCategoryHeader& ch : mCategoryConfig->headers())
     {
-        QList<uint> categoryVotes;
+        QList<int> categoryVotes;
 
         for(uint i = 0; i < ch.nomineeCount; i++, cIdx++)
         {
@@ -119,7 +119,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
 
             // Get value from field
             bool validValue;
-            uint vote = voteField.toUInt(&validValue);
+            int vote = voteField.toUInt(&validValue); // Stored as int, but should be a uint
 
             if(!validValue || vote > 5)
                 return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VOTE.arg(ballotNum).arg(cIdx));

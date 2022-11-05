@@ -25,7 +25,7 @@ public:
 private:
     QString mName;
     QList<Ballot> mBallots;
-    QMap<QString, uint> mTotals;
+    QMap<QString, int> mTotals;
     QList<Rank> mScoreRankings;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ public:
     QStringList nominees() const;
     const QList<Ballot>& ballots() const;
 
-    uint totalScore(const QString& nominee) const;
+    int totalScore(const QString& nominee) const;
     const QList<Rank>& scoreRankings() const;
 };
 
@@ -53,7 +53,7 @@ struct Election::Voter
 struct Election::Vote
 {
     QString nominee;
-    uint score = 0;
+    int score = 0;
 };
 
 class Election::Ballot
@@ -62,7 +62,7 @@ class Election::Ballot
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
     Voter mVoter;
-    QHash<QString, uint> mVotes;
+    QHash<QString, int> mVotes;
 
 //-Constructor--------------------------------------------------------------------------------------------------------
 private:
@@ -72,7 +72,7 @@ private:
 public:
     const Voter& voter() const;
 
-    uint score(const QString& nominee) const;
+    int score(const QString& nominee) const;
     QString preference(const QSet<QString>& nominees) const;
 };
 

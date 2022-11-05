@@ -36,7 +36,7 @@ QSet<QString> Calculator::determinePreliminaryLeaders()
     QSet<QString> nomineesInFirst = mElection->scoreRankings().front().nominees;
     if(nomineesInFirst.size() > 1) // First place tie
     {
-        uint firstPlaceScore = mElection->scoreRankings().front().value;
+        int firstPlaceScore = mElection->scoreRankings().front().value;
 
         if(nomineesInFirst.size() == 2) // Two-way
         {
@@ -70,7 +70,7 @@ QSet<QString> Calculator::determinePreliminaryLeaders()
         QSet<QString> nomineesInSecond = mElection->scoreRankings().at(1).nominees;
         if(nomineesInSecond.size() > 1) // Second place tie
         {
-            uint secondPlaceScore = mElection->scoreRankings().at(1).value;
+            int secondPlaceScore = mElection->scoreRankings().at(1).value;
 
             QString tieLogStr = LOG_EVENT_PRELIMINARY_SECOND_TIE.arg(nomineesInSecond.size()).arg(secondPlaceScore) + '\n' + createNomineeGeneralSetString(nomineesInSecond);
             emit calculationDetail(tieLogStr);
@@ -110,7 +110,7 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performPrimaryRunoff(const QSet<
     QSet<QString> nomineesInFirst = prefRanks.front().nominees;
     if(nomineesInFirst.size() > 1) // First place tie
     {
-        uint firstPlacePrefCount = prefRanks.front().value;
+        int firstPlacePrefCount = prefRanks.front().value;
         QString tieLogStr = LOG_EVENT_PRIMARY_FIRST_TIE.arg(nomineesInFirst.size()).arg(firstPlacePrefCount) + '\n' + createNomineeGeneralSetString(nomineesInFirst);
         emit calculationDetail(tieLogStr);
 
@@ -146,7 +146,7 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performPrimaryRunoff(const QSet<
         QSet<QString> nomineesInSecond = prefRanks.at(1).nominees;
         if(nomineesInSecond.size() > 1) // Second place tie
         {
-            uint secondPlacePrefCount = prefRanks.at(1).value;
+            int secondPlacePrefCount = prefRanks.at(1).value;
             QString tieLogStr = LOG_EVENT_PRIMARY_SECOND_TIE.arg(nomineesInSecond.size()).arg(secondPlacePrefCount) + '\n' + createNomineeGeneralSetString(nomineesInSecond);
             emit calculationDetail(tieLogStr);
 
@@ -232,7 +232,7 @@ QList<Rank> Calculator::rankByPreference(const QSet<QString>& nominees)
 {
     // Determine aggregate preference of nominee list
     emit calculationDetail(LOG_EVENT_RANK_BY_PREF);
-    QMap<QString, uint> totalPreferenceMap;
+    QMap<QString, int> totalPreferenceMap;
 
     /* Add all nominees with an initial preference count of 0, since some might not be preferred even
      * once, and therefore be missed by the next loop
@@ -246,7 +246,7 @@ QList<Rank> Calculator::rankByPreference(const QSet<QString>& nominees)
         QString pref = ballot.preference(nominees);
         if(!pref.isNull())
         {
-            uint newTotal = ++totalPreferenceMap[pref];
+            int newTotal = ++totalPreferenceMap[pref];
             emit calculationDetail(LOG_EVENT_RANK_BY_PREF_HAS_PREF.arg(voterName, pref).arg(newTotal));
         }
         else
@@ -267,7 +267,7 @@ QList<Rank> Calculator::rankByScore(const QSet<QString>& nominees)
      * the full score rankings that are part of the Election
      */
     emit calculationDetail(LOG_EVENT_RANK_BY_SCORE);
-    QMap<QString, uint> totalScoreMap;
+    QMap<QString, int> totalScoreMap;
 
     for(const QString& nominee : nominees)
         totalScoreMap[nominee] = mElection->totalScore(nominee);
@@ -283,7 +283,7 @@ QList<Rank> Calculator::rankByVotesOfMaxScore(const QSet<QString>& nominees)
 {
     // Determine aggregate max votes of nominee list
     emit calculationDetail(LOG_EVENT_RANK_BY_VOTES_OF_MAX_SCORE);
-    QMap<QString, uint> totalMaxVotesMap;
+    QMap<QString, int> totalMaxVotesMap;
 
     for(const QString& nominee : nominees)
     {
@@ -306,7 +306,7 @@ QList<Rank> Calculator::rankByHeadToHeadWins(const QSet<QString>& nominees)
 {
     // Determine aggregate face-off wins of nominees list
     emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS);
-    QMap<QString, uint> headToHeadWinsMap;
+    QMap<QString, int> headToHeadWinsMap;
 
     /* Add all nominees with an initial win count of 0, since some might not win even
      * once, and therefore be missed by the main loop
