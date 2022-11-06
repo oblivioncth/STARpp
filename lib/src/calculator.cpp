@@ -25,7 +25,8 @@ namespace Star
 //Public:
 Calculator::Calculator(const Election* election) :
     mElection(election),
-    mExtraTiebreakMethod(std::nullopt)
+    mExtraTiebreakMethod(std::nullopt),
+    mSpeculative(false)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
@@ -610,9 +611,11 @@ QString Calculator::createNomineeRankListString(const QList<Rank>& ranks)
 //Public:
 std::optional<Calculator::ExtendedTiebreakMethod> Calculator::extraTiebreakMethod() const { return mExtraTiebreakMethod; }
 bool Calculator::isExtraTiebreak() const { return mExtraTiebreakMethod.has_value(); }
+bool Calculator::isSpeculative() const { return mSpeculative; }
 const Election* Calculator::election() const { return mElection; }
 void Calculator::setElection(const Election* election) { mElection = election; }
 void Calculator::setExtraTiebreakMethod(std::optional<ExtendedTiebreakMethod> method) { mExtraTiebreakMethod = method; }
+void Calculator::setSpeculative(bool speculative) { mSpeculative = speculative; }
 
 ElectionResult Calculator::calculateResult()
 {
@@ -641,24 +644,33 @@ ElectionResult Calculator::calculateResult()
     // Check if extended tiebreak could matter
     if(results.first.size() > 1 || results.second.size() > 1)
     {
-        // Test outcome with each method (for analysis purposes)
-        QHash<ExtendedTiebreakMethod, QPair<QSet<QString>, QSet<QString>>> extendedResults;
-
-        constexpr auto methods = magic_enum::enum_values<ExtendedTiebreakMethod>();
-        for(ExtendedTiebreakMethod method : methods)
-        {
-            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_EVAL.arg(ENUM_NAME(method)));
-            extendedResults[method] = performExtendedTiebreak(results.first, results.second, method);
-        }
-
-        if(!mExtraTiebreakMethod.has_value())
-            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_DISABLED);
+        if(!mExtraTiebreakMethod.has_value() && !mSpeculative)
+            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_NO_OP);
         else
         {
-            ExtendedTiebreakMethod selectedMethod = mExtraTiebreakMethod.value();
-            auto selectedMethodResults = extendedResults[selectedMethod];
+            if(mSpeculative)
+                emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_SPECULATIVE);
 
-            if(selectedMethodResults == results)
+            QPair<QSet<QString>, QSet<QString>> selectedMethodResults;
+
+            constexpr auto methods = magic_enum::enum_values<ExtendedTiebreakMethod>();
+            for(ExtendedTiebreakMethod method : methods)
+            {
+                bool isSelMethod = mExtraTiebreakMethod.has_value() && mExtraTiebreakMethod.value() == method;
+
+                if(isSelMethod || mSpeculative)
+                {
+                    emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_EVAL.arg(ENUM_NAME(method)));
+                    auto etbr = performExtendedTiebreak(results.first, results.second, method);
+
+                    if(isSelMethod)
+                        selectedMethodResults = etbr;
+                }
+            }
+
+            if(!mExtraTiebreakMethod.has_value())
+                emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_DISABLED);
+            else if(selectedMethodResults == results)
                 emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_IRRELAVENT);
             else
             {
