@@ -264,7 +264,7 @@ Calculator::HeadToHeadMaps Calculator::createHeadToHeadMaps(const QSet<QString>&
 
     // Create a full nominees list with the nominees under consideration at the top
     QStringList otherNominees = mElection->nominees();
-    for(const QString n : nominees)
+    for(const QString& n : nominees)
         otherNominees.removeAll(n);
     QStringList faceOffQueue = QList<QString>(nominees.cbegin(), nominees.cend()) + otherNominees;
 
