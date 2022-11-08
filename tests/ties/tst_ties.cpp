@@ -1011,6 +1011,40 @@ void tst_ties::all_tie_cases_data()
                Star::Calculator::HTHCount
     );
 
+    addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, single fallback for second",
+               {
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 0},
+                       {.nominee = candidate3, .score = 5},
+                       {.nominee = candidate4, .score = 4}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 2},
+                       {.nominee = candidate4, .score = 4}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 4},
+                       {.nominee = candidate2, .score = 0},
+                       {.nominee = candidate3, .score = 0},
+                       {.nominee = candidate4, .score = 4}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 4},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 5},
+                       {.nominee = candidate4, .score = 0}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate3, candidate4}, {}),
+               Star::Calculator::HTHCount
+    );
+
+    // TODO: addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
+    // TODO: addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
+
     addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, no fallback for second",
                {
                    {
@@ -1167,6 +1201,40 @@ void tst_ties::all_tie_cases_data()
                Star::ExpectedElectionResult({candidate3, candidate4}, {}),
                Star::Calculator::HTHMargin
     );
+
+    addTestRow("Extended [HTHMargin] - First place N-way tie, unsuccessful break, single fallback for second",
+               {
+                   {
+                       {.nominee = candidate1, .score = 4},
+                       {.nominee = candidate2, .score = 1},
+                       {.nominee = candidate3, .score = 5},
+                       {.nominee = candidate4, .score = 0}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 3},
+                       {.nominee = candidate2, .score = 4},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 1}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 1},
+                       {.nominee = candidate2, .score = 3},
+                       {.nominee = candidate3, .score = 0},
+                       {.nominee = candidate4, .score = 5}
+                   },
+                   {
+                       {.nominee = candidate1, .score = 5},
+                       {.nominee = candidate2, .score = 0},
+                       {.nominee = candidate3, .score = 3},
+                       {.nominee = candidate4, .score = 5}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate3, candidate4}, {candidate1}),
+               Star::Calculator::HTHMargin
+    );
+
+    // TODO: addTestRow("Extended [HTHMargin] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
+    // TODO: addTestRow("Extended [HTHMargin] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
 
     addTestRow("Extended [HTHMargin] - Second place N-way tie, successful break",
                {
