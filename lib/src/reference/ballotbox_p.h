@@ -26,7 +26,7 @@ struct RefBallot
 {
     QString voter;
     QDate submissionDate;
-    QList<QList<uint>> votes;
+    QList<QList<int>> votes;
 };
 
 class RefBallotBox
@@ -77,7 +77,7 @@ private:
     RefBallotBox* mTargetBox;
     QFile mCsvFile;
     const RefCategoryConfig* mCategoryConfig;
-    uint mExpectedFieldCount;
+    qsizetype mExpectedFieldCount;
 
 //-Constructor--------------------------------------------------------------------------------------------------------
 public:

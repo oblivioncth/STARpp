@@ -15,8 +15,12 @@ The original motivation for this project was to facilitate automated election re
  - Determination of election winner, as well as runner-up
  - Ability to select a final tiebreak method:
 	 - None
-	 - FiveStar
-	 - Condorcet
+	 - Five-Star
+	 - Head-to-Head Wins
+	 - Head-to-Head Preference Count
+	 - Head-to-Head Preference Margin
+	 - Random
+	 - Condorcet (combines the previous three methods sequentially)
   - Optional Qt signal connection that details calculation steps
 
 ## Library

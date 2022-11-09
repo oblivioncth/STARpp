@@ -1,8 +1,12 @@
 // Unit Include
 #include "star/calculator.h"
 
+// Qt Includes
+#include <QRandomGenerator>
+
 // Qx Includes
 #include <qx/core/qx-string.h>
+#include <qx/core/qx-algorithm.h>
 
 // magic_enum Includes
 #include <magic_enum.hpp>
@@ -21,7 +25,8 @@ namespace Star
 //Public:
 Calculator::Calculator(const Election* election) :
     mElection(election),
-    mExtraTiebreakMethod(std::nullopt)
+    mExtraTiebreakMethod(std::nullopt),
+    mSpeculative(false)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
@@ -36,7 +41,7 @@ QSet<QString> Calculator::determinePreliminaryLeaders()
     QSet<QString> nomineesInFirst = mElection->scoreRankings().front().nominees;
     if(nomineesInFirst.size() > 1) // First place tie
     {
-        uint firstPlaceScore = mElection->scoreRankings().front().value;
+        int firstPlaceScore = mElection->scoreRankings().front().value;
 
         if(nomineesInFirst.size() == 2) // Two-way
         {
@@ -70,7 +75,7 @@ QSet<QString> Calculator::determinePreliminaryLeaders()
         QSet<QString> nomineesInSecond = mElection->scoreRankings().at(1).nominees;
         if(nomineesInSecond.size() > 1) // Second place tie
         {
-            uint secondPlaceScore = mElection->scoreRankings().at(1).value;
+            int secondPlaceScore = mElection->scoreRankings().at(1).value;
 
             QString tieLogStr = LOG_EVENT_PRELIMINARY_SECOND_TIE.arg(nomineesInSecond.size()).arg(secondPlaceScore) + '\n' + createNomineeGeneralSetString(nomineesInSecond);
             emit calculationDetail(tieLogStr);
@@ -110,7 +115,7 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performPrimaryRunoff(const QSet<
     QSet<QString> nomineesInFirst = prefRanks.front().nominees;
     if(nomineesInFirst.size() > 1) // First place tie
     {
-        uint firstPlacePrefCount = prefRanks.front().value;
+        int firstPlacePrefCount = prefRanks.front().value;
         QString tieLogStr = LOG_EVENT_PRIMARY_FIRST_TIE.arg(nomineesInFirst.size()).arg(firstPlacePrefCount) + '\n' + createNomineeGeneralSetString(nomineesInFirst);
         emit calculationDetail(tieLogStr);
 
@@ -146,7 +151,7 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performPrimaryRunoff(const QSet<
         QSet<QString> nomineesInSecond = prefRanks.at(1).nominees;
         if(nomineesInSecond.size() > 1) // Second place tie
         {
-            uint secondPlacePrefCount = prefRanks.at(1).value;
+            int secondPlacePrefCount = prefRanks.at(1).value;
             QString tieLogStr = LOG_EVENT_PRIMARY_SECOND_TIE.arg(nomineesInSecond.size()).arg(secondPlacePrefCount) + '\n' + createNomineeGeneralSetString(nomineesInSecond);
             emit calculationDetail(tieLogStr);
 
@@ -175,6 +180,9 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performExtendedTiebreak(QSet<QSt
 {
     Q_ASSERT(winners.size() > 1 || runnerUps.size() > 1);
 
+    // Get head-to-head results of remaining candidates
+    mHeadToHeadMaps = createHeadToHeadMaps(winners + runnerUps);
+
     // Determine method function
     std::function<QPair<QSet<QString>, QSet<QString>>(QSet<QString>)> methodFn;
     switch(method)
@@ -182,8 +190,20 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performExtendedTiebreak(QSet<QSt
         case FiveStar:
             methodFn = [this](QSet<QString> nominees){ return breakExtendedTieFiveStar(nominees); };
             break;
+        case HTHWins:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadWins(nominees); };
+            break;
+        case HTHCount:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadPrefCount(nominees); };
+            break;
+        case HTHMargin:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadMargin(nominees); };
+            break;
+        case Random:
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieRandom(nominees); };
+            break;
         case Condorcet:
-            methodFn = [this](QSet<QString> nominees){ return breakExtendedTieCondorcet(nominees); };
+            methodFn = [this](QSet<QString> nominees){ return breakExtendedCondorcet(nominees); };
             break;
 
         default:
@@ -228,11 +248,82 @@ QPair<QSet<QString>, QSet<QString>> Calculator::performExtendedTiebreak(QSet<QSt
     return {winners, runnerUps};
 }
 
+Calculator::HeadToHeadMaps Calculator::createHeadToHeadMaps(const QSet<QString>& nominees)
+{
+    // Determine aggregate face-off wins of nominees list
+    emit calculationDetail(LOG_EVENT_CREATE_HEAD_TO_HEAD_MAPS);
+    HeadToHeadMaps maps;
+
+    // Add all nominees with an initial values of zero, since some might not be updated due to ties
+    for(const QString& nominee : nominees)
+    {
+        maps.wins[nominee] = 0;
+        maps.prefCounts[nominee] = 0;
+        maps.margins[nominee] = 0;
+    }
+
+    // Create a full nominees list with the nominees under consideration at the top
+    QStringList otherNominees = mElection->nominees();
+    for(const QString& n : nominees)
+        otherNominees.removeAll(n);
+    QStringList faceOffQueue = QList<QString>(nominees.cbegin(), nominees.cend()) + otherNominees;
+
+    // Perform face-offs (restricted to only those involving nominees under consideration)
+    QString test = *(faceOffQueue.constEnd() - 1);
+    for(auto itrA = faceOffQueue.constBegin(); itrA != faceOffQueue.constEnd() - otherNominees.size(); itrA++)
+    {
+        QString opponentA = *itrA;
+
+        for(auto itrB = itrA + 1; itrB != faceOffQueue.constEnd(); itrB++)
+        {
+            QString opponentB = *itrB;
+
+            emit calculationDetail(LOG_EVENT_CREATE_HEAD_TO_HEAD_PREF.arg(opponentA, opponentB));
+            QList<Rank> prefRanks = rankByPreference({opponentA, opponentB});
+
+            if(prefRanks.first().nominees.size() != 1)
+            {
+                int prefCount = prefRanks.first().value;
+                emit calculationDetail(LOG_EVENT_LOG_EVENT_CREATE_HEAD_TO_HEAD_PREF_TIE.arg(prefCount));
+
+                maps.prefCounts[opponentA] += prefCount;
+                if(nominees.contains(opponentB)) // May not be under consideration
+                    maps.prefCounts[opponentB] += prefCount;
+            }
+            else
+            {
+                QString winner = *prefRanks.first().nominees.constBegin();
+                int winnerCount = prefRanks.first().value;
+                QString loser = *prefRanks.last().nominees.constBegin();
+                int loserCount = prefRanks.last().value;
+                int margin = Qx::distance(winnerCount, loserCount);
+
+                emit calculationDetail(LOG_EVENT_LOG_EVENT_CREATE_HEAD_TO_HEAD_PREF_WIN.arg(winner).arg(winnerCount).arg(loser).arg(loserCount));
+
+                if(nominees.contains(winner))
+                {
+                    maps.wins[winner]++;
+                    maps.prefCounts[winner] += winnerCount;
+                    maps.margins[winner] += margin;
+                }
+
+                if(nominees.contains(loser))
+                {
+                    maps.prefCounts[loser] += loserCount;
+                    maps.margins[loser] -= margin;
+                }
+            }
+        }
+    }
+
+    return maps;
+}
+
 QList<Rank> Calculator::rankByPreference(const QSet<QString>& nominees)
 {
     // Determine aggregate preference of nominee list
     emit calculationDetail(LOG_EVENT_RANK_BY_PREF);
-    QMap<QString, uint> totalPreferenceMap;
+    QMap<QString, int> totalPreferenceMap;
 
     /* Add all nominees with an initial preference count of 0, since some might not be preferred even
      * once, and therefore be missed by the next loop
@@ -246,7 +337,7 @@ QList<Rank> Calculator::rankByPreference(const QSet<QString>& nominees)
         QString pref = ballot.preference(nominees);
         if(!pref.isNull())
         {
-            uint newTotal = ++totalPreferenceMap[pref];
+            int newTotal = ++totalPreferenceMap[pref];
             emit calculationDetail(LOG_EVENT_RANK_BY_PREF_HAS_PREF.arg(voterName, pref).arg(newTotal));
         }
         else
@@ -267,7 +358,7 @@ QList<Rank> Calculator::rankByScore(const QSet<QString>& nominees)
      * the full score rankings that are part of the Election
      */
     emit calculationDetail(LOG_EVENT_RANK_BY_SCORE);
-    QMap<QString, uint> totalScoreMap;
+    QMap<QString, int> totalScoreMap;
 
     for(const QString& nominee : nominees)
         totalScoreMap[nominee] = mElection->totalScore(nominee);
@@ -283,7 +374,7 @@ QList<Rank> Calculator::rankByVotesOfMaxScore(const QSet<QString>& nominees)
 {
     // Determine aggregate max votes of nominee list
     emit calculationDetail(LOG_EVENT_RANK_BY_VOTES_OF_MAX_SCORE);
-    QMap<QString, uint> totalMaxVotesMap;
+    QMap<QString, int> totalMaxVotesMap;
 
     for(const QString& nominee : nominees)
     {
@@ -302,60 +393,59 @@ QList<Rank> Calculator::rankByVotesOfMaxScore(const QSet<QString>& nominees)
     emit calculationDetail(LOG_EVENT_RANKINGS_VOTES_OF_MAX_SCORE + '\n' + createNomineeRankListString(maxVoteRanks));
     return maxVoteRanks;
 }
+
 QList<Rank> Calculator::rankByHeadToHeadWins(const QSet<QString>& nominees)
 {
     // Determine aggregate face-off wins of nominees list
     emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS);
-    QMap<QString, uint> headToHeadWinsMap;
 
-    /* Add all nominees with an initial win count of 0, since some might not win even
-     * once, and therefore be missed by the main loop
-     */
-    for(const QString& nominee : nominees)
-        headToHeadWinsMap[nominee] = 0;
+    // Copy wins map, remove all but the specified nominees
+    QMap<QString, int> wins = mHeadToHeadMaps.wins;
+    wins.removeIf([&nominees](QMap<QString, int>::iterator itr){
+        return !nominees.contains(itr.key());
+    });
 
-    // Create a full nominees list with the nominees under consideration at the top
-    QStringList otherNominees = mElection->nominees();
-    for(const QString n : nominees)
-        otherNominees.removeAll(n);
-    QStringList faceOffQueue = QList<QString>(nominees.cbegin(), nominees.cend()) + otherNominees;
-
-    // Perform face-offs (restricted to only those involving nominees under consideration)
-    QString test = *(faceOffQueue.constEnd() - 1);
-    for(auto itrA = faceOffQueue.constBegin(); itrA != faceOffQueue.constEnd() - otherNominees.size(); itrA++)
-    {
-        QString opponentA = *itrA;
-
-        for(auto itrB = itrA + 1; itrB != faceOffQueue.constEnd(); itrB++)
-        {
-            QString opponentB = *itrB;
-
-            emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF.arg(opponentA, opponentB));
-            QList<Rank> prefRanks = rankByPreference({opponentA, opponentB});
-
-            const QSet<QString>& prefRankWinners = prefRanks.first().nominees;
-            if(prefRankWinners.size() != 1)
-                emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_TIE);
-            else
-            {
-                QString headToHeadWinner = *prefRankWinners.constBegin();
-
-                if(nominees.contains(headToHeadWinner))
-                {
-                    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER.arg(headToHeadWinner));
-                    headToHeadWinsMap[headToHeadWinner]++;
-                }
-                else
-                    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_WINS_PREF_WINNER_IRREL.arg(headToHeadWinner));
-            }
-        }
-    }
-
-    // Create sorted wins list
-    QList<Rank> headToHeadWinsRanks = Rank::rankSort(headToHeadWinsMap);
+    // Create scoped & sorted wins list
+    QList<Rank> headToHeadWinsRanks = Rank::rankSort(wins);
 
     emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_WINS + '\n' + createNomineeRankListString(headToHeadWinsRanks));
     return headToHeadWinsRanks;
+}
+
+QList<Rank> Calculator::rankByHeadToHeadPrefCount(const QSet<QString>& nominees)
+{
+    // Determine aggregate face-off wins of nominees list
+    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_PREF_COUNT);
+
+    // Copy pref counts map, remove all but the specified nominees
+    QMap<QString, int> prefCounts = mHeadToHeadMaps.prefCounts;
+    prefCounts.removeIf([&nominees](QMap<QString, int>::iterator itr){
+        return !nominees.contains(itr.key());
+    });
+
+    // Create scoped & sorted wins list
+    QList<Rank> headToHeadPrefCountRanks = Rank::rankSort(prefCounts);
+
+    emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_PREF_COUNT + '\n' + createNomineeRankListString(headToHeadPrefCountRanks));
+    return headToHeadPrefCountRanks;
+}
+
+QList<Rank> Calculator::rankByHeadToHeadMargin(const QSet<QString>& nominees)
+{
+    // Determine aggregate face-off wins of nominees list
+    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_MARGIN);
+
+    // Copy margins map, remove all but the specified nominees
+    QMap<QString, int> margins = mHeadToHeadMaps.margins;
+    margins.removeIf([&nominees](QMap<QString, int>::iterator itr){
+        return !nominees.contains(itr.key());
+    });
+
+    // Create scoped & sorted wins list
+    QList<Rank> headToHeadMarginRanks = Rank::rankSort(margins);
+
+    emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_MARGIN + '\n' + createNomineeRankListString(headToHeadMarginRanks));
+    return headToHeadMarginRanks;
 }
 
 QPair<QSet<QString>, QSet<QString>> Calculator::rankBasedTiebreak(const QList<Rank>& rankings, const QString& note)
@@ -386,10 +476,88 @@ QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieFiveStar(const Q
     return rankBasedTiebreak(rankByVotesOfMaxScore(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(FiveStar)));
 }
 
-QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieCondorcet(const QSet<QString>& nominees)
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieHeadToHeadWins(const QSet<QString>& nominees)
 {
     // Perform a face-off of each nominee and see which one has the most head-to-head wins
-    return rankBasedTiebreak(rankByHeadToHeadWins(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Condorcet)));
+    return rankBasedTiebreak(rankByHeadToHeadWins(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHWins)));
+}
+
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieHeadToHeadPrefCount(const QSet<QString>& nominees)
+{
+    // Perform a face-off of each nominee and see which one has the most head-to-head wins
+    return rankBasedTiebreak(rankByHeadToHeadPrefCount(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHCount)));
+}
+
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieHeadToHeadMargin(const QSet<QString>& nominees)
+{
+    // Perform a face-off of each nominee and see which one has the most head-to-head wins
+    return rankBasedTiebreak(rankByHeadToHeadMargin(nominees), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHMargin)));
+}
+
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedTieRandom(const QSet<QString>& nominees)
+{
+    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Random)));
+
+    /* Randomly select a winner of the tiebreak
+     *
+     * There is already some level of randomness since the iteration order of a set is undefined, but this is not enough on its own.
+     */
+    QPair<QSet<QString>, QSet<QString>> brokenTie{{}, nominees};
+
+    quint32 selection = QRandomGenerator::global()->bounded(nominees.size());
+
+    auto itr = nominees.constBegin();
+    for(qsizetype i = 0; i < selection; i++)
+        itr ++;
+
+    brokenTie.first.insert(*itr);
+    brokenTie.second.remove(*itr);
+
+    return brokenTie;
+}
+
+QPair<QSet<QString>, QSet<QString>> Calculator::breakExtendedCondorcet(const QSet<QString>& nominees)
+{
+    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Condorcet)));
+    emit calculationDetail(LOG_EVENT_CONDORCET_START_STAGES);
+
+    // This applies other tiebreaks in a specific order, matching the official STAR Condorcet protocol
+    static QList<std::function<QPair<QSet<QString>, QSet<QString>>(QSet<QString>)>> methods{
+        [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadWins(nominees); },
+        [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadPrefCount(nominees); },
+        [this](QSet<QString> nominees){ return breakExtendedTieHeadToHeadMargin(nominees); },
+        [this](QSet<QString> nominees){ return breakExtendedTieRandom(nominees); }
+    };
+
+    QPair<QSet<QString>, QSet<QString>> result{nominees, {}};
+
+    for(auto methodFn : methods)
+    {
+        // Save previous runner-up
+        QSet<QString> runnerUpFallback = result.second;
+
+        // Use current breaker
+        result = methodFn(result.first);
+
+        if(result.first.count() == 1)
+        {
+            emit calculationDetail(LOG_EVENT_CONDORCET_TIE_RESOLVED.arg(*result.first.constBegin()));
+            return result;
+        }
+        else
+        {
+            if(result.second.isEmpty())
+            {
+                emit calculationDetail(LOG_EVENT_CONDORCET_TIE_MITIGATION_FAIL);
+                result.second = runnerUpFallback.size() > 1 ? methodFn(runnerUpFallback).first : runnerUpFallback;
+            }
+
+            emit calculationDetail(LOG_EVENT_CONDORCET_TIE_REMAINS);
+        }
+    }
+
+    qFatal("This method did not produce a clear winner despite ending with a random tiebreak.");
+    return {};
 }
 
 QString Calculator::createNomineeGeneralSetString(const QSet<QString>& nominees)
@@ -443,9 +611,11 @@ QString Calculator::createNomineeRankListString(const QList<Rank>& ranks)
 //Public:
 std::optional<Calculator::ExtendedTiebreakMethod> Calculator::extraTiebreakMethod() const { return mExtraTiebreakMethod; }
 bool Calculator::isExtraTiebreak() const { return mExtraTiebreakMethod.has_value(); }
+bool Calculator::isSpeculative() const { return mSpeculative; }
 const Election* Calculator::election() const { return mElection; }
 void Calculator::setElection(const Election* election) { mElection = election; }
 void Calculator::setExtraTiebreakMethod(std::optional<ExtendedTiebreakMethod> method) { mExtraTiebreakMethod = method; }
+void Calculator::setSpeculative(bool speculative) { mSpeculative = speculative; }
 
 ElectionResult Calculator::calculateResult()
 {
@@ -474,24 +644,33 @@ ElectionResult Calculator::calculateResult()
     // Check if extended tiebreak could matter
     if(results.first.size() > 1 || results.second.size() > 1)
     {
-        // Test outcome with each method (for analysis purposes)
-        QHash<ExtendedTiebreakMethod, QPair<QSet<QString>, QSet<QString>>> extendedResults;
-
-        constexpr auto methods = magic_enum::enum_values<ExtendedTiebreakMethod>();
-        for(ExtendedTiebreakMethod method : methods)
-        {
-            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_EVAL.arg(ENUM_NAME(method)));
-            extendedResults[method] = performExtendedTiebreak(results.first, results.second, method);
-        }
-
-        if(!mExtraTiebreakMethod.has_value())
-            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_DISABLED);
+        if(!mExtraTiebreakMethod.has_value() && !mSpeculative)
+            emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_NO_OP);
         else
         {
-            ExtendedTiebreakMethod selectedMethod = mExtraTiebreakMethod.value();
-            auto selectedMethodResults = extendedResults[selectedMethod];
+            if(mSpeculative)
+                emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_SPECULATIVE);
 
-            if(selectedMethodResults == results)
+            QPair<QSet<QString>, QSet<QString>> selectedMethodResults;
+
+            constexpr auto methods = magic_enum::enum_values<ExtendedTiebreakMethod>();
+            for(ExtendedTiebreakMethod method : methods)
+            {
+                bool isSelMethod = mExtraTiebreakMethod.has_value() && mExtraTiebreakMethod.value() == method;
+
+                if(isSelMethod || mSpeculative)
+                {
+                    emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_EVAL.arg(ENUM_NAME(method)));
+                    auto etbr = performExtendedTiebreak(results.first, results.second, method);
+
+                    if(isSelMethod)
+                        selectedMethodResults = etbr;
+                }
+            }
+
+            if(!mExtraTiebreakMethod.has_value())
+                emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_DISABLED);
+            else if(selectedMethodResults == results)
                 emit calculationDetail(LOG_EVENT_EXTENDED_TIEBREAK_IRRELAVENT);
             else
             {

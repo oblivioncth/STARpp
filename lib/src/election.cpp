@@ -20,9 +20,9 @@ QString Election::name() const { return mName; }
 QStringList Election::nominees() const { return mTotals.keys(); }
 const QList<Election::Ballot>& Election::ballots() const { return mBallots; }
 
-uint Election::totalScore(const QString& nominee) const
+int Election::totalScore(const QString& nominee) const
 {
-    // NOTE: This could instead return a std::optional<uint> for if *nominee* is missing, but that
+    // NOTE: This could instead return a std::optional<int> for if *nominee* is missing, but that
     // would indicate a bug elsewhere and should never happen, so instead this just throws.
     if(!mTotals.contains(nominee))
         throw std::runtime_error(std::string(Q_FUNC_INFO) + " the desired nominee is not present.");
@@ -43,17 +43,17 @@ Election::Ballot::Ballot() {}
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
 const Election::Voter& Election::Ballot::voter() const { return mVoter; }
-uint Election::Ballot::score(const QString& nominee) const { return mVotes.value(nominee, 0); }
+int Election::Ballot::score(const QString& nominee) const { return mVotes.value(nominee, 0); }
 
 QString Election::Ballot::preference(const QSet<QString>& nominees) const
 {
     QString pref;
-    uint prefScore = 0;
+    int prefScore = 0;
 
     // Check for highest score
     for(const QString& nominee : nominees)
     {
-        uint nomScore = score(nominee);
+        int nomScore = score(nominee);
         if(nomScore == prefScore)
         {
             pref = QString(); // Score ties prevent preference
@@ -92,7 +92,8 @@ Election::Builder& Election::Builder::wBallot(const Voter& voter, const QList<Vo
     for(const Vote& vote : votes)
     {
         const QString& nominee = vote.nominee;
-        uint score = std::min(vote.score, uint(5));
+
+        int score = std::max(0, std::min(vote.score, 5));
         ballot.mVotes[nominee] = score;
         mConstruct.mTotals[nominee] += score;
     }
