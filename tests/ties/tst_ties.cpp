@@ -1042,8 +1042,8 @@ void tst_ties::all_tie_cases_data()
                Star::Calculator::HTHCount
     );
 
-     TODO: addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
-     TODO: addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
+    // TODO: addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
+    // TODO: addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
 
     addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, no fallback for second",
                {
