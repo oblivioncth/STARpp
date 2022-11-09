@@ -1038,7 +1038,7 @@ void tst_ties::all_tie_cases_data()
                        {.nominee = candidate4, .score = 0}
                    }
                },
-               Star::ExpectedElectionResult({candidate3, candidate4}, {}),
+               Star::ExpectedElectionResult({candidate3, candidate4}, {candidate1}),
                Star::Calculator::HTHCount
     );
 
