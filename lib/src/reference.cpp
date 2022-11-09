@@ -29,7 +29,7 @@ namespace
                 const RefBallot& rBallot = box.ballots()[bIdx];
 
                 // Get votes that pertain to category
-                const QList<uint>& categoryVotes = rBallot.votes[cIdx];
+                const QList<int>& categoryVotes = rBallot.votes[cIdx];
 
                 // List to fill with nominee mapped votes in standard form
                 QList<Election::Vote> mappedVotes;

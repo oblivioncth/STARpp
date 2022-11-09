@@ -10,7 +10,7 @@
 
 //-Struct Functions-------------------------------------------------------------------------------------------------
 //Public:
-QList<Rank> Rank::rankSort(const QMap<QString, uint>& valueMap)
+QList<Rank> Rank::rankSort(const QMap<QString, int>& valueMap)
 {
     QList<Rank> rankings;
 
@@ -18,7 +18,7 @@ QList<Rank> Rank::rankSort(const QMap<QString, uint>& valueMap)
      * key (ascending), this will create a ranking list from lowest rank to highest rank with all
      * nominees at a given rank (> 1 if there are ties) tied to its corresponding score as the key.
      */
-    QMultiMap<uint, QStringView> reverseRankings;
+    QMultiMap<int, QStringView> reverseRankings;
     for(auto [nominee, value] : valueMap.asKeyValueRange())
         reverseRankings.insert(value, nominee);
 
@@ -27,7 +27,7 @@ QList<Rank> Rank::rankSort(const QMap<QString, uint>& valueMap)
      * to iterate by key "group". So, transform the rankings into a more convenient form that
      * uses a list for nominees.
      */
-    uint currentKey = reverseRankings.firstKey();
+    int currentKey = reverseRankings.firstKey();
     Rank currentRank = {.value = currentKey, .nominees = {}};
     for(auto [totalScore, nominee] : reverseRankings.asKeyValueRange())
     {
