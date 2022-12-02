@@ -67,7 +67,6 @@ int main(int argc, char *argv[])
     // Create calculator
     Star::Calculator calculator;
     calculator.setExtraTiebreakMethod(rec.extraTiebreakMethod);
-    calculator.setSpeculative(rec.speculative);
     QObject::connect(&calculator, &Star::Calculator::calculationDetail, &core, &Core::logCalculatorDetail);
 
     // Result container

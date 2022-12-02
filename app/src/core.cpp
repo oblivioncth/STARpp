@@ -137,7 +137,6 @@ ErrorCode Core::initialize()
             .ccPath = clParser.value(CL_OPTION_CONFIG),
             .bbPath = clParser.value(CL_OPTION_BOX),
             .extraTiebreakMethod = tbm,
-            .speculative = clParser.isSet(CL_OPTION_SPECULATIVE)
         };
 
         logElectionData(mRefElectionCfg.value());

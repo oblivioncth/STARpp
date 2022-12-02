@@ -78,10 +78,6 @@ private:
     static inline const QString CL_OPT_MINIMAL_L_NAME = QStringLiteral("minimal");
     static inline const QString CL_OPT_MINIMAL_DESC = QStringLiteral("Only presents the results summary.");
 
-    static inline const QString CL_OPT_SPECULATIVE_S_NAME = QStringLiteral("s");
-    static inline const QString CL_OPT_SPECULATIVE_L_NAME = QStringLiteral("speculative");
-    static inline const QString CL_OPT_SPECULATIVE_DESC = QStringLiteral("Logs the potential result of all extended tiebreak methods, regardless of if they're selected.");
-
     // Global command line options
     static inline const QCommandLineOption CL_OPTION_HELP{{CL_OPT_HELP_S_NAME, CL_OPT_HELP_L_NAME, CL_OPT_HELP_E_NAME}, CL_OPT_HELP_DESC}; // Boolean option
     static inline const QCommandLineOption CL_OPTION_VERSION{{CL_OPT_VERSION_S_NAME, CL_OPT_VERSION_L_NAME}, CL_OPT_VERSION_DESC}; // Boolean option
@@ -89,10 +85,9 @@ private:
     static inline const QCommandLineOption CL_OPTION_BOX{{CL_OPT_BOX_S_NAME, CL_OPT_BOX_L_NAME}, CL_OPT_BOX_DESC, "box"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_EXTRA{{CL_OPT_EXTRA_S_NAME, CL_OPT_EXTRA_L_NAME}, CL_OPT_EXTRA_DESC, "extra"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_MINIMAL{{CL_OPT_MINIMAL_S_NAME, CL_OPT_MINIMAL_L_NAME}, CL_OPT_MINIMAL_DESC}; // Boolean option
-    static inline const QCommandLineOption CL_OPTION_SPECULATIVE{{CL_OPT_SPECULATIVE_S_NAME, CL_OPT_SPECULATIVE_L_NAME}, CL_OPT_SPECULATIVE_DESC}; // Boolean option
 
     static inline const QList<const QCommandLineOption*> CL_OPTIONS_ALL{&CL_OPTION_HELP, &CL_OPTION_VERSION, &CL_OPTION_CONFIG, &CL_OPTION_BOX, &CL_OPTION_EXTRA,
-                                                                        &CL_OPTION_MINIMAL, &CL_OPTION_SPECULATIVE};
+                                                                        &CL_OPTION_MINIMAL};
 
     // Help template
     static inline const QString HELP_TEMPL = "Usage:\n"

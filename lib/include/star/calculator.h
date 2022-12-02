@@ -62,8 +62,6 @@ private:
 
     // Logging - Consider Extended Tiebreak
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_SKIP = QStringLiteral("Skipping extended tiebreak consideration as there are no ties after the primary runoff.");
-    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_NO_OP = QStringLiteral("There is a tie after the primary runoff, but neither the extended tiebreak nor tiebreak speculation are enabled.");
-    static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_SPECULATIVE = QStringLiteral("Tiebreak speculation is enabled, the results of all extended tiebreak methods will be tested.");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_ENABLED = QStringLiteral(R"(Extended tiebreak with selected method altered outcome, using extended results.)");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_DISABLED = QStringLiteral(R"(Extended tiebreak is not enabled, using original results.)");
     static inline const QString LOG_EVENT_EXTENDED_TIEBREAK_IRRELAVENT = QStringLiteral(R"(Extended tiebreak with selected method resulted in no change.)");
@@ -133,7 +131,6 @@ private:
 private:
     std::optional<ExtendedTiebreakMethod> mExtraTiebreakMethod;
     const Election* mElection;
-    bool mSpeculative;
     HeadToHeadMaps mHeadToHeadMaps;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
@@ -176,11 +173,9 @@ public:
     const Election* election() const;
     std::optional<ExtendedTiebreakMethod> extraTiebreakMethod() const;
     bool isExtraTiebreak() const;
-    bool isSpeculative() const;
 
     void setElection(const Election* election);
     void setExtraTiebreakMethod(std::optional<ExtendedTiebreakMethod> method);
-    void setSpeculative(bool speculative);
 
     ElectionResult calculateResult();
 

@@ -1327,7 +1327,6 @@ void tst_ties::all_tie_cases()
     static Star::Calculator calc;
     calc.setElection(&election);
     calc.setExtraTiebreakMethod(extended_method);
-    calc.setSpeculative(false);
 
     // Compare results
     QCOMPARE(calc.calculateResult(), expected_result);
