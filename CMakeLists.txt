@@ -95,7 +95,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
-fetch_qx("a67682b6e94c7dd686df7e475eb91406f92efbfa")
+fetch_qx("3de0116d75f94dcc14ab5c9c0bcfa3c1854aba09")
 
 # Fetch Neargye's Magic Enum
 include(OB/FetchMagicEnum)
