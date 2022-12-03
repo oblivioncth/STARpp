@@ -10,7 +10,7 @@
 
 //-Struct Functions-------------------------------------------------------------------------------------------------
 //Public:
-QList<Rank> Rank::rankSort(const QMap<QString, int>& valueMap)
+QList<Rank> Rank::rankSort(const QMap<QString, int>& valueMap, Order order)
 {
     QList<Rank> rankings;
 
@@ -35,7 +35,10 @@ QList<Rank> Rank::rankSort(const QMap<QString, int>& valueMap)
         if(totalScore != currentKey)
         {
             // Finish current rank
-            rankings.prepend(currentRank); // Prepend to flip the order so that index '0' is 1st place
+            if(order == Ascending)
+                rankings.prepend(currentRank);
+            else
+                rankings.append(currentRank);
 
             // Prepare next rank
             currentRank = {.value = totalScore, .nominees = {}};
