@@ -123,8 +123,8 @@ void HeadToHeadResults::narrow(QSet<QString> candidates, NarrowMode mode)
 
     for(CandidateStats& stat : mStats)
     {
-        stat.defeats.removeIf([&](QSet<QString>::iterator itr){ return shouldCull(*itr); });
-        stat.victories.removeIf([&](QSet<QString>::iterator itr) { return shouldCull(*itr); });
+        stat.defeats.removeIf([&](const QString& c){ return shouldCull(c); });
+        stat.victories.removeIf([&](const QString& c) { return shouldCull(c); });
 
         QList<QString> cans = stat.preferences.components();
         for(const QString& c : cans)

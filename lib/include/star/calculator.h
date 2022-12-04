@@ -11,21 +11,15 @@
 namespace Star
 {
 
+// Forward Declarations
+class HeadToHeadResults;
+
 class Calculator : public QObject
 {
     Q_OBJECT
 //-Class Enums------------------------------------------------------------------------------------------------------
 public:
     enum ExtendedTiebreakMethod { FiveStar, HTHWins, HTHCount, HTHMargin, Random, Condorcet };
-
-//-Class Structs----------------------------------------------------------------------------------------------------
-private:
-    struct HeadToHeadMaps
-    {
-        QMap<QString, int> wins;
-        QMap<QString, int> prefCounts;
-        QMap<QString, int> margins;
-    };
 
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
@@ -131,43 +125,49 @@ private:
 private:
     std::optional<ExtendedTiebreakMethod> mExtraTiebreakMethod;
     const Election* mElection;
-    HeadToHeadMaps mHeadToHeadMaps;
+    std::unique_ptr<HeadToHeadResults> mHeadToHeadResults;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     Calculator(const Election* election = nullptr);
 
+//-Destructor---------------------------------------------------------------------------------------------------------
+public:
+    /* Required for std::unique_ptr<HeadToHeadResults> member to work correctly
+     *
+     * See: https://stackoverflow.com/questions/33212686/how-to-use-unique-ptr-with-forward-declared-type
+     */
+    ~Calculator();
+
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
     // Main steps
     QSet<QString> determinePreliminaryLeaders();
-    QPair<QSet<QString>, QSet<QString>> performPrimaryRunoff(const QSet<QString>& preliminaryLeaders);
-    QPair<QSet<QString>, QSet<QString>> performExtendedTiebreak(QSet<QString> initialWinners, QSet<QString> initialRunnerUps, ExtendedTiebreakMethod method);
+    QString performPrimaryRunoff(QPair<QString, QString> candidates) const;
 
     // Utility
-    HeadToHeadMaps createHeadToHeadMaps(const QSet<QString>& nominees);
+    QList<Rank> rankByScore(const QSet<QString>& nominees, Rank::Order order) const;
+    QList<Rank> rankByVotesOfMaxScore(const QSet<QString>& nominees, Rank::Order order) const;
+    QList<Rank> rankByHeadToHeadLosses(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const;
+    QList<Rank> rankByHeadToHeadPreferences(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const;
+    QList<Rank> rankByHeadToHeadMargin(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const;
 
-    QList<Rank> rankByPreference(const QSet<QString>& nominees);
-    QList<Rank> rankByScore(const QSet<QString>& nominees);
-    QList<Rank> rankByVotesOfMaxScore(const QSet<QString>& nominees);
-    QList<Rank> rankByHeadToHeadWins(const QSet<QString>& nominees);
-    QList<Rank> rankByHeadToHeadPrefCount(const QSet<QString>& nominees);
-    QList<Rank> rankByHeadToHeadMargin(const QSet<QString>& nominees);
+    QSet<QString> preliminaryCandidateTieReduction(QSet<QString> candidates, qsizetype desiredCount) const;
 
-    QPair<QSet<QString>, QSet<QString>> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note);
-    QPair<QSet<QString>, QSet<QString>> breakScoreTie(const QSet<QString>& nominees);
-    QPair<QSet<QString>, QSet<QString>> breakPreferenceTie(const QSet<QString>& nominees);
-    QPair<QSet<QString>, QSet<QString>> breakExtendedTieFiveStar(const QSet<QString>& nominees);
-    QPair<QSet<QString>, QSet<QString>> breakExtendedTieHeadToHeadWins(const QSet<QString>& nominees);
-    QPair<QSet<QString>, QSet<QString>> breakExtendedTieHeadToHeadPrefCount(const QSet<QString>& nominees);
-    QPair<QSet<QString>, QSet<QString>> breakExtendedTieHeadToHeadMargin(const QSet<QString>& nominees);
-    QPair<QSet<QString>, QSet<QString>> breakExtendedTieRandom(const QSet<QString>& nominees);
-    QPair<QSet<QString>, QSet<QString>> breakExtendedCondorcet(const QSet<QString>& nominees);
+    QSet<QString> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note) const;
+    QSet<QString> breakTieMostFiveStar(const QSet<QString>& nominees) const;
+    QSet<QString> breakTieLeastFiveStar(const QSet<QString>& nominees) const;
+    QSet<QString> breakTieMostHeadToHeadLosses(const QSet<QString>& nominees, const HeadToHeadResults* hth) const;
+    QSet<QString> breakTieLeastHeadToHeadPreferences(const QSet<QString>& nominees, const HeadToHeadResults* hth) const;
+    QSet<QString> breakTieSmallestHeadToHeadMargin(const QSet<QString>& nominees, const HeadToHeadResults* hth) const;
+    QSet<QString> breakTieHighestScore(const QSet<QString>& nominees) const;
+    //QSet<QString> breakTieCondorcetProtocol(const QSet<QString>& nominees, const HeadToHeadResults* hth);
+    QString breakTieRandom(const QSet<QString>& nominees) const;
 
     // Logging
-    QString createNomineeGeneralSetString(const QSet<QString>& nominees);
-    QString createNomineeToalScoreSetString(const QSet<QString>& nominees);
-    QString createNomineeRankListString(const QList<Rank>& ranks);
+    QString createNomineeGeneralSetString(const QSet<QString>& nominees) const;
+    QString createNomineeToalScoreSetString(const QSet<QString>& nominees) const;
+    QString createNomineeRankListString(const QList<Rank>& ranks) const;
 
 public:
     const Election* election() const;
@@ -181,7 +181,7 @@ public:
 
 //-Signals & Slots-------------------------------------------------------------------------------------------------
 signals:
-    void calculationDetail(const QString& detail);
+    void calculationDetail(const QString& detail) const;
 
 };
 

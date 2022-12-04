@@ -6,6 +6,8 @@
 // Project Includes
 #include "star/election.h"
 
+// TODO: Add operator==()
+
 namespace Star
 {
 
@@ -14,21 +16,19 @@ class ElectionResult
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
     const Election* mElection;
-    QSet<QString> mWinners;
-    QSet<QString> mRunnerUps;
+    QString mWinner;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     ElectionResult();
-    ElectionResult(const Election* election, const QSet<QString>& winners, const QSet<QString>& runnerUps);
+    ElectionResult(const Election* election, const QString& winner);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     bool isNull() const;
 
     const Election* election() const;
-    const QSet<QString>& winners() const;
-    const QSet<QString>& runnerUps() const;
+    QString winner() const;
 };
 
 }
