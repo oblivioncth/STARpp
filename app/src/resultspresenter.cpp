@@ -41,13 +41,6 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 {
     QString category = result.election()->name();
     QStringList nominees = result.election()->nominees();
-    QString winnerStr = result.winners().size() > 1 ?
-                        WINNER_MULTI_TEMPLATE.arg(Qx::String::join(result.winners(), R"(", ")")) :
-                        WINNER_SINGLE_TEMPLATE.arg(*result.winners().constBegin());
-    QString runnerUpStr = result.winners().size() > 1 ?
-                          RUNNERUP_MULTI_TEMPLATE.arg(Qx::String::join(result.runnerUps(), R"(", ")")) :
-                          RUNNERUP_SINGLE_TEMPLATE.arg(*result.runnerUps().constBegin());
-
     // Print category
     cout << HEADING_CATEGORY.arg(category) << endl << endl;
 
@@ -61,8 +54,8 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     pause();
 
     // Print result
-    cout << HEADING_OUTCOME << endl;
-    cout << winnerStr << endl << runnerUpStr << endl << endl;
+    cout << HEADING_WINNERS << endl;
+    cout << WINNER_TEMPLATE.arg(1).arg(result.winner());
 
     // Print raw score rankings
     for(const Rank& rank : result.election()->scoreRankings())
@@ -92,7 +85,7 @@ void ResultPresenter::printSummary()
     // Add headings
     summaryTable.at(0, 0) = SUMMARY_HEADING_CATEGORY;
     summaryTable.at(0, 1) = SUMMARY_HEADING_WINNER;
-    summaryTable.at(0, 2) = SUMMARY_HEADING_RUNNER_UP;
+    summaryTable.at(0, 2) = "TEMP";
 
     // Add results
     for(int res = 0, row = 1; res < mResults->size(); res++, row++)
@@ -102,8 +95,8 @@ void ResultPresenter::printSummary()
 
         // Category, winner, runner-up
         summaryTable.at(row, 0) = ' ' + result.election()->name() + ' ';
-        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(Qx::String::join(result.winners(), R"(", ")"));
-        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(Qx::String::join(result.runnerUps(), R"(", ")"));
+        summaryTable.at(row, 1) = result.winner();
+        summaryTable.at(row, 2) = "TEMP";
     }
 
     // Determine field widths

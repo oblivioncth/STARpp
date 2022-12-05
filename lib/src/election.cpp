@@ -25,7 +25,7 @@ int Election::totalScore(const QString& nominee) const
     // NOTE: This could instead return a std::optional<int> for if *nominee* is missing, but that
     // would indicate a bug elsewhere and should never happen, so instead this just throws.
     if(!mTotals.contains(nominee))
-        throw std::runtime_error(std::string(Q_FUNC_INFO) + " the desired nominee is not present.");
+        qFatal(" the desired nominee is not present.");
 
     return mTotals[nominee];
 }
@@ -45,29 +45,14 @@ Election::Ballot::Ballot() {}
 const Election::Voter& Election::Ballot::voter() const { return mVoter; }
 int Election::Ballot::score(const QString& nominee) const { return mVotes.value(nominee, 0); }
 
-QString Election::Ballot::preference(const QSet<QString>& nominees) const
+QString Election::Ballot::preference(const QString& nomineeA, const QString& nomineeB) const
 {
-    QString pref;
-    int prefScore = 0;
+    int scoreA = score(nomineeA);
+    int scoreB = score(nomineeB);
 
-    // Check for highest score
-    for(const QString& nominee : nominees)
-    {
-        int nomScore = score(nominee);
-        if(nomScore == prefScore)
-        {
-            pref = QString(); // Score ties prevent preference
-            if(nomScore == 5) // A score tie of 5 means a preference is impossible
-                break;
-        }
-        else if(nomScore > prefScore)
-        {
-            pref = nominee;
-            prefScore = nomScore;
-        }
-    }
-
-    return pref;
+    return scoreA > scoreB ? nomineeA :
+           scoreB > scoreA ? nomineeB :
+           QString();
 }
 
 //===============================================================================================================

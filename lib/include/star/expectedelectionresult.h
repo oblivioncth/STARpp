@@ -14,23 +14,20 @@ class ExpectedElectionResult
 {
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
-    QSet<QString> mWinners;
-    QSet<QString> mRunnerUps;
+    QString mWinner;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     ExpectedElectionResult();
-    ExpectedElectionResult(const QSet<QString>& winners, const QSet<QString>& runnerUps);
+    ExpectedElectionResult(const QString& winner);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     bool isNull() const;
 
-    const QSet<QString>& winners() const;
-    const QSet<QString>& runnerUps() const;
+    QString winner() const;
 
-    void setWinners(const QSet<QString>& winners);
-    void setRunnerUps(const QSet<QString>& runnerUps);
+    void setWinner(const QString& winner);
 
     bool operator==(const ElectionResult& result) const;
 };

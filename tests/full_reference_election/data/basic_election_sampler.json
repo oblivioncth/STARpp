@@ -1,74 +1,56 @@
 [
   {
-    "winners": ["Sixth film"],
-    "runnerups": ["Eighth film"]
+    "winners": ["Sixth film"]
   },
   {
-    "winners": ["Fourth Director"],
-    "runnerups": ["Fifth Director"]
+    "winners": ["Fourth Director"]
   },
   {
-    "winners": ["Fifth Cheesesteak"],
-    "runnerups": ["Fourth Cheesesteak"]
+    "winners": ["Fifth Cheesesteak"]
   },
   {
-    "winners": ["Sixth Actress"],
-    "runnerups": ["Fifth Actress"]
+    "winners": ["Sixth Actress"]
   },
   {
-    "winners": ["Fifth Actor"],
-    "runnerups": ["First Actor"]
+    "winners": ["Fifth Actor"]
   },
   {
-    "winners": ["First Supporting Actress"],
-    "runnerups": ["Fourth Supporting Actress"]
+    "winners": ["First Supporting Actress"]
   },
   {
-    "winners": ["First Supporting Actor"],
-    "runnerups": ["Second Supporting Actor"]
+    "winners": ["First Supporting Actor"]
   },
   {
-    "winners": ["Fifth Documentary"],
-    "runnerups": ["Second Documentary"]
+    "winners": ["Fifth Documentary"]
   },
   {
-    "winners": ["Third Script"],
-    "runnerups": ["Second Script"]
+    "winners": ["Third Script"]
   },
   {
-    "winners": ["Fifth Soundtrack"],
-    "runnerups": ["Third Soundtrack"]
+    "winners": ["Fifth Soundtrack"]
   },
   {
-    "winners": ["Fourth Directorial Debut"],
-    "runnerups": ["Fifth Directorial Debut"]
+    "winners": ["Fourth Directorial Debut"]
   },
   {
-    "winners": ["Fourth Breakthrough"],
-    "runnerups": ["First Breakthrough"]
+    "winners": ["Fourth Breakthrough"]
   },
   {
-    "winners": ["Fourth Cinematography"],
-    "runnerups": ["Fifth Cinematography"]
+    "winners": ["Fourth Cinematography"]
   },
   {
-    "winners": ["Second Foreign"],
-    "runnerups": ["Fourth Foreign"]
+    "winners": ["Second Foreign"]
   },
   {
-    "winners": ["Second Animated"],
-    "runnerups": ["First Animated"]
+    "winners": ["Second Animated"]
   },
   {
-    "winners": ["Third Ensemble"],
-    "runnerups": ["Second Ensemble"]
+    "winners": ["Third Ensemble"]
   },
   {
-    "winners": ["Second Friedman"],
-    "runnerups": ["Third Friedman"]
+    "winners": ["Second Friedman"]
   },
   {
-    "winners": ["Second May"],
-    "runnerups": ["First May"]
+    "winners": ["Second May"]
   }
 ]

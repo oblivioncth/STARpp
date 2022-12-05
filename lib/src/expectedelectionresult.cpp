@@ -11,25 +11,22 @@ namespace Star
 //-Constructor---------------------------------------------------------------------------------------------------------
 //Public:
 ExpectedElectionResult::ExpectedElectionResult() :
-    mWinners(),
-    mRunnerUps()
+    mWinner()
 {}
 
-ExpectedElectionResult::ExpectedElectionResult(const QSet<QString>& winners, const QSet<QString>& runnerUps) :
-    mWinners(winners),
-    mRunnerUps(runnerUps)
+ExpectedElectionResult::ExpectedElectionResult(const QString& winner) :
+    mWinner(winner)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-bool ExpectedElectionResult::isNull() const { return mWinners.isEmpty(); }
+bool ExpectedElectionResult::isNull() const { return mWinner.isEmpty(); }
 
-const QSet<QString>& ExpectedElectionResult::winners() const { return mWinners; }
-const QSet<QString>& ExpectedElectionResult::runnerUps() const { return mRunnerUps; }
+QString ExpectedElectionResult::winner() const { return mWinner; }
 
 bool ExpectedElectionResult::operator==(const ElectionResult& result) const
 {
-    return result.winners() == mWinners && result.runnerUps() == mRunnerUps;
+    return result.winner() == mWinner;
 }
 
 }

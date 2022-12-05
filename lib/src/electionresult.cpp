@@ -12,23 +12,20 @@ namespace Star
 //Public:
 ElectionResult::ElectionResult() :
     mElection(nullptr),
-    mWinners(),
-    mRunnerUps()
+    mWinner()
 {}
 
-ElectionResult::ElectionResult(const Election* election, const QSet<QString>& winners, const QSet<QString>& runnerUps) :
+ElectionResult::ElectionResult(const Election* election, const QString& winner) :
     mElection(election),
-    mWinners(winners),
-    mRunnerUps(runnerUps)
+    mWinner(winner)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-bool ElectionResult::isNull() const { return !mElection || mWinners.isEmpty(); }
+bool ElectionResult::isNull() const { return !mElection || mWinner.isNull(); }
 
 const Election* ElectionResult::election() const { return mElection; }
-const QSet<QString>& ElectionResult::winners() const { return mWinners; }
-const QSet<QString>& ElectionResult::runnerUps() const { return mRunnerUps; }
+QString ElectionResult::winner() const { return mWinner; }
 
 
 

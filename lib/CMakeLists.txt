@@ -47,7 +47,7 @@ set(CXX_PUBLIC_HEADERS
 )
 
 set(CXX_PRIVATE_HEADERS
-    dummy_p.h
+    headtoheadresults.h
     reference/ballotbox_p.h
     reference/categoryconfig_p.h
     reference/resultset_p.h
@@ -58,6 +58,7 @@ set(CXX_IMPLEMENTATION
     election.cpp
     electionresult.cpp
     expectedelectionresult.cpp
+    headtoheadresults.cpp
     rank.cpp
     reference.cpp
     reference/ballotbox_p.cpp

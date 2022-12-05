@@ -6,10 +6,12 @@
 
 struct Rank
 {
+    enum Order { Ascending, Descending };
+
     int value;
     QSet<QString> nominees;
 
-    static QList<Rank> rankSort(const QMap<QString, int>& valueMap);
+    static QList<Rank> rankSort(const QMap<QString, int>& valueMap, Order order = Descending);
 };
 
 #endif // RANK_H
