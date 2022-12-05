@@ -27,7 +27,8 @@ namespace Star
 //-Constructor---------------------------------------------------------------------------------------------------------
 //Public:
 Calculator::Calculator(const Election* election) :
-    mElection(election)
+    mElection(election),
+    mOptions(Option::NoOptions)
 {}
 
 Calculator::~Calculator() = default;
@@ -131,10 +132,7 @@ QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) con
     }
 
     // Note results
-    if(winner.isNull())
-        ; // TODO: Add when supporting true ties
-    else
-        emit calculationDetail(LOG_EVENT_PRIMARY_WINNER.arg(winner));
+    emit calculationDetail(winner.isNull() ? LOG_EVENT_PRIMARY_UNRESOLVED : LOG_EVENT_PRIMARY_WINNER.arg(winner));
 
     // Return result
     return winner;
@@ -428,7 +426,9 @@ QString Calculator::createNomineeRankListString(const QList<Rank>& ranks) const
 
 //Public:
 const Election* Calculator::election() const { return mElection; }
+Calculator::Options Calculator::options() const { return mOptions; }
 void Calculator::setElection(const Election* election) { mElection = election; }
+void Calculator::setOptions(Options options) { mOptions = options; }
 
 ElectionResult Calculator::calculateResult()
 {
@@ -452,36 +452,41 @@ ElectionResult Calculator::calculateResult()
     emit calculationDetail(LOG_EVENT_CALC_HEAD_TO_HEAD);
     mHeadToHeadResults = std::make_unique<HeadToHeadResults>(mElection);
 
+    // Results holders
+    QString winner;
+    QSet<QString> unresolvedCandidates;
+
     // Determine preliminary leaders based on raw score
     QSet<QString> preliminaryLeaders = determinePreliminaryLeaders();
 
     // Check for an unresolved preliminary tie that prevented a runoff
     if(preliminaryLeaders.size() != 2)
     {
-        // TODO: Fill out when disabling random tiebreaker is added
+        emit calculationDetail(LOG_EVENT_NO_RUNOFF);
+        unresolvedCandidates = preliminaryLeaders;
     }
-
-    // Segment out runoff candidates
-    QPair<QString, QString> runoffCandidates;
-    auto pItr = preliminaryLeaders.cbegin();
-    runoffCandidates.first = *(pItr++);
-    runoffCandidates.second = *pItr;
-    emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffCandidates.first, runoffCandidates.second));
-
-    // Perform primary runoff
-    QString winner = performPrimaryRunoff(runoffCandidates);
-
-    // Check for unresolved runoff tie
-    if(winner.isNull())
+    else
     {
-        // TODO: Fill out when disabling random tiebreaker is added
+        // Segment out runoff candidates
+        QPair<QString, QString> runoffCandidates;
+        auto pItr = preliminaryLeaders.cbegin();
+        runoffCandidates.first = *(pItr++);
+        runoffCandidates.second = *pItr;
+        emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffCandidates.first, runoffCandidates.second));
+
+        // Perform primary runoff
+        winner = performPrimaryRunoff(runoffCandidates);
+
+        // Check for unresolved runoff tie
+        if(winner.isNull())
+            unresolvedCandidates = preliminaryLeaders;
     }
 
     // Log finish
     emit calculationDetail(LOG_EVENT_CALC_FINISH + '\n' + QString(120,'-'));
 
     // Return final results
-    return ElectionResult(mElection, winner);
+    return ElectionResult(mElection, winner, unresolvedCandidates);
 }
 
 

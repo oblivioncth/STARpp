@@ -1,56 +1,74 @@
 [
   {
-    "winners": ["Sixth film"]
+    "winners": ["Sixth film"],
+	"unresolved": []
   },
   {
-    "winners": ["Fourth Director"]
+    "winners": ["Fourth Director"],
+	"unresolved": []
   },
   {
-    "winners": ["Fifth Cheesesteak"]
+    "winners": ["Fifth Cheesesteak"],
+	"unresolved": []
   },
   {
-    "winners": ["Sixth Actress"]
+    "winners": ["Sixth Actress"],
+	"unresolved": []
   },
   {
-    "winners": ["Fifth Actor"]
+    "winners": ["Fifth Actor"],
+	"unresolved": []
   },
   {
-    "winners": ["First Supporting Actress"]
+    "winners": ["First Supporting Actress"],
+	"unresolved": []
   },
   {
-    "winners": ["First Supporting Actor"]
+    "winners": ["First Supporting Actor"],
+	"unresolved": []
   },
   {
-    "winners": ["Fifth Documentary"]
+    "winners": ["Fifth Documentary"],
+	"unresolved": []
   },
   {
-    "winners": ["Third Script"]
+    "winners": ["Third Script"],
+	"unresolved": []
   },
   {
-    "winners": ["Fifth Soundtrack"]
+    "winners": ["Fifth Soundtrack"],
+	"unresolved": []
   },
   {
-    "winners": ["Fourth Directorial Debut"]
+    "winners": ["Fourth Directorial Debut"],
+	"unresolved": []
   },
   {
-    "winners": ["Fourth Breakthrough"]
+    "winners": ["Fourth Breakthrough"],
+	"unresolved": []
   },
   {
-    "winners": ["Fourth Cinematography"]
+    "winners": ["Fourth Cinematography"],
+	"unresolved": []
   },
   {
-    "winners": ["Second Foreign"]
+    "winners": ["Second Foreign"],
+	"unresolved": []
   },
   {
-    "winners": ["Second Animated"]
+    "winners": ["Second Animated"],
+	"unresolved": []
   },
   {
-    "winners": ["Third Ensemble"]
+    "winners": ["Third Ensemble"],
+	"unresolved": []
   },
   {
-    "winners": ["Second Friedman"]
+    "winners": ["Second Friedman"],
+	"unresolved": []
   },
   {
-    "winners": ["Second May"]
+    "winners": ["Second May"],
+	"unresolved": []
   }
 ]

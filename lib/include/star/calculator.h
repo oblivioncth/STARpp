@@ -3,6 +3,7 @@
 
 // Qt Includes
 #include <QObject>
+#include <QFlags>
 
 // Project Includes
 #include "star/election.h"
@@ -17,6 +18,15 @@ class HeadToHeadResults;
 class Calculator : public QObject
 {
     Q_OBJECT
+//-Class Enums------------------------------------------------------------------------------------------------------
+public:
+    enum Option
+    {
+        NoOptions = 0x00,
+        AllowTrueTies = 0x01
+    };
+    Q_DECLARE_FLAGS(Options, Option);
+
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
     // Logging - Intro
@@ -42,7 +52,7 @@ private:
     static inline const QString LOG_EVENT_PPRELIMINARY_TIE_REDUCTION_RESULT = QStringLiteral("Preliminary tie reduced to:");
 
     // Logging - Main Runoff
-     static inline const QString LOG_EVENT_RUNOFF_CANDIDATES = QStringLiteral(R"("%1" & "%2" advance to the runoff.)");
+    static inline const QString LOG_EVENT_RUNOFF_CANDIDATES = QStringLiteral(R"("%1" & "%2" advance to the runoff.)");
     static inline const QString LOG_EVENT_PERFORM_PRIMARY_RUNOFF = QStringLiteral("Performing primary runoff...");
     static inline const QString LOG_EVENT_PRIMARY_HEAD_TO_HEAD_WINNER_CHECK = QStringLiteral("Checking for clear winner of head-to-head.");
     static inline const QString LOG_EVENT_PRIMARY_TIE = QStringLiteral("There candidates in the runoff are tied in terms of preference.");
@@ -51,6 +61,7 @@ private:
     static inline const QString LOG_EVENT_PRIMARY_CHOOSING_RANDOM_WINNER = QStringLiteral("Choosing runoff winner randomly.");
    // static inline const QString LOG_EVENT_CONDORCET_START_STAGES = QStringLiteral("Following STAR Condorcet protocol methodology...");
     static inline const QString LOG_EVENT_PRIMARY_WINNER = QStringLiteral(R"(The runoff resulted in a win for: "%1")");
+    static inline const QString LOG_EVENT_PRIMARY_UNRESOLVED = QStringLiteral(R"(The runoff tie could not be broken.)");
 
     // Logging - Ranking
     static inline const QString LOG_EVENT_RANK_BY_SCORE = QStringLiteral("Ranking relevant nominees by score (%1)...");
@@ -74,7 +85,10 @@ private:
     static inline const QString LOG_EVENT_BREAK_TIE_RANDOM = QStringLiteral("Breaking %1-way tie randomly...");
     static inline const QString LOG_EVENT_BREAK_RESULT = QStringLiteral("Tie Break Winner(s) - { %1 }");
 
-    // Logging - Final Results
+    // Logging - No Runoff
+    static inline const QString LOG_EVENT_NO_RUNOFF = QStringLiteral("The number of candidates could not be narrowed to two in order to perform the runoff.");
+
+    // Logging - Final Results TODO: Use this
     static inline const QString LOG_EVENT_FINAL_RESULT_WINNERS = QStringLiteral(R"(Final winners: { %1 })");
 
     // Logging - Finish
@@ -88,6 +102,7 @@ private:
 private:
     const Election* mElection;
     std::unique_ptr<HeadToHeadResults> mHeadToHeadResults;
+    Options mOptions;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
@@ -132,9 +147,10 @@ private:
 
 public:
     const Election* election() const;
-    bool isExtraTiebreak() const;
+    Options options() const;
 
     void setElection(const Election* election);
+    void setOptions(Options options);
 
     ElectionResult calculateResult();
 
@@ -142,6 +158,7 @@ public:
 signals:
     void calculationDetail(const QString& detail) const; // clazy:exclude=const-signal-or-slot
 };
+Q_DECLARE_OPERATORS_FOR_FLAGS(Calculator::Options)
 
 }
 

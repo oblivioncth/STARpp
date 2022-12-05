@@ -60,19 +60,26 @@ Qx::GenericError ResultSetReader::readInto()
         Qx::GenericError convError;
 
         QJsonArray jWinnerArray;
+        QJsonArray jUnresolvedArray;
         if((convError = Qx::Json::checkedKeyRetrieval(jWinnerArray, expectedResultObj, KEY_WINNERS_ARRAY)).isValid())
+            return convError;
+        if((convError = Qx::Json::checkedKeyRetrieval(jUnresolvedArray, expectedResultObj, KEY_UNRESOLVED_ARRAY)).isValid())
             return convError;
 
         // Convert arrays to string lists
         QList<QString> winners;
+        QList<QString> unresolved;
         if((convError = Qx::Json::checkedArrayConversion(winners, jWinnerArray)).isValid())
+            return convError;
+        if((convError = Qx::Json::checkedArrayConversion(unresolved, jUnresolvedArray)).isValid())
             return convError;
 
         // Convert to sets
         QSet<QString> winnerSet = QSet<QString>(winners.constBegin(), winners.constEnd());
+        QSet<QString> unresolvedSet = QSet<QString>(unresolved.constBegin(), unresolved.constEnd());
 
         // Add expected result to list
-        mTargetList->append(ExpectedElectionResult(*winnerSet.cbegin())); // Temporary
+        mTargetList->append(ExpectedElectionResult(*winnerSet.cbegin(), unresolvedSet)); // TODO: Temporary, before bloc
     }
 
     return Qx::GenericError();
