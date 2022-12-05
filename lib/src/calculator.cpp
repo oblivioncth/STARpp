@@ -103,24 +103,29 @@ QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) con
     emit calculationDetail(LOG_EVENT_PERFORM_PRIMARY_RUNOFF);
 
     // Check for clear winner
+    emit calculationDetail(LOG_EVENT_PRIMARY_HEAD_TO_HEAD_WINNER_CHECK);
     QString winner = mHeadToHeadResults->winner(candidates.first, candidates.second);
     if(winner.isNull())
     {
+        emit calculationDetail(LOG_EVENT_PRIMARY_TIE);
         QSet<QString> cTied = {candidates.first, candidates.second};
 
         // Try to break tie by original score
+        emit calculationDetail(LOG_EVENT_PRIMARY_HIGHER_SCORE_CHECK);
         QSet<QString> highestScore = breakTieHighestScore(cTied);
         if(highestScore.size() == 1)
             winner = *highestScore.cbegin();
         else
         {
             // Try to break tie by five star votes
+            emit calculationDetail(LOG_EVENT_PRIMARY_MORE_FIVE_STAR_CHECK);
             QSet<QString> mostFiveStar = breakTieMostFiveStar(cTied);
             if(mostFiveStar.size() == 1)
                 winner = *mostFiveStar.cbegin();
             else
             {
                 // Randomly choose a winner
+                emit calculationDetail(LOG_EVENT_PRIMARY_CHOOSING_RANDOM_WINNER);
                 winner = breakTieRandom(cTied);
             }
         }
@@ -128,12 +133,67 @@ QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) con
 
     // Note results
     if(winner.isNull())
-        ;
+        ; // TODO: Add when supporting true ties
     else
-        ;
+        emit calculationDetail(LOG_EVENT_PRIMARY_WINNER.arg(winner));
 
     // Return result
     return winner;
+}
+
+QSet<QString> Calculator::preliminaryCandidateTieReduction(QSet<QString> candidates, qsizetype desiredCount) const
+{
+    // This function should never be called in this situation, but account for it anyway
+    if(candidates.size() <= desiredCount)
+    {
+        qWarning("called with a set of candidates that is already at or less than the desired count.");
+        return candidates;
+    }
+
+    // Get copy of head-to-head results and reduce it to only include tied candidates
+    HeadToHeadResults relevantHthResults = *mHeadToHeadResults;
+    relevantHthResults.narrow(candidates, HeadToHeadResults::Inclusive);
+
+    // Eliminate the weakest candidates in turn until at the desired amount
+    emit calculationDetail(LOG_EVENT_PRELIMINARY_TIE_REDUCTION.arg(candidates.size()).arg(desiredCount));
+    while(candidates.size() != desiredCount)
+    {
+        QString toBeCut;
+
+        // Check for clear head-to-head loser
+        QSet<QString> mostLosses = breakTieMostHeadToHeadLosses(candidates, &relevantHthResults);
+        if(mostLosses.size() == 1)
+            toBeCut = *mostLosses.begin();
+        else
+        {
+            // Check for clear Five Star loser
+            QSet<QString> leastFiveStars = breakTieLeastFiveStar(mostLosses);
+            if(leastFiveStars.size() == 1)
+                toBeCut = *leastFiveStars.begin();
+            else
+            {
+                // Randomly choose a candidate to cut
+                toBeCut = breakTieRandom(leastFiveStars);
+            }
+        }
+
+        // Cut candidate if the tie was resolvable
+        if(!toBeCut.isNull())
+        {
+            emit calculationDetail(LOG_EVENT_PPRELIMINARY_TIE_CUT_CANDIDATE.arg(toBeCut));
+            candidates.remove(toBeCut);
+            relevantHthResults.narrow({toBeCut}, HeadToHeadResults::Exclusive);
+        }
+        else
+        {
+            emit calculationDetail(LOG_EVENT_PPRELIMINARY_TIE_REDUCTION_UNSUCCESSFUL);
+            break;
+        }
+    }
+
+    // Return the reduced candidate set, ideally at target size
+    emit calculationDetail(LOG_EVENT_PPRELIMINARY_TIE_REDUCTION_RESULT + '\n' + createNomineeToalScoreSetString(candidates));
+    return candidates;
 }
 
 QList<Rank> Calculator::rankByScore(const QSet<QString>& nominees, Rank::Order order) const
@@ -142,7 +202,7 @@ QList<Rank> Calculator::rankByScore(const QSet<QString>& nominees, Rank::Order o
      * Redoing this with the provided sub-list is more straight forward than trying to manipulate
      * the full score rankings that are part of the Election
      */
-    emit calculationDetail(LOG_EVENT_RANK_BY_SCORE);
+    emit calculationDetail(LOG_EVENT_RANK_BY_SCORE.arg(ENUM_NAME(order)));
     QMap<QString, int> totalScoreMap;
 
     for(const QString& nominee : nominees)
@@ -158,7 +218,7 @@ QList<Rank> Calculator::rankByScore(const QSet<QString>& nominees, Rank::Order o
 QList<Rank> Calculator::rankByVotesOfMaxScore(const QSet<QString>& nominees, Rank::Order order) const
 {
     // Determine aggregate max votes of nominee list
-    emit calculationDetail(LOG_EVENT_RANK_BY_VOTES_OF_MAX_SCORE); // TODO: Change log text to reflect "least"
+    emit calculationDetail(LOG_EVENT_RANK_BY_VOTES_OF_MAX_SCORE.arg(ENUM_NAME(order)));
     QMap<QString, int> totalMaxVotesMap;
 
     for(const QString& nominee : nominees)
@@ -182,21 +242,23 @@ QList<Rank> Calculator::rankByVotesOfMaxScore(const QSet<QString>& nominees, Ran
 QList<Rank> Calculator::rankByHeadToHeadLosses(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const
 {
     // Create losses map
+    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_LOSSES.arg(ENUM_NAME(order)));
     QMap<QString, int> losses;
+
     for(const QString& c : nominees)
         losses[c] = hth->losses(c);
 
     // Create sorted wins losses list
     QList<Rank> headToHeadLossesRanks = Rank::rankSort(losses, order);
 
-    // TODO: Log
+    emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_LOSSES + '\n' + createNomineeRankListString(headToHeadLossesRanks));
     return headToHeadLossesRanks;
 }
 
 QList<Rank> Calculator::rankByHeadToHeadPreferences(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const
 {
     // Determine aggregate face-off wins of nominees list
-    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_PREF_COUNT);
+    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_PREFERENCES.arg(ENUM_NAME(order)));
 
     // Create pref count map
     QMap<QString, int> preferences;
@@ -206,14 +268,14 @@ QList<Rank> Calculator::rankByHeadToHeadPreferences(const QSet<QString>& nominee
     // Create scoped & sorted wins list
     QList<Rank> headToHeadPrefCountRanks = Rank::rankSort(preferences, order);
 
-    emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_PREF_COUNT + '\n' + createNomineeRankListString(headToHeadPrefCountRanks));
+    emit calculationDetail(LOG_EVENT_RANKINGS_HEAD_TO_HEAD_PREFERENCES + '\n' + createNomineeRankListString(headToHeadPrefCountRanks));
     return headToHeadPrefCountRanks;
 }
 
 QList<Rank> Calculator::rankByHeadToHeadMargin(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const
 {
     // Determine aggregate face-off wins of nominees list
-    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_MARGIN);
+    emit calculationDetail(LOG_EVENT_RANK_BY_HEAD_TO_HEAD_MARGIN.arg(ENUM_NAME(order)));
 
     // Create pref count map
     QMap<QString, int> margins;
@@ -227,95 +289,44 @@ QList<Rank> Calculator::rankByHeadToHeadMargin(const QSet<QString>& nominees, co
     return headToHeadMarginRanks;
 }
 
-QSet<QString> Calculator::preliminaryCandidateTieReduction(QSet<QString> candidates, qsizetype desiredCount) const
-{
-    // This function should never be called in this situation, but account for it anyway
-    if(candidates.size() <= desiredCount)
-        return candidates;
-
-    // Get copy of head-to-head results and reduce it to only include tied candidates
-    HeadToHeadResults relevantHthResults = *mHeadToHeadResults;
-    relevantHthResults.narrow(candidates, HeadToHeadResults::Inclusive);
-
-    // Eliminate the weakest candidates in turn until at the desired amount
-    while(candidates.size() != desiredCount)
-    {        
-        QString toBeCut;
-
-        // Check for clear head-to-head loser
-        QSet<QString> mostLosses = breakTieMostHeadToHeadLosses(candidates, &relevantHthResults);
-        if(mostLosses.size() == 1)
-            toBeCut = *mostLosses.begin();
-        else
-        {
-            // Check for clear Five Star loser
-            QSet<QString> leastFiveStars = breakTieLeastFiveStar(mostLosses);
-            if(leastFiveStars.size() == 1)
-                toBeCut = *leastFiveStars.begin();
-            else
-            {
-                // Randomly choose a candidate to cut
-                toBeCut = breakTieRandom(leastFiveStars);
-            }
-        }
-
-        // Cut candidate if the tie was resolvable
-        if(!toBeCut.isNull())
-        {
-            candidates.remove(toBeCut);
-            relevantHthResults.narrow({toBeCut}, HeadToHeadResults::Exclusive);
-        }
-        else
-            break;
-    }
-
-    // Return the reduced candidate set, ideally at target size
-    return candidates;
-}
-
 QSet<QString> Calculator::rankBasedTiebreak(const QList<Rank>& rankings, const QString& note) const
 {
-    // Check number of times a nominee is preferred to break tie
+    // Break a tie by using the provided rankings
     emit calculationDetail(note);
     QSet<QString> tieBreak = rankings.front().nominees;
 
-    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(Qx::String::join(tieBreak, ", "))); // TODO: Adjust text to account for one less name
+    emit calculationDetail(LOG_EVENT_BREAK_RESULT.arg(Qx::String::join(tieBreak, ", ")));
     return tieBreak;
 }
 
 QSet<QString> Calculator::breakTieMostFiveStar(const QSet<QString>& nominees) const
 {
-    // Check number of times a nominee was given the maximum score possible to break tie
-    return rankBasedTiebreak(rankByVotesOfMaxScore(nominees, Rank::Descending), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size())); // TODO: Text
+    return rankBasedTiebreak(rankByVotesOfMaxScore(nominees, Rank::Descending), LOG_EVENT_BREAK_TIE_MOST_FIVE_STAR.arg(nominees.size()));
 }
 
 QSet<QString> Calculator::breakTieLeastFiveStar(const QSet<QString>& nominees) const
 {
-    // Check number of times a nominee was given the maximum score possible to break tie
-    return rankBasedTiebreak(rankByVotesOfMaxScore(nominees, Rank::Ascending), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size())); // TODO: Text
+    return rankBasedTiebreak(rankByVotesOfMaxScore(nominees, Rank::Ascending), LOG_EVENT_BREAK_TIE_LEAST_FIVE_STAR.arg(nominees.size()));
 }
 
 QSet<QString> Calculator::breakTieMostHeadToHeadLosses(const QSet<QString>& nominees, const HeadToHeadResults* hth) const
 {
-    return rankBasedTiebreak(rankByHeadToHeadLosses(nominees, hth, Rank::Descending), LOG_EVENT_BREAK_EXTENDED_TIE.arg("")); // TODO: Text
+    return rankBasedTiebreak(rankByHeadToHeadLosses(nominees, hth, Rank::Descending), LOG_EVENT_BREAK_TIE_MOST_HEAD_TO_HEAD_LOSSES.arg(nominees.size()));
 }
 
 QSet<QString> Calculator::breakTieLeastHeadToHeadPreferences(const QSet<QString>& nominees, const HeadToHeadResults* hth) const
 {
-    // Perform a face-off of each nominee and see which one has the most head-to-head wins
-    return rankBasedTiebreak(rankByHeadToHeadPreferences(nominees, hth, Rank::Ascending), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHCount)));
+    return rankBasedTiebreak(rankByHeadToHeadPreferences(nominees, hth, Rank::Ascending), LOG_EVENT_BREAK_TIE_LEAST_HEAD_TO_HEAD_PREFERENCES.arg(nominees.size()));
 }
 
 QSet<QString> Calculator::breakTieSmallestHeadToHeadMargin(const QSet<QString>& nominees, const HeadToHeadResults* hth) const
 {
-    // Perform a face-off of each nominee and see which one has the most head-to-head wins
-    return rankBasedTiebreak(rankByHeadToHeadMargin(nominees, hth, Rank::Ascending), LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(HTHMargin)));
+    return rankBasedTiebreak(rankByHeadToHeadMargin(nominees, hth, Rank::Ascending), LOG_EVENT_BREAK_TIE_SMALLEST_HEAD_TO_HEAD_MARGIN.arg(nominees.size()));
 }
 
 QSet<QString> Calculator::breakTieHighestScore(const QSet<QString>& nominees) const
 {
-    // Check number of times a nominee is preferred to break tie
-    return rankBasedTiebreak(rankByScore(nominees, Rank::Descending), LOG_EVENT_BREAK_SCORE_TIE.arg(nominees.size()));
+    return rankBasedTiebreak(rankByScore(nominees, Rank::Descending), LOG_EVENT_BREAK_TIE_HIGHEST_SCORE.arg(nominees.size()));
 }
 
 // TODO: Remove
@@ -353,7 +364,7 @@ QSet<QString> Calculator::breakTieHighestScore(const QSet<QString>& nominees) co
 
 QString Calculator::breakTieRandom(const QSet<QString>& nominees) const
 {
-    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(nominees.size()).arg(ENUM_NAME(Random)));
+    emit calculationDetail(LOG_EVENT_BREAK_TIE_RANDOM.arg(nominees.size()));
 
     /* Randomly select a winner/loser of the tiebreak
      *
@@ -442,6 +453,7 @@ ElectionResult Calculator::calculateResult()
     emit calculationDetail(LOG_EVENT_INITAL_RAW_RANKINGS + '\n' + createNomineeRankListString(mElection->scoreRankings()));
 
     // Pre-calculate head-to-heads
+    emit calculationDetail(LOG_EVENT_CALC_HEAD_TO_HEAD);
     mHeadToHeadResults = std::make_unique<HeadToHeadResults>(mElection);
 
     // Determine preliminary leaders based on raw score
@@ -458,6 +470,7 @@ ElectionResult Calculator::calculateResult()
     auto pItr = preliminaryLeaders.cbegin();
     runoffCandidates.first = *(pItr++);
     runoffCandidates.second = *pItr;
+    emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffCandidates.first, runoffCandidates.second));
 
     // Perform primary runoff
     QString winner = performPrimaryRunoff(runoffCandidates);
