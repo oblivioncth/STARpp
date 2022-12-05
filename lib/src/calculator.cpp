@@ -27,8 +27,7 @@ namespace Star
 //-Constructor---------------------------------------------------------------------------------------------------------
 //Public:
 Calculator::Calculator(const Election* election) :
-    mElection(election),
-    mExtraTiebreakMethod(std::nullopt)
+    mElection(election)
 {}
 
 Calculator::~Calculator() = default;
@@ -428,11 +427,8 @@ QString Calculator::createNomineeRankListString(const QList<Rank>& ranks) const
 }
 
 //Public:
-std::optional<Calculator::ExtendedTiebreakMethod> Calculator::extraTiebreakMethod() const { return mExtraTiebreakMethod; }
-bool Calculator::isExtraTiebreak() const { return mExtraTiebreakMethod.has_value(); }
 const Election* Calculator::election() const { return mElection; }
 void Calculator::setElection(const Election* election) { mElection = election; }
-void Calculator::setExtraTiebreakMethod(std::optional<ExtendedTiebreakMethod> method) { mExtraTiebreakMethod = method; }
 
 ElectionResult Calculator::calculateResult()
 {

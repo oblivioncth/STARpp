@@ -17,10 +17,6 @@ class HeadToHeadResults;
 class Calculator : public QObject
 {
     Q_OBJECT
-//-Class Enums------------------------------------------------------------------------------------------------------
-public:
-    enum ExtendedTiebreakMethod { FiveStar, HTHWins, HTHCount, HTHMargin, Random, Condorcet };
-
 //-Class Variables------------------------------------------------------------------------------------------------------
 private:
     // Logging - Intro
@@ -90,7 +86,6 @@ private:
 
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
-    std::optional<ExtendedTiebreakMethod> mExtraTiebreakMethod;
     const Election* mElection;
     std::unique_ptr<HeadToHeadResults> mHeadToHeadResults;
 
@@ -137,11 +132,9 @@ private:
 
 public:
     const Election* election() const;
-    std::optional<ExtendedTiebreakMethod> extraTiebreakMethod() const;
     bool isExtraTiebreak() const;
 
     void setElection(const Election* election);
-    void setExtraTiebreakMethod(std::optional<ExtendedTiebreakMethod> method);
 
     ElectionResult calculateResult();
 

@@ -76,9 +76,7 @@ void Core::showVersion()
 
 void Core::logElectionData(const ReferenceElectionConfig data)
 {
-    auto tbMethod = data.extraTiebreakMethod;
-    QString tbStr = tbMethod.has_value() ? ENUM_NAME(tbMethod.value()) : "*None*";
-    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath, tbStr));
+    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath));
 }
 
 //Public:
@@ -119,24 +117,10 @@ ErrorCode Core::initialize()
     }
     else if(clParser.isSet(CL_OPTION_CONFIG) && clParser.isSet(CL_OPTION_BOX))
     {
-        // Check extra tiebreak parameter
-        std::optional<Star::Calculator::ExtendedTiebreakMethod> tbm;
-        if(clParser.isSet(CL_OPTION_EXTRA))
-        {
-            // Try to get enum value
-            tbm = magic_enum::enum_cast<Star::Calculator::ExtendedTiebreakMethod>(clParser.value(CL_OPTION_EXTRA).toStdString());
-            if(!tbm.has_value())
-            {
-                logError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_ARGS, LOG_ERR_INVALID_EXTRA));
-                return ErrorCode::INVALID_ARGS;
-            }
-        }
-
         // Setup options container
         mRefElectionCfg = ReferenceElectionConfig{
             .ccPath = clParser.value(CL_OPTION_CONFIG),
             .bbPath = clParser.value(CL_OPTION_BOX),
-            .extraTiebreakMethod = tbm,
         };
 
         logElectionData(mRefElectionCfg.value());

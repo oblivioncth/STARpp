@@ -11,7 +11,6 @@ struct ReferenceElectionConfig
 {
     QString ccPath;
     QString bbPath;
-    std::optional<Star::Calculator::ExtendedTiebreakMethod> extraTiebreakMethod;
 };
 
 #endif // REFERENCE_ELECTION_CONFIG_H
