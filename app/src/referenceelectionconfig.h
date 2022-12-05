@@ -4,9 +4,6 @@
 // Qt Includes
 #include <QString>
 
-// Base Includes
-#include "star/calculator.h"
-
 struct ReferenceElectionConfig
 {
     QString ccPath;

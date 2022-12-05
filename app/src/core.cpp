@@ -11,6 +11,7 @@
 // Macros
 #define ENUM_NAME(eenum) QString(magic_enum::enum_name(eenum).data())
 
+
 //===============================================================================================================
 // CORE
 //===============================================================================================================
@@ -22,6 +23,7 @@ Core::Core(QCoreApplication* app) :
     mLogErrorOccurred(false),
     mArguments(app->arguments()),
     mRefElectionCfg(std::nullopt),
+    mCalcOptions(Star::Calculator::NoOptions),
     mMinimal(false)
 {
     // Logger tweaks
@@ -125,6 +127,17 @@ ErrorCode Core::initialize()
 
         logElectionData(mRefElectionCfg.value());
 
+        // Handle calculator options
+        QStringList selectedOpts;
+        if(clParser.isSet(CL_OPTION_TRUE_TIES))
+        {
+            selectedOpts.append(ENUM_NAME(Star::Calculator::AllowTrueTies));
+            mCalcOptions.setFlag(Star::Calculator::AllowTrueTies);
+        }
+
+        QString optStr = !selectedOpts.isEmpty() ? selectedOpts.join(',') : ENUM_NAME(Star::Calculator::NoOptions);
+        logEvent(NAME, LOG_EVENT_SELECTED_CALCULATOR_OPTIONS.arg(optStr));
+
         // Handle minimal option
         if(clParser.isSet(CL_OPTION_MINIMAL))
         {
@@ -142,14 +155,16 @@ ErrorCode Core::initialize()
     return ErrorCode::NO_ERR;
 }
 
-bool Core::hasActionableArguments() { return mRefElectionCfg.has_value(); }
+bool Core::hasActionableArguments() const { return mRefElectionCfg.has_value(); }
 
-ReferenceElectionConfig Core::referenceElectionConfig()
+ReferenceElectionConfig Core::referenceElectionConfig() const
 {
     return mRefElectionCfg.has_value() ? mRefElectionCfg.value() : ReferenceElectionConfig();
 }
 
-bool Core::isMinimalPresentation() { return mMinimal; }
+Star::Calculator::Options Core::calculatorOptions() const { return mCalcOptions; }
+
+bool Core::isMinimalPresentation() const { return mMinimal; }
 
 //-Signals & Slots------------------------------------------------------------------------------------------------------------
 //Public slots:

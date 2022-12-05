@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
 
     // Create calculator
     Star::Calculator calculator;
+    calculator.setOptions(core.calculatorOptions());
     QObject::connect(&calculator, &Star::Calculator::calculationDetail, &core, &Core::logCalculatorDetail);
 
     // Result container
