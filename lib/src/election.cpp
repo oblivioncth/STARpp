@@ -14,11 +14,12 @@ Election::Election() {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-bool Election::isValid() const { return nominees().count() > 1 && ballots().count() > 1; }
+bool Election::isValid() const { return nominees().count() > 1 && ballots().count() > 1 && seatCount() > 0; }
 
 QString Election::name() const { return mName; }
 QStringList Election::nominees() const { return mTotals.keys(); }
 const QList<Election::Ballot>& Election::ballots() const { return mBallots; }
+int Election::seatCount() const { return mSeats; }
 
 int Election::totalScore(const QString& nominee) const
 {
@@ -88,6 +89,8 @@ Election::Builder& Election::Builder::wBallot(const Voter& voter, const QList<Vo
 
     return *this;
 }
+
+Election::Builder& Election::Builder::wSeatCount(int count) { mConstruct.mSeats = count; return *this; }
 
 void Election::Builder::reset()
 {

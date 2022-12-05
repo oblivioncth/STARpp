@@ -25,6 +25,7 @@ public:
 private:
     QString mName;
     QList<Ballot> mBallots;
+    int mSeats;
     QMap<QString, int> mTotals;
     QList<Rank> mScoreRankings;
 
@@ -39,6 +40,7 @@ public:
     QString name() const;
     QStringList nominees() const;
     const QList<Ballot>& ballots() const;
+    int seatCount() const;
 
     int totalScore(const QString& nominee) const;
     const QList<Rank>& scoreRankings() const;
@@ -89,6 +91,7 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     Builder& wBallot(const Voter& voter, const QList<Vote>& votes);
+    Builder& wSeatCount(int count);
     void reset();
     Election build();
 };

@@ -35,17 +35,17 @@ Calculator::~Calculator() = default;
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Private:
-QSet<QString> Calculator::determinePreliminaryLeaders()
+QSet<QString> Calculator::determinePreliminaryLeaders(const QList<Rank>& scoreRankings)
 {
     emit calculationDetail(LOG_EVENT_DETERMINE_PRELIMINARY_LEADERS);
 
     QSet<QString> leaders;
 
     // Handle tie & non-tie cases
-    QSet<QString> nomineesInFirst = mElection->scoreRankings().front().nominees;
+    QSet<QString> nomineesInFirst = scoreRankings.front().nominees;
     if(nomineesInFirst.size() > 1) // First place tie
     {
-        int firstPlaceScore = mElection->scoreRankings().front().value;
+        int firstPlaceScore = scoreRankings.front().value;
 
         if(nomineesInFirst.size() == 2) // Two-way
         {
@@ -71,10 +71,10 @@ QSet<QString> Calculator::determinePreliminaryLeaders()
         leaders.insert(first);
 
         // Check second place
-        QSet<QString> nomineesInSecond = mElection->scoreRankings().at(1).nominees;
+        QSet<QString> nomineesInSecond = scoreRankings.at(1).nominees;
         if(nomineesInSecond.size() > 1) // Second place tie
         {
-            int secondPlaceScore = mElection->scoreRankings().at(1).value;
+            int secondPlaceScore = scoreRankings.at(1).value;
 
             QString tieLogStr = LOG_EVENT_PRELIMINARY_SECOND_TIE.arg(nomineesInSecond.size()).arg(secondPlaceScore) + '\n' + createNomineeGeneralSetString(nomineesInSecond);
             emit calculationDetail(tieLogStr);
@@ -424,6 +424,32 @@ QString Calculator::createNomineeRankListString(const QList<Rank>& ranks) const
     return listStr;
 }
 
+void Calculator::logElectionResults(const ElectionResult& results) const
+{
+    // Create filled seats string
+    QString seatListStr;
+    for(qsizetype i = 0; i < results.winners().size(); i++)
+    {
+        QString seatWinner = results.winners().at(i);
+        QString seatStr = LIST_ITEM_SEAT.arg(i).arg(seatWinner);
+        seatStr += '\n';
+        seatListStr.append(seatStr);
+    }
+
+    // Create unresolved candidates string
+    QString unresolvedListStr;
+    for(auto itr = results.unresolvedNominees().cbegin(); itr != results.unresolvedNominees().cend(); itr++)
+    {
+        QString candidate = *itr;
+        QString unresolvedStr = LIST_ITEM_UNRESOLVED.arg(candidate);
+        unresolvedStr += '\n';
+        unresolvedListStr.append(unresolvedListStr);
+    }
+
+    // Log
+    emit calculationDetail(LOG_EVENT_FINAL_RESULTS.arg(seatListStr, unresolvedListStr).arg(results.unfilledSeatCount()));
+}
+
 //Public:
 const Election* Calculator::election() const { return mElection; }
 Calculator::Options Calculator::options() const { return mOptions; }
@@ -443,7 +469,9 @@ ElectionResult Calculator::calculateResult()
     emit calculationDetail(LOG_EVENT_CALC_START.arg(mElection->name()) + '\n' + QString(120,'#'));
 
     // Note counts
-    emit calculationDetail(LOG_EVENT_INPUT_COUNTS.arg(mElection->nominees().size()).arg(mElection->ballots().size()));
+    emit calculationDetail(LOG_EVENT_INPUT_COUNTS.arg(mElection->nominees().size())
+                                                 .arg(mElection->ballots().size())
+                                                 .arg(mElection->seatCount()));
 
     // Print out raw score rankings
     emit calculationDetail(LOG_EVENT_INITAL_RAW_RANKINGS + '\n' + createNomineeRankListString(mElection->scoreRankings()));
@@ -453,20 +481,29 @@ ElectionResult Calculator::calculateResult()
     mHeadToHeadResults = std::make_unique<HeadToHeadResults>(mElection);
 
     // Results holders
-    QString winner;
+    QStringList winners;
     QSet<QString> unresolvedCandidates;
 
-    // Determine preliminary leaders based on raw score
-    QSet<QString> preliminaryLeaders = determinePreliminaryLeaders();
+    // Active candidate rankings
+    QList<Rank> candidateRankings = mElection->scoreRankings();
 
-    // Check for an unresolved preliminary tie that prevented a runoff
-    if(preliminaryLeaders.size() != 2)
+    for(int s = 0; s < mElection->seatCount(); s++)
     {
-        emit calculationDetail(LOG_EVENT_NO_RUNOFF);
-        unresolvedCandidates = preliminaryLeaders;
-    }
-    else
-    {
+        emit calculationDetail(LOG_EVENT_FILLING_SEAT.arg(s));
+
+        QString seatWinner;
+
+        // Determine preliminary leaders based on raw score
+        QSet<QString> preliminaryLeaders = determinePreliminaryLeaders(candidateRankings);
+
+        // Check for an unresolved preliminary tie that prevented a runoff
+        if(preliminaryLeaders.size() != 2)
+        {
+            emit calculationDetail(LOG_EVENT_NO_RUNOFF);
+            unresolvedCandidates = preliminaryLeaders;
+            break;
+        }
+
         // Segment out runoff candidates
         QPair<QString, QString> runoffCandidates;
         auto pItr = preliminaryLeaders.cbegin();
@@ -475,18 +512,45 @@ ElectionResult Calculator::calculateResult()
         emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffCandidates.first, runoffCandidates.second));
 
         // Perform primary runoff
-        winner = performPrimaryRunoff(runoffCandidates);
+        seatWinner = performPrimaryRunoff(runoffCandidates);
 
         // Check for unresolved runoff tie
-        if(winner.isNull())
+        if(seatWinner.isNull())
             unresolvedCandidates = preliminaryLeaders;
+
+        // Record seat winner
+        winners.append(seatWinner);
+
+        // Remove seat winner from remaining rankings
+        auto rItr = candidateRankings.begin();
+        while(rItr != candidateRankings.end())
+        {
+            Rank& rank = *rItr;
+
+            if(rank.nominees.contains(seatWinner))
+            {
+                if(rank.nominees.size() == 1)
+                    candidateRankings.erase(rItr);
+                else
+                    rank.nominees.remove(seatWinner);
+
+                break;
+            }
+
+            rItr++;
+        }
     }
+
+    ElectionResult finalResults(mElection, winners, unresolvedCandidates);
+
+    // Note final results
+    logElectionResults(finalResults);
 
     // Log finish
     emit calculationDetail(LOG_EVENT_CALC_FINISH + '\n' + QString(120,'-'));
 
     // Return final results
-    return ElectionResult(mElection, winner, unresolvedCandidates);
+    return finalResults;
 }
 
 

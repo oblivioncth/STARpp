@@ -8,6 +8,7 @@
 #include <qx/core/qx-iostream.h>
 #include <qx/core/qx-table.h>
 #include <qx/core/qx-string.h>
+#include <qx/utility/qx-helpers.h>
 
 // Using
 using Qx::cout;
@@ -54,8 +55,10 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     pause();
 
     // Print result
+    const QStringList& winners = result.winners();
     cout << HEADING_WINNERS << endl;
-    cout << WINNER_TEMPLATE.arg(1).arg(result.winner());
+    for(qsizetype w = 0; w < winners.size(); w++)
+        cout << WINNER_TEMPLATE.arg(w).arg(winners.at(w)) << endl;
 
     // Print raw score rankings
     for(const Rank& rank : result.election()->scoreRankings())
@@ -80,12 +83,11 @@ void ResultPresenter::printResults()
 void ResultPresenter::printSummary()
 {
     //-Create results summary table---------------------------
-    Qx::Table<QString> summaryTable(QSize(3, mResults->size() + 1)); // +1 for heading
+    Qx::Table<QString> summaryTable(QSize(2, mResults->size() + 1)); // +1 for heading
 
     // Add headings
     summaryTable.at(0, 0) = SUMMARY_HEADING_CATEGORY;
     summaryTable.at(0, 1) = SUMMARY_HEADING_WINNER;
-    summaryTable.at(0, 2) = "TEMP";
 
     // Add results
     for(int res = 0, row = 1; res < mResults->size(); res++, row++)
@@ -95,8 +97,7 @@ void ResultPresenter::printSummary()
 
         // Category, winner, runner-up
         summaryTable.at(row, 0) = ' ' + result.election()->name() + ' ';
-        summaryTable.at(row, 1) = result.winner();
-        summaryTable.at(row, 2) = "TEMP";
+        summaryTable.at(row, 1) = result.winners().front();
     }
 
     // Determine field widths
