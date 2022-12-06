@@ -74,12 +74,11 @@ Qx::GenericError ResultSetReader::readInto()
         if((convError = Qx::Json::checkedArrayConversion(unresolved, jUnresolvedArray)).isValid())
             return convError;
 
-        // Convert to sets
-        QSet<QString> winnerSet = QSet<QString>(winners.constBegin(), winners.constEnd());
+        // Convert to set
         QSet<QString> unresolvedSet = QSet<QString>(unresolved.constBegin(), unresolved.constEnd());
 
         // Add expected result to list
-        mTargetList->append(ExpectedElectionResult(*winnerSet.cbegin(), unresolvedSet)); // TODO: Temporary, before bloc
+        mTargetList->append(ExpectedElectionResult(winners, unresolvedSet));
     }
 
     return Qx::GenericError();

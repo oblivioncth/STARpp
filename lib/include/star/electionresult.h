@@ -16,21 +16,26 @@ class ElectionResult
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
     const Election* mElection;
-    QString mWinner;
+    QStringList mWinners;
     QSet<QString> mUnresolvedNominees;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     ElectionResult();
-    ElectionResult(const Election* election, const QString& winner, const QSet<QString> unresolved);
+    ElectionResult(const Election* election, const QStringList& winners, const QSet<QString> unresolved);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     bool isNull() const;
     bool isComplete() const;
-    QString winner() const;
+    QStringList winners() const;
     QSet<QString> unresolvedNominees() const;
+    int filledSeatCount() const;
+    int unfilledSeatCount() const;
     const Election* election() const;
+
+    bool operator==(const ElectionResult& other) const;
+    bool operator!=(const ElectionResult& other) const;
 };
 
 }

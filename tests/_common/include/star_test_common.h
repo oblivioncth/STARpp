@@ -13,15 +13,13 @@ namespace Star
 
 char* toString(const ExpectedElectionResult& eer)
 {
-    //QString string = "W = {" + Qx::String::join(eer.winners(), ", ") +  "}  | R = {" + Qx::String::join(eer.runnerUps(), ", ") + '}';
-    QString string = "Winner = " + eer.winner();
+    QString string = "Winners = {" + eer.winners().join(", ") + '}';
     return qstrdup(string.toUtf8().constData());
 }
 
 char* toString(const ElectionResult& er)
 {
-    //QString string = "W = {" + Qx::String::join(er.winners(), ", ") +  "}  | R = {" + Qx::String::join(er.runnerUps(), ", ") + '}';
-    QString string = "Winner = " + er.winner();
+    QString string = "Winners = {" + er.winners().join(", ") + '}';
     return qstrdup(string.toUtf8().constData());
 }
 

@@ -1,74 +1,74 @@
 [
   {
-    "winners": ["Sixth film"],
+    "winners": ["Sixth film", "Seventh film"],
 	"unresolved": []
   },
   {
-    "winners": ["Fourth Director"],
+    "winners": ["Fourth Director", "Fifth Director"],
 	"unresolved": []
   },
   {
-    "winners": ["Fifth Cheesesteak"],
+    "winners": ["Fifth Cheesesteak", "Fourth Cheesesteak"],
 	"unresolved": []
   },
   {
-    "winners": ["Sixth Actress"],
+    "winners": ["Sixth Actress", "Fifth Actress"],
 	"unresolved": []
   },
   {
-    "winners": ["Fifth Actor"],
+    "winners": ["Fifth Actor", "First Actor"],
 	"unresolved": []
   },
   {
-    "winners": ["First Supporting Actress"],
+    "winners": ["First Supporting Actress", "Fourth Supporting Actress"],
 	"unresolved": []
   },
   {
-    "winners": ["First Supporting Actor"],
+    "winners": ["First Supporting Actor", "Second Supporting Actor"],
 	"unresolved": []
   },
   {
-    "winners": ["Fifth Documentary"],
+    "winners": ["Fifth Documentary", "Second Documentary"],
 	"unresolved": []
   },
   {
-    "winners": ["Third Script"],
+    "winners": ["Third Script", "Second Script"],
 	"unresolved": []
   },
   {
-    "winners": ["Fifth Soundtrack"],
+    "winners": ["Fifth Soundtrack", "Third Soundtrack"],
 	"unresolved": []
   },
   {
-    "winners": ["Fourth Directorial Debut"],
+    "winners": ["Fourth Directorial Debut", "Fifth Directorial Debut"],
 	"unresolved": []
   },
   {
-    "winners": ["Fourth Breakthrough"],
+    "winners": ["Fourth Breakthrough", "First Breakthrough"],
 	"unresolved": []
   },
   {
-    "winners": ["Fourth Cinematography"],
+    "winners": ["Fourth Cinematography", "Fifth Cinematography"],
 	"unresolved": []
   },
   {
-    "winners": ["Second Foreign"],
+    "winners": ["Second Foreign", "Fifth Foreign"],
 	"unresolved": []
   },
   {
-    "winners": ["Second Animated"],
+    "winners": ["Second Animated", "First Animated"],
 	"unresolved": []
   },
   {
-    "winners": ["Third Ensemble"],
+    "winners": ["Third Ensemble", "Second Ensemble"],
 	"unresolved": []
   },
   {
-    "winners": ["Second Friedman"],
+    "winners": ["Second Friedman", "Third Friedman"],
 	"unresolved": []
   },
   {
-    "winners": ["Second May"],
+    "winners": ["Second May", "First May"],
 	"unresolved": []
   }
 ]

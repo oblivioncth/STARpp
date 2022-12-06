@@ -12,22 +12,30 @@ namespace Star
 //Public:
 ElectionResult::ElectionResult() :
     mElection(nullptr),
-    mWinner(),
+    mWinners(),
     mUnresolvedNominees()
 {}
 
-ElectionResult::ElectionResult(const Election* election, const QString& winner, const QSet<QString> unresolved) :
+ElectionResult::ElectionResult(const Election* election, const QStringList& winners, const QSet<QString> unresolved) :
     mElection(election),
-    mWinner(winner),
+    mWinners(winners),
     mUnresolvedNominees(unresolved)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-bool ElectionResult::isNull() const { return !mElection || (mWinner.isNull() && mUnresolvedNominees.isEmpty()); }
+bool ElectionResult::isNull() const { return !mElection || (mWinners.isEmpty() && mUnresolvedNominees.isEmpty()); }
 bool ElectionResult::isComplete() const { return mUnresolvedNominees.isEmpty(); }
-QString ElectionResult::winner() const { return mWinner; }
+QStringList ElectionResult::winners() const { return mWinners; }
 QSet<QString> ElectionResult::unresolvedNominees() const { return mUnresolvedNominees; }
+int ElectionResult::filledSeatCount() const { return mWinners.size(); }
+int ElectionResult::unfilledSeatCount() const { return mElection ? mElection->seatCount() - mWinners.size() : 0; }
 const Election* ElectionResult::election() const { return mElection; }
 
+bool ElectionResult::operator==(const ElectionResult& other) const
+{
+    return mElection == other.mElection && mWinners == other.mWinners && mUnresolvedNominees == other.mUnresolvedNominees;
+}
+
+bool ElectionResult::operator!=(const ElectionResult& other) const { return !(*this == other); }
 }

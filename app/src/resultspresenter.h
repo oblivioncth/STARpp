@@ -48,7 +48,9 @@ private:
     // Summary
     static inline const QString SUMMARY_HEADING_CATEGORY = QStringLiteral(" Category ");
     static inline const QString SUMMARY_HEADING_WINNER = QStringLiteral(" Winner ");
+    static inline const QString SUMMARY_HEADING_SECOND_SEAT = QStringLiteral(" Second Seat ");
     static inline const QString SUMMARY_LIST_ITEM = QStringLiteral(R"( "%1" )");
+    static inline const QString SUMMARY_BLANK_FIELD = "*None*";
     static inline const QChar SUMMARY_VERTICAL_SEP = '|';
     static inline const QChar SUMMARY_HORIZONTAL_SEP = '-';
 

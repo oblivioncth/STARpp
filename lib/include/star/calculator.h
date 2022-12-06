@@ -32,7 +32,7 @@ private:
     // Logging - Intro
     static inline const QString LOG_EVENT_INVALID_ELECTION = QStringLiteral("The provided election is invalid.");
     static inline const QString LOG_EVENT_CALC_START = QStringLiteral("Calculating results of election - %1");
-    static inline const QString LOG_EVENT_INPUT_COUNTS = QStringLiteral("There are %1 nominees and %2 ballots.");
+    static inline const QString LOG_EVENT_INPUT_COUNTS = QStringLiteral("There are %1 nominees, %2 ballots, and %3 seats to fill.");
     static inline const QString LOG_EVENT_INITAL_RAW_RANKINGS = QStringLiteral("Initial score rankings:");
     static inline const QString LOG_EVENT_CALC_HEAD_TO_HEAD = QStringLiteral("Pre-calculating head-to-head matchup results...");
 
@@ -87,11 +87,22 @@ private:
     static inline const QString LOG_EVENT_BREAK_TIE_RANDOM = QStringLiteral("Breaking %1-way tie randomly...");
     static inline const QString LOG_EVENT_BREAK_RESULT = QStringLiteral("Tie Break Winner(s) - { %1 }");
 
-    // Logging - No Runoff
+    // Logging - Main
+    static inline const QString LOG_EVENT_FILLING_SEAT = QStringLiteral("Filling seat %1...");
+    static inline const QString LOG_EVENT_DIRECT_SEAT_FILL = QStringLiteral("Only one candidate remains, seat can be filled directly.");
     static inline const QString LOG_EVENT_NO_RUNOFF = QStringLiteral("The number of candidates could not be narrowed to two in order to perform the runoff.");
 
-    // Logging - Final Results TODO: Use this
-    static inline const QString LOG_EVENT_FINAL_RESULT_WINNERS = QStringLiteral(R"(Final winners: { %1 })");
+    // Logging - Final Results
+    static inline const QString LOG_EVENT_FINAL_RESULTS = QStringLiteral("Final Results:\n"
+                                                                         "--------------\n"
+                                                                         "\n"
+                                                                         "Filled Seats:\n"
+                                                                         "%1"
+                                                                         "\n"
+                                                                         "Unresolved Candidates:\n"
+                                                                         "%2"
+                                                                         "\n"
+                                                                         "Unfilled Seats: %3\n");
 
     // Logging - Finish
     static inline const QString LOG_EVENT_CALC_FINISH = QStringLiteral("Calculation complete.");
@@ -99,6 +110,8 @@ private:
     // Logging - Lists
     static inline const QString LIST_ITEM_NOMINEE_TOTAL_SCORE = QStringLiteral("\t- \"%1\" <%2>");
     static inline const QString LIST_ITEM_RANK = QStringLiteral("\t%1) { \"%2\" } <%3>");
+    static inline const QString LIST_ITEM_SEAT = QStringLiteral("\t%1) \"%2\"");
+    static inline const QString LIST_ITEM_UNRESOLVED = QStringLiteral("\t- \"%1\"");
 
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
@@ -121,7 +134,7 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
     // Main steps
-    QSet<QString> determinePreliminaryLeaders();
+    QSet<QString> determinePreliminaryLeaders(const QList<Rank>& scoreRankings);
     QString performPrimaryRunoff(QPair<QString, QString> candidates) const;
     QSet<QString> preliminaryCandidateTieReduction(QSet<QString> candidates, qsizetype desiredCount) const;
 
@@ -146,6 +159,7 @@ private:
     QString createNomineeGeneralSetString(const QSet<QString>& nominees) const;
     QString createNomineeToalScoreSetString(const QSet<QString>& nominees) const;
     QString createNomineeRankListString(const QList<Rank>& ranks) const;
+    void logElectionResults(const ElectionResult& results) const;
 
 public:
     const Election* election() const;

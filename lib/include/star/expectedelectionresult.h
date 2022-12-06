@@ -14,25 +14,26 @@ class ExpectedElectionResult
 {
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
-    QString mWinner;
+    QStringList mWinners;
     QSet<QString> mUnresolvedNominees;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     ExpectedElectionResult();
-    ExpectedElectionResult(const QString& winner, const QSet<QString> unresolved);
+    ExpectedElectionResult(const QStringList& winners, const QSet<QString> unresolved);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     bool isNull() const;
 
-    QString winner() const;
+    QStringList winners() const;
     QSet<QString> unresolvedNominees() const;
 
-    void setWinner(const QString& winner);
+    void setWinners(const QStringList& winners);
     void setUnresolvedNominees(QSet<QString> unresolved);
 
     bool operator==(const ElectionResult& result) const;
+    bool operator!=(const ElectionResult& result) const;
 };
 
 }

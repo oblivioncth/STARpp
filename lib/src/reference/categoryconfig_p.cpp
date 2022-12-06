@@ -15,12 +15,14 @@ namespace Star
 //Public:
 RefCategoryConfig::RefCategoryConfig() :
     mHeaders(),
+    mSeats(0),
     mTotalNominees(0)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
 uint RefCategoryConfig::totalNominees() const { return mTotalNominees; }
+uint RefCategoryConfig::seats() const { return mSeats; }
 const QList<RefCategoryHeader>& RefCategoryConfig::headers() const { return mHeaders; }
 
 //===============================================================================================================
@@ -53,53 +55,90 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
     if(openReport.isFailure())
         return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(openReport.outcomeInfo());
 
-    // Read first line and ensure the group is correct
-    QString sectionGroup = mIniReader.readLine().trimmed();
-    if(sectionGroup != SECTION_HEADING)
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_LAYOUT);
+    // Set default section
+    Section currentSection = Section::None;
 
-    // Read each key/value
+    // Read file line-by-line
     uint line = -1;
     while(!mIniReader.atEnd())
     {
-        QString keyValueStr = mIniReader.readLine();
+        QString iniLine = mIniReader.readLine().trimmed();
         line++;
 
         // Skip blank lines
-        if(keyValueStr.isEmpty())
+        if(iniLine.isEmpty())
             continue;
 
-        // Split key/value
-        QStringList keyValueList = keyValueStr.split('=');
-        if(keyValueList.size() != 2)
+        // Handle each phase of processing
+        if(iniLine.front() == '[') // Section Change
+        {
+            if(iniLine == RefCategoryConfig::SECTION_HEADING_CATEGORIES)
+                currentSection = Section::Categories;
+            else if(iniLine == RefCategoryConfig::SECTION_HEADING_GENERAL)
+                currentSection = Section::General;
+            else
+                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_LAYOUT.arg(line));
+        }
+        else if(currentSection == Section::None) // No Section
             return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_INI.arg(line));
+        else // Key/Value
+        {
+            // Split key/value
+            QStringList keyValueList = iniLine.split('=');
+            if(keyValueList.size() != 2)
+                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_INI.arg(line));
 
-        QString key = keyValueList.at(0).trimmed();
-        QString valueStr = keyValueList.at(1).trimmed();
+            QString key = keyValueList.at(0).trimmed();
+            QString valueStr = keyValueList.at(1).trimmed();
 
-        // Convert value to unsigned integer, ensure string was valid
-        bool validValue;
-        uint categoryCount = valueStr.toUInt(&validValue);
+            // Convert value to unsigned integer, ensure string was valid
+            bool validValue;
+            uint value = valueStr.toUInt(&validValue);
 
-        if(!validValue || categoryCount < 2)
-            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VALUE.arg(line));
+            if(!validValue)
+                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VALUE_TYPE.arg(line));
 
-        // Make sure this isn't a duplicate
-        auto start = mTargetConfig->headers().constBegin();
-        auto end = mTargetConfig->headers().constEnd();
-        bool dupe = (std::find_if(start, end, [&key](const RefCategoryHeader& header){
-            return header.name == key;
-        }) != end);
+            // Sections
+            if(currentSection == Section::Categories)
+            {
+                // Ensure value is valid
+                if(value < 2)
+                    return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_CATEGORY_COUNT.arg(line));
 
-        if(dupe)
-            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE.arg(line));
+                // Make sure this isn't a duplicate
+                auto start = mTargetConfig->headers().constBegin();
+                auto end = mTargetConfig->headers().constEnd();
+                bool dupe = (std::find_if(start, end, [&key](const RefCategoryHeader& header){
+                    return header.name == key;
+                }) != end);
 
-        // Add header to target config
-        RefCategoryHeader ch{.name = key, .nomineeCount = categoryCount};
-        mTargetConfig->mHeaders.append(ch);
+                if(dupe)
+                    return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE_CATEGORY.arg(line));
 
-        // Increase total nominee count
-        mTargetConfig->mTotalNominees += categoryCount;
+                // Add header to target config
+                RefCategoryHeader ch{.name = key, .nomineeCount = value};
+                mTargetConfig->mHeaders.append(ch);
+
+                // Increase total nominee count
+                mTargetConfig->mTotalNominees += value;
+            }
+            else if(currentSection == Section::General)
+            {
+                // Keys
+                if(key == RefCategoryConfig::KEY_GENERAL_SEATS)
+                {
+                    // Ensure value is valid
+                    if(value < 1)
+                        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_SEAT_COUNT.arg(line));
+
+                    mTargetConfig->mSeats = value;
+                }
+                else
+                    return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_GENERAL_KEY.arg(line));
+            }
+            else
+                qCritical("Unhandled section");
+        }
     }
 
     // Check stream status
@@ -108,7 +147,11 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
 
     // Fail if there are no categories
     if(mTargetConfig->mHeaders.isEmpty())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_EMPTY);
+        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_NO_CATEGORIES);
+
+    // Fail if seat count wasn't specified
+    if(mTargetConfig->mSeats < 1)
+        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_NO_SEATS);
 
     return Qx::GenericError();
 }
