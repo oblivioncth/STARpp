@@ -65,6 +65,10 @@ private:
     static inline const QString CL_OPT_TRUE_TIES_L_NAME = QStringLiteral("true-ties");
     static inline const QString CL_OPT_TRUE_TIES_DESC = QStringLiteral("Ends an election prematurely instead of using a random tiebreaker when an unresovable tie occurs.");
 
+    static inline const QString CL_OPT_EXTRA_TIEBREAK_S_NAME = QStringLiteral("e");
+    static inline const QString CL_OPT_EXTRA_TIEBREAK_L_NAME = QStringLiteral("extra-tiebreak");
+    static inline const QString CL_OPT_EXTRA_TIEBREAK_DESC = QStringLiteral("Uses the Condercet protocol tiebreaker during the scoring round before the random tiebreaker if necessary.");
+
     static inline const QString CL_OPT_MINIMAL_S_NAME = QStringLiteral("m");
     static inline const QString CL_OPT_MINIMAL_L_NAME = QStringLiteral("minimal");
     static inline const QString CL_OPT_MINIMAL_DESC = QStringLiteral("Only presents the results summary.");
@@ -75,10 +79,11 @@ private:
     static inline const QCommandLineOption CL_OPTION_CONFIG{{CL_OPT_CONFIG_S_NAME, CL_OPT_CONFIG_L_NAME}, CL_OPT_CONFIG_DESC, "config"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_BOX{{CL_OPT_BOX_S_NAME, CL_OPT_BOX_L_NAME}, CL_OPT_BOX_DESC, "box"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_TRUE_TIES{{CL_OPT_TRUE_TIES_S_NAME, CL_OPT_TRUE_TIES_L_NAME}, CL_OPT_TRUE_TIES_DESC}; // Boolean option
+    static inline const QCommandLineOption CL_OPTION_EXTRA_TIEBREAK{{CL_OPT_EXTRA_TIEBREAK_S_NAME, CL_OPT_EXTRA_TIEBREAK_L_NAME}, CL_OPT_EXTRA_TIEBREAK_DESC}; // Boolean option
     static inline const QCommandLineOption CL_OPTION_MINIMAL{{CL_OPT_MINIMAL_S_NAME, CL_OPT_MINIMAL_L_NAME}, CL_OPT_MINIMAL_DESC}; // Boolean option
 
     static inline const QList<const QCommandLineOption*> CL_OPTIONS_ALL{&CL_OPTION_HELP, &CL_OPTION_VERSION, &CL_OPTION_CONFIG, &CL_OPTION_BOX,
-                                                                        &CL_OPTION_MINIMAL, &CL_OPTION_TRUE_TIES};
+                                                                        &CL_OPTION_MINIMAL, &CL_OPTION_TRUE_TIES, &CL_OPTION_EXTRA_TIEBREAK};
 
     // Help template
     static inline const QString HELP_TEMPL = "Usage:\n"

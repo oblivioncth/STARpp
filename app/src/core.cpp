@@ -134,6 +134,11 @@ ErrorCode Core::initialize()
             selectedOpts.append(ENUM_NAME(Star::Calculator::AllowTrueTies));
             mCalcOptions.setFlag(Star::Calculator::AllowTrueTies);
         }
+        if(clParser.isSet(CL_OPTION_EXTRA_TIEBREAK))
+        {
+            selectedOpts.append(ENUM_NAME(Star::Calculator::CondorcetProtocol));
+            mCalcOptions.setFlag(Star::Calculator::CondorcetProtocol);
+        }
 
         QString optStr = !selectedOpts.isEmpty() ? selectedOpts.join(',') : ENUM_NAME(Star::Calculator::NoOptions);
         logEvent(NAME, LOG_EVENT_SELECTED_CALCULATOR_OPTIONS.arg(optStr));
