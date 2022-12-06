@@ -8,9 +8,8 @@ option(STARCALC_TESTS "Build StarCalc tests" OFF)
 
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
-set(STAR_CALC_BASE_VERSION 0.0.9.4) # Required for CI/CD
 project(StarCalc
-    VERSION ${STAR_CALC_BASE_VERSION}
+    VERSION 0.0.9.4
     LANGUAGES CXX
     DESCRIPTION "An application to determine the winner of an election using the STAR voting system"
 )
