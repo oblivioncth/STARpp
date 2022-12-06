@@ -31,13 +31,13 @@ namespace
                 // Get votes that pertain to category
                 const QList<int>& categoryVotes = rBallot.votes[cIdx];
 
-                // List to fill with nominee mapped votes in standard form
+                // List to fill with candidate mapped votes in standard form
                 QList<Election::Vote> mappedVotes;
 
-                // Map votes to nominees, convert to standard Vote, add to list
+                // Map votes to candidates, convert to standard Vote, add to list
                 for(qsizetype nIdx = 0; nIdx < categoryVotes.size(); nIdx++)
                 {
-                    Election::Vote stdVote{.nominee = rCategory.nominees[nIdx], .score = categoryVotes[nIdx]};
+                    Election::Vote stdVote{.candidate = rCategory.candidates[nIdx], .score = categoryVotes[nIdx]};
                     mappedVotes.append(stdVote);
                 }
 

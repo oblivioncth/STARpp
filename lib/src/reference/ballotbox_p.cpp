@@ -34,7 +34,7 @@ RefBallotBox::Reader::Reader(RefBallotBox* targetBox, const QString& filePath, c
     mTargetBox(targetBox),
     mCsvFile(filePath),
     mCategoryConfig(categoryConfig),
-    mExpectedFieldCount(STATIC_FIELD_COUNT + mCategoryConfig->totalNominees())
+    mExpectedFieldCount(STATIC_FIELD_COUNT + mCategoryConfig->totalCandidates())
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
@@ -46,20 +46,20 @@ Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& he
 
     for(const RefCategoryHeader& ch : mCategoryConfig->headers())
     {
-        // Read nominees directly into Category
-        RefCategory category{.name = ch.name, .nominees = {}};
-        QStringList& nominees = category.nominees;
+        // Read candidates directly into Category
+        RefCategory category{.name = ch.name, .candidates = {}};
+        QStringList& candidates = category.candidates;
 
-        for(uint i = 0; i < ch.nomineeCount; i++, cIdx++)
+        for(uint i = 0; i < ch.candidateCount; i++, cIdx++)
         {
-            QString nomineeField = headingsRow[cIdx].toString().trimmed();
-            if(nomineeField.isEmpty())
+            QString candidateField = headingsRow[cIdx].toString().trimmed();
+            if(candidateField.isEmpty())
                 return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_BLANK_VALUE.arg(0).arg(cIdx));
 
-            if(nominees.contains(nomineeField))
-                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE_NOMINEE);
+            if(candidates.contains(candidateField))
+                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE_CANDIDATE);
 
-            nominees += nomineeField;
+            candidates += candidateField;
         }
 
         // Add category to box
@@ -106,7 +106,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
     {
         QList<int> categoryVotes;
 
-        for(uint i = 0; i < ch.nomineeCount; i++, cIdx++)
+        for(uint i = 0; i < ch.candidateCount; i++, cIdx++)
         {
             QString voteField = ballotRow[cIdx].toString().trimmed();
 

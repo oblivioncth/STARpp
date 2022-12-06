@@ -9,7 +9,7 @@ struct Rank
     enum Order { Ascending, Descending };
 
     int value;
-    QSet<QString> nominees;
+    QSet<QString> candidates;
 
     static QList<Rank> rankSort(const QMap<QString, int>& valueMap, Order order = Descending);
 };

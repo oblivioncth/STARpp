@@ -33,7 +33,7 @@ private:
     // Logging - Intro
     static inline const QString LOG_EVENT_INVALID_ELECTION = QStringLiteral("The provided election is invalid.");
     static inline const QString LOG_EVENT_CALC_START = QStringLiteral("Calculating results of election - %1");
-    static inline const QString LOG_EVENT_INPUT_COUNTS = QStringLiteral("There are %1 nominees, %2 ballots, and %3 seats to fill.");
+    static inline const QString LOG_EVENT_INPUT_COUNTS = QStringLiteral("There are %1 candidates, %2 ballots, and %3 seats to fill.");
     static inline const QString LOG_EVENT_INITAL_RAW_RANKINGS = QStringLiteral("Initial score rankings:");
     static inline const QString LOG_EVENT_CALC_HEAD_TO_HEAD = QStringLiteral("Pre-calculating head-to-head matchup results...");
 
@@ -67,15 +67,15 @@ private:
     static inline const QString LOG_EVENT_PRIMARY_UNRESOLVED = QStringLiteral(R"(The runoff tie could not be broken.)");
 
     // Logging - Ranking
-    static inline const QString LOG_EVENT_RANK_BY_SCORE = QStringLiteral("Ranking relevant nominees by score (%1)...");
+    static inline const QString LOG_EVENT_RANK_BY_SCORE = QStringLiteral("Ranking relevant candidates by score (%1)...");
     static inline const QString LOG_EVENT_RANKINGS_SCORE = QStringLiteral("Score rankings:");
-    static inline const QString LOG_EVENT_RANK_BY_VOTES_OF_MAX_SCORE = QStringLiteral("Ranking relevant nominees by votes of max score (%1)...");
+    static inline const QString LOG_EVENT_RANK_BY_VOTES_OF_MAX_SCORE = QStringLiteral("Ranking relevant candidates by votes of max score (%1)...");
     static inline const QString LOG_EVENT_RANKINGS_VOTES_OF_MAX_SCORE = QStringLiteral("Votes of Max Score rankings:");
-    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_LOSSES = QStringLiteral("Ranking relevant nominees by head-to-head losses (%1)...");
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_LOSSES = QStringLiteral("Ranking relevant candidates by head-to-head losses (%1)...");
     static inline const QString LOG_EVENT_RANKINGS_HEAD_TO_HEAD_LOSSES = QStringLiteral("Head-to-head losses rankings:");
-    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_PREFERENCES = QStringLiteral("Ranking relevant nominees by head-to-head preference count (%1)...");
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_PREFERENCES = QStringLiteral("Ranking relevant candidates by head-to-head preference count (%1)...");
     static inline const QString LOG_EVENT_RANKINGS_HEAD_TO_HEAD_PREFERENCES = QStringLiteral("Head-to-head preference count rankings:");
-    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_MARGIN = QStringLiteral("Ranking relevant nominees by head-to-head margin (%1)...");
+    static inline const QString LOG_EVENT_RANK_BY_HEAD_TO_HEAD_MARGIN = QStringLiteral("Ranking relevant candidates by head-to-head margin (%1)...");
     static inline const QString LOG_EVENT_RANKINGS_HEAD_TO_HEAD_MARGIN = QStringLiteral("Head-to-head margin rankings:");
 
     // Logging - Tiebreak
@@ -109,7 +109,7 @@ private:
     static inline const QString LOG_EVENT_CALC_FINISH = QStringLiteral("Calculation complete.");
 
     // Logging - Lists
-    static inline const QString LIST_ITEM_NOMINEE_TOTAL_SCORE = QStringLiteral("\t- \"%1\" <%2>");
+    static inline const QString LIST_ITEM_CANDIDATE_TOTAL_SCORE = QStringLiteral("\t- \"%1\" <%2>");
     static inline const QString LIST_ITEM_RANK = QStringLiteral("\t%1) { \"%2\" } <%3>");
     static inline const QString LIST_ITEM_SEAT = QStringLiteral("\t%1) \"%2\"");
     static inline const QString LIST_ITEM_UNRESOLVED = QStringLiteral("\t- \"%1\"");
@@ -140,26 +140,26 @@ private:
     QSet<QString> preliminaryCandidateTieReduction(QSet<QString> candidates, qsizetype desiredCount) const;
 
     // Utility
-    QList<Rank> rankByScore(const QSet<QString>& nominees, Rank::Order order) const;
-    QList<Rank> rankByVotesOfMaxScore(const QSet<QString>& nominees, Rank::Order order) const;
-    QList<Rank> rankByHeadToHeadLosses(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const;
-    QList<Rank> rankByHeadToHeadPreferences(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const;
-    QList<Rank> rankByHeadToHeadMargin(const QSet<QString>& nominees, const HeadToHeadResults* hth, Rank::Order order) const;
+    QList<Rank> rankByScore(const QSet<QString>& candidates, Rank::Order order) const;
+    QList<Rank> rankByVotesOfMaxScore(const QSet<QString>& candidates, Rank::Order order) const;
+    QList<Rank> rankByHeadToHeadLosses(const QSet<QString>& candidates, const HeadToHeadResults* hth, Rank::Order order) const;
+    QList<Rank> rankByHeadToHeadPreferences(const QSet<QString>& candidates, const HeadToHeadResults* hth, Rank::Order order) const;
+    QList<Rank> rankByHeadToHeadMargin(const QSet<QString>& candidates, const HeadToHeadResults* hth, Rank::Order order) const;
 
     QSet<QString> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note) const;
-    QSet<QString> breakTieMostFiveStar(const QSet<QString>& nominees) const;
-    QSet<QString> breakTieLeastFiveStar(const QSet<QString>& nominees) const;
-    QSet<QString> breakTieMostHeadToHeadLosses(const QSet<QString>& nominees, const HeadToHeadResults* hth) const;
-    QSet<QString> breakTieLeastHeadToHeadPreferences(const QSet<QString>& nominees, const HeadToHeadResults* hth) const;
-    QSet<QString> breakTieSmallestHeadToHeadMargin(const QSet<QString>& nominees, const HeadToHeadResults* hth) const;
-    QSet<QString> breakTieHighestScore(const QSet<QString>& nominees) const;
-    //QSet<QString> breakTieCondorcetProtocol(const QSet<QString>& nominees, const HeadToHeadResults* hth);
-    QString breakTieRandom(const QSet<QString>& nominees) const;
+    QSet<QString> breakTieMostFiveStar(const QSet<QString>& candidates) const;
+    QSet<QString> breakTieLeastFiveStar(const QSet<QString>& candidates) const;
+    QSet<QString> breakTieMostHeadToHeadLosses(const QSet<QString>& candidates, const HeadToHeadResults* hth) const;
+    QSet<QString> breakTieLeastHeadToHeadPreferences(const QSet<QString>& candidates, const HeadToHeadResults* hth) const;
+    QSet<QString> breakTieSmallestHeadToHeadMargin(const QSet<QString>& candidates, const HeadToHeadResults* hth) const;
+    QSet<QString> breakTieHighestScore(const QSet<QString>& candidates) const;
+    //QSet<QString> breakTieCondorcetProtocol(const QSet<QString>& candidates, const HeadToHeadResults* hth);
+    QString breakTieRandom(const QSet<QString>& candidates) const;
 
     // Logging
-    QString createNomineeGeneralSetString(const QSet<QString>& nominees) const;
-    QString createNomineeToalScoreSetString(const QSet<QString>& nominees) const;
-    QString createNomineeRankListString(const QList<Rank>& ranks) const;
+    QString createCandidateGeneralSetString(const QSet<QString>& candidates) const;
+    QString createCandidateToalScoreSetString(const QSet<QString>& candidates) const;
+    QString createCandidateRankListString(const QList<Rank>& ranks) const;
     void logElectionResults(const ElectionResult& results) const;
 
 public:

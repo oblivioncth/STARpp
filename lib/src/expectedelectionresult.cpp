@@ -12,26 +12,26 @@ namespace Star
 //Public:
 ExpectedElectionResult::ExpectedElectionResult() :
     mWinners(),
-    mUnresolvedNominees()
+    mUnresolvedCandidates()
 {}
 
 ExpectedElectionResult::ExpectedElectionResult(const QStringList& winners, const QSet<QString> unresolved) :
     mWinners(winners),
-    mUnresolvedNominees(unresolved)
+    mUnresolvedCandidates(unresolved)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
 bool ExpectedElectionResult::isNull() const { return mWinners.isEmpty(); }
 QStringList ExpectedElectionResult::winners() const { return mWinners; }
-QSet<QString> ExpectedElectionResult::unresolvedNominees() const { return mUnresolvedNominees; }
+QSet<QString> ExpectedElectionResult::unresolvedCandidates() const { return mUnresolvedCandidates; }
 
 void ExpectedElectionResult::setWinners(const QStringList& winner) { mWinners = winner; }
-void ExpectedElectionResult::setUnresolvedNominees(QSet<QString> unresolved) { mUnresolvedNominees = unresolved; }
+void ExpectedElectionResult::setUnresolvedCandidates(QSet<QString> unresolved) { mUnresolvedCandidates = unresolved; }
 
 bool ExpectedElectionResult::operator==(const ElectionResult& result) const
 {
-    return result.winners() == mWinners && result.unresolvedNominees() == mUnresolvedNominees;
+    return result.winners() == mWinners && result.unresolvedCandidates() == mUnresolvedCandidates;
 }
 
 bool ExpectedElectionResult::operator!=(const ElectionResult& result) const { return !(*this == result); }

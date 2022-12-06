@@ -41,13 +41,13 @@ void ResultPresenter::pause()
 void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 {
     QString category = result.election()->name();
-    QStringList nominees = result.election()->nominees();
+    QStringList candidates = result.election()->candidates();
     // Print category
     cout << HEADING_CATEGORY.arg(category) << endl << endl;
 
-    // Print nominees
-    cout << HEADING_NOMINEES << endl;
-    for(const QString& nom : nominees)
+    // Print candidates
+    cout << HEADING_CANDIDATES << endl;
+    for(const QString& nom : candidates)
         cout << '"' << nom << '"' << endl;
     cout << endl;
 
@@ -62,7 +62,7 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 
     // Print raw score rankings
     for(const Rank& rank : result.election()->scoreRankings())
-        cout << RAW_SCORE_TEMPLATE.arg(Qx::String::join(rank.nominees, R"(", ")")).arg(rank.value) << endl;
+        cout << RAW_SCORE_TEMPLATE.arg(Qx::String::join(rank.candidates, R"(", ")")).arg(rank.value) << endl;
     cout << endl;
 
     // Wait on user confirm

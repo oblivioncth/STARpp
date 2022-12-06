@@ -17,7 +17,7 @@ class ElectionResult
 private:
     const Election* mElection;
     QStringList mWinners;
-    QSet<QString> mUnresolvedNominees;
+    QSet<QString> mUnresolvedCandidates;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
@@ -29,7 +29,7 @@ public:
     bool isNull() const;
     bool isComplete() const;
     QStringList winners() const;
-    QSet<QString> unresolvedNominees() const;
+    QSet<QString> unresolvedCandidates() const;
     int filledSeatCount() const;
     int unfilledSeatCount() const;
     const Election* election() const;

@@ -16,12 +16,12 @@ namespace Star
 RefCategoryConfig::RefCategoryConfig() :
     mHeaders(),
     mSeats(0),
-    mTotalNominees(0)
+    mTotalCandidates(0)
 {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-uint RefCategoryConfig::totalNominees() const { return mTotalNominees; }
+uint RefCategoryConfig::totalCandidates() const { return mTotalCandidates; }
 uint RefCategoryConfig::seats() const { return mSeats; }
 const QList<RefCategoryHeader>& RefCategoryConfig::headers() const { return mHeaders; }
 
@@ -116,11 +116,11 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
                     return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE_CATEGORY.arg(line));
 
                 // Add header to target config
-                RefCategoryHeader ch{.name = key, .nomineeCount = value};
+                RefCategoryHeader ch{.name = key, .candidateCount = value};
                 mTargetConfig->mHeaders.append(ch);
 
-                // Increase total nominee count
-                mTargetConfig->mTotalNominees += value;
+                // Increase total candidate count
+                mTargetConfig->mTotalCandidates += value;
             }
             else if(currentSection == Section::General)
             {

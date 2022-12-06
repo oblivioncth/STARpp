@@ -15,7 +15,7 @@ class ExpectedElectionResult
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
     QStringList mWinners;
-    QSet<QString> mUnresolvedNominees;
+    QSet<QString> mUnresolvedCandidates;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
@@ -27,10 +27,10 @@ public:
     bool isNull() const;
 
     QStringList winners() const;
-    QSet<QString> unresolvedNominees() const;
+    QSet<QString> unresolvedCandidates() const;
 
     void setWinners(const QStringList& winners);
-    void setUnresolvedNominees(QSet<QString> unresolved);
+    void setUnresolvedCandidates(QSet<QString> unresolved);
 
     bool operator==(const ElectionResult& result) const;
     bool operator!=(const ElectionResult& result) const;

@@ -25,8 +25,8 @@ private:
         "========================================================="
     );
 
-    static inline const QString HEADING_NOMINEES = QStringLiteral(
-        "Nominees\n"
+    static inline const QString HEADING_CANDIDATES = QStringLiteral(
+        "Candidates\n"
         "--------"
     );
 

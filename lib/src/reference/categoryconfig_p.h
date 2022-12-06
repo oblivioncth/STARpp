@@ -15,7 +15,7 @@ namespace Star
 struct RefCategoryHeader
 {
     QString name;
-    uint nomineeCount;
+    uint candidateCount;
 };
 
 class RefCategoryConfig
@@ -34,7 +34,7 @@ private:
 private:
     QList<RefCategoryHeader> mHeaders;
     uint mSeats;
-    uint mTotalNominees;
+    uint mTotalCandidates;
 
 //-Constructor--------------------------------------------------------------------------------------------------------
 public:
@@ -42,7 +42,7 @@ public:
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
-    uint totalNominees() const;
+    uint totalCandidates() const;
     uint seats() const;
     const QList<RefCategoryHeader>& headers() const;
 };

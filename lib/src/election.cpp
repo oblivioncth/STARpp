@@ -16,22 +16,22 @@ Election::Election() {}
 //Public:
 bool Election::isValid() const
 {
-    return nominees().count() > 1 && ballots().count() > 1 && seatCount() > 0 && seatCount() <= nominees().count();
+    return candidates().count() > 1 && ballots().count() > 1 && seatCount() > 0 && seatCount() <= candidates().count();
 }
 
 QString Election::name() const { return mName; }
-QStringList Election::nominees() const { return mTotals.keys(); }
+QStringList Election::candidates() const { return mTotals.keys(); }
 const QList<Election::Ballot>& Election::ballots() const { return mBallots; }
 int Election::seatCount() const { return mSeats; }
 
-int Election::totalScore(const QString& nominee) const
+int Election::totalScore(const QString& candidate) const
 {
-    // NOTE: This could instead return a std::optional<int> for if *nominee* is missing, but that
+    // NOTE: This could instead return a std::optional<int> for if *candidate* is missing, but that
     // would indicate a bug elsewhere and should never happen, so instead this just throws.
-    if(!mTotals.contains(nominee))
-        qFatal(" the desired nominee is not present.");
+    if(!mTotals.contains(candidate))
+        qFatal(" the desired candidate is not present.");
 
-    return mTotals[nominee];
+    return mTotals[candidate];
 }
 
 const QList<Rank>& Election::scoreRankings() const { return mScoreRankings; }
@@ -47,15 +47,15 @@ Election::Ballot::Ballot() {}
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
 const Election::Voter& Election::Ballot::voter() const { return mVoter; }
-int Election::Ballot::score(const QString& nominee) const { return mVotes.value(nominee, 0); }
+int Election::Ballot::score(const QString& candidate) const { return mVotes.value(candidate, 0); }
 
-QString Election::Ballot::preference(const QString& nomineeA, const QString& nomineeB) const
+QString Election::Ballot::preference(const QString& candidateA, const QString& candidateB) const
 {
-    int scoreA = score(nomineeA);
-    int scoreB = score(nomineeB);
+    int scoreA = score(candidateA);
+    int scoreB = score(candidateB);
 
-    return scoreA > scoreB ? nomineeA :
-           scoreB > scoreA ? nomineeB :
+    return scoreA > scoreB ? candidateA :
+           scoreB > scoreA ? candidateB :
            QString();
 }
 
@@ -80,11 +80,11 @@ Election::Builder& Election::Builder::wBallot(const Voter& voter, const QList<Vo
 
     for(const Vote& vote : votes)
     {
-        const QString& nominee = vote.nominee;
+        const QString& candidate = vote.candidate;
 
         int score = std::max(0, std::min(vote.score, 5));
-        ballot.mVotes[nominee] = score;
-        mConstruct.mTotals[nominee] += score;
+        ballot.mVotes[candidate] = score;
+        mConstruct.mTotals[candidate] += score;
     }
 
     // Add ballot to construct

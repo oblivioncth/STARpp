@@ -16,7 +16,7 @@ namespace Star
 HeadToHeadResults::HeadToHeadResults(const Election* election)
 {
     // Get candidate list
-    QStringList candidates = election->nominees();
+    QStringList candidates = election->candidates();
 
     // Perform face-offs
     for(auto itrA = candidates.cbegin(); itrA != candidates.cend() - 1; itrA++)

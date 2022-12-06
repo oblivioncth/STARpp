@@ -38,11 +38,11 @@ public:
     bool isValid() const;
 
     QString name() const;
-    QStringList nominees() const;
+    QStringList candidates() const;
     const QList<Ballot>& ballots() const;
     int seatCount() const;
 
-    int totalScore(const QString& nominee) const;
+    int totalScore(const QString& candidate) const;
     const QList<Rank>& scoreRankings() const;
 };
 
@@ -54,7 +54,7 @@ struct Election::Voter
 
 struct Election::Vote
 {
-    QString nominee;
+    QString candidate;
     int score = 0;
 };
 
@@ -74,8 +74,8 @@ private:
 public:
     const Voter& voter() const;
 
-    int score(const QString& nominee) const;
-    QString preference(const QString& nomineeA, const QString& nomineeB) const;
+    int score(const QString& candidate) const;
+    QString preference(const QString& candidateA, const QString& candidateB) const;
 };
 
 class Election::Builder
