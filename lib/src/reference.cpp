@@ -9,7 +9,7 @@ namespace Star
 
 namespace
 {
-    QList<Election> electionTransform(const RefBallotBox& box)
+    QList<Election> electionTransform(const RefBallotBox& box, uint seatCount)
     {
         QList<Election> views;
 
@@ -48,6 +48,9 @@ namespace
                 // Add ballot to builder
                 eBuilder.wBallot(stdVoter, mappedVotes);
             }
+
+            // Set seat count
+            eBuilder.wSeatCount(seatCount);
 
             // Build election and add to list
             views.append(eBuilder.build());
@@ -89,7 +92,8 @@ ReferenceError electionsFromReferenceInput(QList<Election>& returnBuffer,
         return qxGenErrToRefError(ReferenceErrorType::BallotBox, errorStatus);
 
     // Create elections from standard ballot box
-    returnBuffer = electionTransform(bb);
+
+    returnBuffer = electionTransform(bb, cc.seats());
 
     return ReferenceError();
 }
