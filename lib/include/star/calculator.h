@@ -62,7 +62,6 @@ private:
     static inline const QString LOG_EVENT_RUNOFF_MORE_FIVE_STAR_CHECK = QStringLiteral("Checking for the candidate with more five star votes.");
     static inline const QString LOG_EVENT_RUNOFF_CHOOSING_RANDOM_WINNER = QStringLiteral("Choosing runoff winner randomly.");
     static inline const QString LOG_EVENT_RUNOFF_NO_RANDOM = QStringLiteral("Random tiebreaker is disabled, the runoff candidates remained tied.");
-   // static inline const QString LOG_EVENT_CONDORCET_START_STAGES = QStringLiteral("Following STAR Condorcet protocol methodology...");
     static inline const QString LOG_EVENT_RUNOFF_WINNER = QStringLiteral(R"(The runoff resulted in a win for: "%1")");
     static inline const QString LOG_EVENT_RUNOFF_UNRESOLVED = QStringLiteral(R"(The runoff tie could not be broken.)");
 

@@ -355,39 +355,6 @@ QSet<QString> Calculator::breakTieHighestScore(const QSet<QString>& candidates) 
     return rankBasedTiebreak(rankByScore(candidates, Rank::Descending), LOG_EVENT_BREAK_TIE_HIGHEST_SCORE.arg(candidates.size()));
 }
 
-// TODO: Remove
-//QSet<QString> Calculator::breakTieCondorcetProtocol(const QSet<QString>& candidates, const HeadToHeadResults* hth)
-//{
-//    emit calculationDetail(LOG_EVENT_BREAK_EXTENDED_TIE.arg(candidates.size()).arg(ENUM_NAME(Condorcet)));
-//    emit calculationDetail(LOG_EVENT_CONDORCET_START_STAGES);
-
-//    // Break tie by least head-to-head preferences
-//    QSet<QString> leastPreferences = breakTieLeastHeadToHeadPreferences(candidates, hth);
-//    if(leastPreferences.size() == 1)
-//        return leastPreferences;
-//    else
-//    {
-//        // Remove any candidates handled by the previous break if necessary
-//        std::unique_ptr<HeadToHeadResults> reducedHth;
-//        if(leastPreferences.size() < candidates.size())
-//        {
-//            reducedHth = std::make_unique<HeadToHeadResults>(*hth);
-//            reducedHth->narrow()
-//        }
-
-
-//        // Check for clear Five Star loser
-//        QSet<QString> leastFiveStars = breakTieLeastFiveStar(mostLosses);
-//        if(leastFiveStars.size() == 1)
-//            toBeCut = *leastFiveStars.begin();
-//        else
-//        {
-//            // Randomly choose a candidate to cut
-//            toBeCut = breakTieRandom(leastFiveStars);
-//        }
-//    }
-//}
-
 QString Calculator::breakTieRandom(const QSet<QString>& candidates) const
 {
     emit calculationDetail(LOG_EVENT_BREAK_TIE_RANDOM.arg(candidates.size()));
