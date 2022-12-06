@@ -48,6 +48,7 @@ private:
     // Logging - Preliminary Candidate Tie Reduction
     static inline const QString LOG_EVENT_PRELIMINARY_TIE_REDUCTION = QStringLiteral("Resolving %1-way tie down to the target of %2 candidates...");
     static inline const QString LOG_EVENT_PPRELIMINARY_TIE_CUT_CANDIDATE = QStringLiteral(R"(Cutting candidate "%1")");
+    static inline const QString LOG_EVENT_PRELIMINARY_NO_RANDOM = QStringLiteral("Random tiebreaker is disabled.");
     static inline const QString LOG_EVENT_PPRELIMINARY_TIE_REDUCTION_UNSUCCESSFUL = QStringLiteral(R"(Unable to resolve preliminary tie to reach the target number of candidates.)");
     static inline const QString LOG_EVENT_PPRELIMINARY_TIE_REDUCTION_RESULT = QStringLiteral("Preliminary tie reduced to:");
 
@@ -59,6 +60,7 @@ private:
     static inline const QString LOG_EVENT_PRIMARY_HIGHER_SCORE_CHECK = QStringLiteral("Checking for the candidate with the higher score.");
     static inline const QString LOG_EVENT_PRIMARY_MORE_FIVE_STAR_CHECK = QStringLiteral("Checking for the candidate with more five star votes.");
     static inline const QString LOG_EVENT_PRIMARY_CHOOSING_RANDOM_WINNER = QStringLiteral("Choosing runoff winner randomly.");
+    static inline const QString LOG_EVENT_PRIMARY_NO_RANDOM = QStringLiteral("Random tiebreaker is disabled, the runoff candidates remained tied.");
    // static inline const QString LOG_EVENT_CONDORCET_START_STAGES = QStringLiteral("Following STAR Condorcet protocol methodology...");
     static inline const QString LOG_EVENT_PRIMARY_WINNER = QStringLiteral(R"(The runoff resulted in a win for: "%1")");
     static inline const QString LOG_EVENT_PRIMARY_UNRESOLVED = QStringLiteral(R"(The runoff tie could not be broken.)");
