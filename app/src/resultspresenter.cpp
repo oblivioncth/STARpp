@@ -59,8 +59,11 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     cout << HEADING_WINNERS << endl;
     for(qsizetype w = 0; w < winners.size(); w++)
         cout << WINNER_TEMPLATE.arg(w).arg(winners.at(w)) << endl;
+    cout << endl;
+
 
     // Print raw score rankings
+    cout << HEADING_SCORE_RANKINGS << endl;
     for(const Rank& rank : result.election()->scoreRankings())
         cout << RAW_SCORE_TEMPLATE.arg(Qx::String::join(rank.candidates, R"(", ")")).arg(rank.value) << endl;
     cout << endl;
@@ -88,7 +91,7 @@ void ResultPresenter::printSummary()
     // Add headings
     summaryTable.at(0, 0) = SUMMARY_HEADING_CATEGORY;
     summaryTable.at(0, 1) = SUMMARY_HEADING_WINNER;
-    summaryTable.at(0, 1) = SUMMARY_HEADING_SECOND_SEAT;
+    summaryTable.at(0, 2) = SUMMARY_HEADING_SECOND_SEAT;
 
     // Add results
     for(int res = 0, row = 1; res < mResults->size(); res++, row++)
@@ -98,8 +101,8 @@ void ResultPresenter::printSummary()
 
         // Category, winner, runner-up
         summaryTable.at(row, 0) = ' ' + result.election()->name() + ' ';
-        summaryTable.at(row, 1) = result.filledSeatCount() > 0 ? result.winners().at(0) : SUMMARY_BLANK_FIELD;
-        summaryTable.at(row, 2) = result.filledSeatCount() > 1 ? result.winners().at(1) : SUMMARY_BLANK_FIELD;
+        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(result.filledSeatCount() > 0 ? result.winners().at(0) : SUMMARY_BLANK_FIELD);
+        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(result.filledSeatCount() > 1 ? result.winners().at(1) : SUMMARY_BLANK_FIELD);
     }
 
     // Determine field widths

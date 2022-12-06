@@ -35,6 +35,11 @@ private:
         "-------"
     );
 
+    static inline const QString HEADING_SCORE_RANKINGS = QStringLiteral(
+        "Score Rankings\n"
+        "--------------"
+    );
+
     static inline const QString HEADING_SUMMARY = QStringLiteral(
         "<><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
         "   Summary                                              \n"
