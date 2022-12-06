@@ -83,11 +83,12 @@ void ResultPresenter::printResults()
 void ResultPresenter::printSummary()
 {
     //-Create results summary table---------------------------
-    Qx::Table<QString> summaryTable(QSize(2, mResults->size() + 1)); // +1 for heading
+    Qx::Table<QString> summaryTable(QSize(3, mResults->size() + 1)); // +1 for heading
 
     // Add headings
     summaryTable.at(0, 0) = SUMMARY_HEADING_CATEGORY;
     summaryTable.at(0, 1) = SUMMARY_HEADING_WINNER;
+    summaryTable.at(0, 1) = SUMMARY_HEADING_SECOND_SEAT;
 
     // Add results
     for(int res = 0, row = 1; res < mResults->size(); res++, row++)
@@ -97,7 +98,8 @@ void ResultPresenter::printSummary()
 
         // Category, winner, runner-up
         summaryTable.at(row, 0) = ' ' + result.election()->name() + ' ';
-        summaryTable.at(row, 1) = result.winners().front();
+        summaryTable.at(row, 1) = result.filledSeatCount() > 0 ? result.winners().at(0) : SUMMARY_BLANK_FIELD;
+        summaryTable.at(row, 2) = result.filledSeatCount() > 1 ? result.winners().at(1) : SUMMARY_BLANK_FIELD;
     }
 
     // Determine field widths
