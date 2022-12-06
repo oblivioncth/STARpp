@@ -89,6 +89,7 @@ private:
 
     // Logging - Main
     static inline const QString LOG_EVENT_FILLING_SEAT = QStringLiteral("Filling seat %1...");
+    static inline const QString LOG_EVENT_DIRECT_SEAT_FILL = QStringLiteral("Only one candidate remains, seat can be filled directly.");
     static inline const QString LOG_EVENT_NO_RUNOFF = QStringLiteral("The number of candidates could not be narrowed to two in order to perform the runoff.");
 
     // Logging - Final Results

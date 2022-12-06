@@ -499,6 +499,18 @@ ElectionResult Calculator::calculateResult()
     {
         emit calculationDetail(LOG_EVENT_FILLING_SEAT.arg(s));
 
+        // Handle case of only one candidate remaining
+        if(candidateRankings.size() == 1)
+        {
+            const QSet<QString>& frontCandidates = candidateRankings.at(0).nominees;
+            if(frontCandidates.size() == 1)
+            {
+                emit calculationDetail(LOG_EVENT_DIRECT_SEAT_FILL);
+                winners.append(*frontCandidates.cbegin());
+                break;
+            }
+        }
+
         QString seatWinner;
 
         // Determine preliminary leaders based on raw score
@@ -529,7 +541,11 @@ ElectionResult Calculator::calculateResult()
         // Record seat winner
         winners.append(seatWinner);
 
-        // Remove seat winner from remaining rankings
+        /* Remove seat winner from remaining rankings
+         *
+         * It's known that the winner will always be in the first or second rank, but this
+         * is done as a loop anyway for clarity and ease of rank erasure.
+         */
         auto rItr = candidateRankings.begin();
         while(rItr != candidateRankings.end())
         {
