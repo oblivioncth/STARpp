@@ -467,7 +467,8 @@ void Calculator::logElectionResults(const ElectionResult& results) const
 
     // Create unresolved candidates string
     QString unresolvedListStr;
-    for(auto itr = results.unresolvedCandidates().cbegin(); itr != results.unresolvedCandidates().cend(); itr++)
+    const QSet<QString>& cUnresolved = results.unresolvedCandidates();
+    for(auto itr = cUnresolved.cbegin(); itr != cUnresolved.cend(); itr++)
     {
         QString candidate = *itr;
         QString unresolvedStr = LIST_ITEM_UNRESOLVED.arg(candidate);
