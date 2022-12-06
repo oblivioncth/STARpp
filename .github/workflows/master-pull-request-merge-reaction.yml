@@ -32,7 +32,7 @@ jobs:
       env:
         new_version: ${{ steps.get-proj-ver.outputs.version }}
       run: |
-        $new_tag = "v${new_version}"
+        $new_tag = "v${Env:new_version}"
         echo "new_tag=$new_tag" >> $Env:GITHUB_OUTPUT
         git tag -a $new_tag -m "Release $new_tag"
         git push --tags
