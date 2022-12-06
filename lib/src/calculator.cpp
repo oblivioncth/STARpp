@@ -124,9 +124,14 @@ QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) con
                 winner = *mostFiveStar.cbegin();
             else
             {
-                // Randomly choose a winner
-                emit calculationDetail(LOG_EVENT_PRIMARY_CHOOSING_RANDOM_WINNER);
-                winner = breakTieRandom(cTied);
+                // Randomly choose a winner if allowed
+                if(!mOptions.testFlag(Option::AllowTrueTies))
+                {
+                    emit calculationDetail(LOG_EVENT_PRIMARY_CHOOSING_RANDOM_WINNER);
+                    winner = breakTieRandom(cTied);
+                }
+                else
+                    emit calculationDetail(LOG_EVENT_PRIMARY_NO_RANDOM);
             }
         }
     }
@@ -169,8 +174,11 @@ QSet<QString> Calculator::preliminaryCandidateTieReduction(QSet<QString> candida
                 toBeCut = *leastFiveStars.begin();
             else
             {
-                // Randomly choose a candidate to cut
-                toBeCut = breakTieRandom(leastFiveStars);
+                // Randomly choose a candidate to cut if allowed
+                if(!mOptions.testFlag(Option::AllowTrueTies))
+                    toBeCut = breakTieRandom(leastFiveStars);
+                else
+                    emit calculationDetail(LOG_EVENT_PRELIMINARY_NO_RANDOM);
             }
         }
 
