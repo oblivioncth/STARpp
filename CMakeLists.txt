@@ -8,9 +8,8 @@ option(STARCALC_TESTS "Build StarCalc tests" OFF)
 
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
-set(STAR_CALC_BASE_VERSION 0.0.9.3) # Required for CI/CD
 project(StarCalc
-    VERSION ${STAR_CALC_BASE_VERSION}
+    VERSION 0.0.9.4
     LANGUAGES CXX
     DESCRIPTION "An application to determine the winner of an election using the STAR voting system"
 )
@@ -95,7 +94,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
-fetch_qx("a67682b6e94c7dd686df7e475eb91406f92efbfa")
+fetch_qx("3de0116d75f94dcc14ab5c9c0bcfa3c1854aba09")
 
 # Fetch Neargye's Magic Enum
 include(OB/FetchMagicEnum)

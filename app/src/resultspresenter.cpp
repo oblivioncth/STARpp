@@ -8,6 +8,7 @@
 #include <qx/core/qx-iostream.h>
 #include <qx/core/qx-table.h>
 #include <qx/core/qx-string.h>
+#include <qx/utility/qx-helpers.h>
 
 // Using
 using Qx::cout;
@@ -40,20 +41,13 @@ void ResultPresenter::pause()
 void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 {
     QString category = result.election()->name();
-    QStringList nominees = result.election()->nominees();
-    QString winnerStr = result.winners().size() > 1 ?
-                        WINNER_MULTI_TEMPLATE.arg(Qx::String::join(result.winners(), R"(", ")")) :
-                        WINNER_SINGLE_TEMPLATE.arg(*result.winners().constBegin());
-    QString runnerUpStr = result.winners().size() > 1 ?
-                          RUNNERUP_MULTI_TEMPLATE.arg(Qx::String::join(result.runnerUps(), R"(", ")")) :
-                          RUNNERUP_SINGLE_TEMPLATE.arg(*result.runnerUps().constBegin());
-
+    QStringList candidates = result.election()->candidates();
     // Print category
     cout << HEADING_CATEGORY.arg(category) << endl << endl;
 
-    // Print nominees
-    cout << HEADING_NOMINEES << endl;
-    for(const QString& nom : nominees)
+    // Print candidates
+    cout << HEADING_CANDIDATES << endl;
+    for(const QString& nom : candidates)
         cout << '"' << nom << '"' << endl;
     cout << endl;
 
@@ -61,12 +55,17 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     pause();
 
     // Print result
-    cout << HEADING_OUTCOME << endl;
-    cout << winnerStr << endl << runnerUpStr << endl << endl;
+    const QStringList& winners = result.winners();
+    cout << HEADING_WINNERS << endl;
+    for(qsizetype w = 0; w < winners.size(); w++)
+        cout << WINNER_TEMPLATE.arg(w).arg(winners.at(w)) << endl;
+    cout << endl;
+
 
     // Print raw score rankings
+    cout << HEADING_SCORE_RANKINGS << endl;
     for(const Rank& rank : result.election()->scoreRankings())
-        cout << RAW_SCORE_TEMPLATE.arg(Qx::String::join(rank.nominees, R"(", ")")).arg(rank.value) << endl;
+        cout << RAW_SCORE_TEMPLATE.arg(Qx::String::join(rank.candidates, R"(", ")")).arg(rank.value) << endl;
     cout << endl;
 
     // Wait on user confirm
@@ -92,7 +91,7 @@ void ResultPresenter::printSummary()
     // Add headings
     summaryTable.at(0, 0) = SUMMARY_HEADING_CATEGORY;
     summaryTable.at(0, 1) = SUMMARY_HEADING_WINNER;
-    summaryTable.at(0, 2) = SUMMARY_HEADING_RUNNER_UP;
+    summaryTable.at(0, 2) = SUMMARY_HEADING_SECOND_SEAT;
 
     // Add results
     for(int res = 0, row = 1; res < mResults->size(); res++, row++)
@@ -102,8 +101,8 @@ void ResultPresenter::printSummary()
 
         // Category, winner, runner-up
         summaryTable.at(row, 0) = ' ' + result.election()->name() + ' ';
-        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(Qx::String::join(result.winners(), R"(", ")"));
-        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(Qx::String::join(result.runnerUps(), R"(", ")"));
+        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(result.filledSeatCount() > 0 ? result.winners().at(0) : SUMMARY_BLANK_FIELD);
+        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(result.filledSeatCount() > 1 ? result.winners().at(1) : SUMMARY_BLANK_FIELD);
     }
 
     // Determine field widths

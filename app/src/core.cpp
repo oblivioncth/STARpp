@@ -11,6 +11,7 @@
 // Macros
 #define ENUM_NAME(eenum) QString(magic_enum::enum_name(eenum).data())
 
+
 //===============================================================================================================
 // CORE
 //===============================================================================================================
@@ -22,6 +23,7 @@ Core::Core(QCoreApplication* app) :
     mLogErrorOccurred(false),
     mArguments(app->arguments()),
     mRefElectionCfg(std::nullopt),
+    mCalcOptions(Star::Calculator::NoOptions),
     mMinimal(false)
 {
     // Logger tweaks
@@ -76,9 +78,7 @@ void Core::showVersion()
 
 void Core::logElectionData(const ReferenceElectionConfig data)
 {
-    auto tbMethod = data.extraTiebreakMethod;
-    QString tbStr = tbMethod.has_value() ? ENUM_NAME(tbMethod.value()) : "*None*";
-    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath, tbStr));
+    logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath));
 }
 
 //Public:
@@ -119,28 +119,29 @@ ErrorCode Core::initialize()
     }
     else if(clParser.isSet(CL_OPTION_CONFIG) && clParser.isSet(CL_OPTION_BOX))
     {
-        // Check extra tiebreak parameter
-        std::optional<Star::Calculator::ExtendedTiebreakMethod> tbm;
-        if(clParser.isSet(CL_OPTION_EXTRA))
-        {
-            // Try to get enum value
-            tbm = magic_enum::enum_cast<Star::Calculator::ExtendedTiebreakMethod>(clParser.value(CL_OPTION_EXTRA).toStdString());
-            if(!tbm.has_value())
-            {
-                logError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_ARGS, LOG_ERR_INVALID_EXTRA));
-                return ErrorCode::INVALID_ARGS;
-            }
-        }
-
         // Setup options container
         mRefElectionCfg = ReferenceElectionConfig{
             .ccPath = clParser.value(CL_OPTION_CONFIG),
             .bbPath = clParser.value(CL_OPTION_BOX),
-            .extraTiebreakMethod = tbm,
-            .speculative = clParser.isSet(CL_OPTION_SPECULATIVE)
         };
 
         logElectionData(mRefElectionCfg.value());
+
+        // Handle calculator options
+        QStringList selectedOpts;
+        if(clParser.isSet(CL_OPTION_TRUE_TIES))
+        {
+            selectedOpts.append(ENUM_NAME(Star::Calculator::AllowTrueTies));
+            mCalcOptions.setFlag(Star::Calculator::AllowTrueTies);
+        }
+        if(clParser.isSet(CL_OPTION_EXTRA_TIEBREAK))
+        {
+            selectedOpts.append(ENUM_NAME(Star::Calculator::CondorcetProtocol));
+            mCalcOptions.setFlag(Star::Calculator::CondorcetProtocol);
+        }
+
+        QString optStr = !selectedOpts.isEmpty() ? selectedOpts.join(',') : ENUM_NAME(Star::Calculator::NoOptions);
+        logEvent(NAME, LOG_EVENT_SELECTED_CALCULATOR_OPTIONS.arg(optStr));
 
         // Handle minimal option
         if(clParser.isSet(CL_OPTION_MINIMAL))
@@ -159,14 +160,16 @@ ErrorCode Core::initialize()
     return ErrorCode::NO_ERR;
 }
 
-bool Core::hasActionableArguments() { return mRefElectionCfg.has_value(); }
+bool Core::hasActionableArguments() const { return mRefElectionCfg.has_value(); }
 
-ReferenceElectionConfig Core::referenceElectionConfig()
+ReferenceElectionConfig Core::referenceElectionConfig() const
 {
     return mRefElectionCfg.has_value() ? mRefElectionCfg.value() : ReferenceElectionConfig();
 }
 
-bool Core::isMinimalPresentation() { return mMinimal; }
+Star::Calculator::Options Core::calculatorOptions() const { return mCalcOptions; }
+
+bool Core::isMinimalPresentation() const { return mMinimal; }
 
 //-Signals & Slots------------------------------------------------------------------------------------------------------------
 //Public slots:

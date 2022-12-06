@@ -19,7 +19,7 @@ class ResultSetReader
 private:
     // Keys
     static inline const QString KEY_WINNERS_ARRAY = QStringLiteral("winners");
-    static inline const QString KEY_RUNNERUPS_ARRAY = QStringLiteral("runnerups");
+    static inline const QString KEY_UNRESOLVED_ARRAY = QStringLiteral("unresolved");
 
     // Errors
     static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading results set.");

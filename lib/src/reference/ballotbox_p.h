@@ -19,7 +19,7 @@ class RefCategoryConfig;
 struct RefCategory
 {
     QString name;
-    QStringList nominees;
+    QStringList candidates;
 };
 
 struct RefBallot
@@ -63,7 +63,7 @@ private:
     static inline const QString ERR_EMPTY = QStringLiteral("The provided file contains no ballots.");
     static inline const QString ERR_BLANK_VALUE = QStringLiteral("A field expected to have a value was blank (r: %1, c: %2).");
     static inline const QString ERR_INVALID_VOTE = QStringLiteral("A vote value was not a valid unsigned integer between 0 and 5 (r: %1, c: %2).");
-    static inline const QString ERR_DUPLICATE_NOMINEE = QStringLiteral("The ballot box contained duplicate nominees within the same category.");
+    static inline const QString ERR_DUPLICATE_CANDIDATE = QStringLiteral("The ballot box contained duplicate candidates within the same category.");
 
     static inline const Qx::GenericError ERROR_TEMPLATE = Qx::GenericError(Qx::GenericError::Critical, MAIN_ERR_MSG);
 

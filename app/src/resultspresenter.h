@@ -25,14 +25,19 @@ private:
         "========================================================="
     );
 
-    static inline const QString HEADING_NOMINEES = QStringLiteral(
-        "Nominees\n"
+    static inline const QString HEADING_CANDIDATES = QStringLiteral(
+        "Candidates\n"
         "--------"
     );
 
-    static inline const QString HEADING_OUTCOME = QStringLiteral(
-        "Outcome\n"
+    static inline const QString HEADING_WINNERS = QStringLiteral(
+        "Winners\n"
         "-------"
+    );
+
+    static inline const QString HEADING_SCORE_RANKINGS = QStringLiteral(
+        "Score Rankings\n"
+        "--------------"
     );
 
     static inline const QString HEADING_SUMMARY = QStringLiteral(
@@ -42,18 +47,15 @@ private:
     );
 
     // Result Templates
-    static inline const QString WINNER_SINGLE_TEMPLATE = QStringLiteral(R"(Winner: "%1")");
-    static inline const QString WINNER_MULTI_TEMPLATE = QStringLiteral(R"(Winners: "%1")");
-    static inline const QString RUNNERUP_SINGLE_TEMPLATE = QStringLiteral(R"(Runner-Up: "%1")");
-    static inline const QString RUNNERUP_MULTI_TEMPLATE = QStringLiteral(R"(Runner-Ups: "%1")");
-
+    static inline const QString WINNER_TEMPLATE = QStringLiteral(R"(%1) "%2")");
     static inline const QString RAW_SCORE_TEMPLATE = QStringLiteral(R"({"%1"} [%2])");
 
     // Summary
     static inline const QString SUMMARY_HEADING_CATEGORY = QStringLiteral(" Category ");
     static inline const QString SUMMARY_HEADING_WINNER = QStringLiteral(" Winner ");
-    static inline const QString SUMMARY_HEADING_RUNNER_UP = QStringLiteral(" Runner-up ");
+    static inline const QString SUMMARY_HEADING_SECOND_SEAT = QStringLiteral(" Second Seat ");
     static inline const QString SUMMARY_LIST_ITEM = QStringLiteral(R"( "%1" )");
+    static inline const QString SUMMARY_BLANK_FIELD = "*None*";
     static inline const QChar SUMMARY_VERTICAL_SEP = '|';
     static inline const QChar SUMMARY_HORIZONTAL_SEP = '-';
 

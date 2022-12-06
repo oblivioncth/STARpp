@@ -25,6 +25,7 @@ public:
 private:
     QString mName;
     QList<Ballot> mBallots;
+    int mSeats;
     QMap<QString, int> mTotals;
     QList<Rank> mScoreRankings;
 
@@ -37,10 +38,11 @@ public:
     bool isValid() const;
 
     QString name() const;
-    QStringList nominees() const;
+    QStringList candidates() const;
     const QList<Ballot>& ballots() const;
+    int seatCount() const;
 
-    int totalScore(const QString& nominee) const;
+    int totalScore(const QString& candidate) const;
     const QList<Rank>& scoreRankings() const;
 };
 
@@ -52,7 +54,7 @@ struct Election::Voter
 
 struct Election::Vote
 {
-    QString nominee;
+    QString candidate;
     int score = 0;
 };
 
@@ -72,8 +74,8 @@ private:
 public:
     const Voter& voter() const;
 
-    int score(const QString& nominee) const;
-    QString preference(const QSet<QString>& nominees) const;
+    int score(const QString& candidate) const;
+    QString preference(const QString& candidateA, const QString& candidateB) const;
 };
 
 class Election::Builder
@@ -89,6 +91,7 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     Builder& wBallot(const Voter& voter, const QList<Vote>& votes);
+    Builder& wSeatCount(int count);
     void reset();
     Election build();
 };
