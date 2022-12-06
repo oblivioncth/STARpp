@@ -174,9 +174,30 @@ QSet<QString> Calculator::preliminaryCandidateTieReduction(QSet<QString> candida
                 toBeCut = *leastFiveStars.begin();
             else
             {
-                // Randomly choose a candidate to cut if allowed
-                if(!mOptions.testFlag(Option::AllowTrueTies))
-                    toBeCut = breakTieRandom(leastFiveStars);
+                QSet<QString> remainingPool = leastFiveStars;
+
+                // Follow Condorcet protocol if enabled
+                if(mOptions.testFlag(Option::CondorcetProtocol))
+                {
+                    // Check for clear preference loser
+                    QSet<QString> leastPreferences = breakTieLeastHeadToHeadPreferences(leastFiveStars, &relevantHthResults);
+                    if(leastPreferences.size() == 1)
+                        toBeCut = *leastPreferences.begin();
+                    else
+                    {
+                        // Check for clear head-to-head win margin loser
+                        QSet<QString> smallestMargin = breakTieSmallestHeadToHeadMargin(leastPreferences, &relevantHthResults);
+                        if(smallestMargin.size() == 1)
+                            toBeCut = *smallestMargin.begin();
+                        else
+                            remainingPool = smallestMargin;
+                    }
+
+                }
+
+                // Randomly choose a candidate to cut if required and allowed
+                if(toBeCut.isNull() && !mOptions.testFlag(Option::AllowTrueTies))
+                    toBeCut = breakTieRandom(remainingPool);
                 else
                     emit calculationDetail(LOG_EVENT_PRELIMINARY_NO_RANDOM);
             }

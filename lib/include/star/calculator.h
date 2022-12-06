@@ -23,7 +23,8 @@ public:
     enum Option
     {
         NoOptions = 0x00,
-        AllowTrueTies = 0x01
+        AllowTrueTies = 0x01,
+        CondorcetProtocol = 0x02
     };
     Q_DECLARE_FLAGS(Options, Option);
 
