@@ -35,9 +35,9 @@ Calculator::~Calculator() = default;
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Private:
-QSet<QString> Calculator::determinePreliminaryLeaders(const QList<Rank>& scoreRankings)
+QSet<QString> Calculator::determineScoringRoundLeaders(const QList<Rank>& scoreRankings)
 {
-    emit calculationDetail(LOG_EVENT_DETERMINE_PRELIMINARY_LEADERS);
+    emit calculationDetail(LOG_EVENT_DETERMINE_SCORING_ROUND_LEADERS);
 
     QSet<QString> leaders;
 
@@ -49,14 +49,14 @@ QSet<QString> Calculator::determinePreliminaryLeaders(const QList<Rank>& scoreRa
 
         if(candidatesInFirst.size() == 2) // Two-way
         {
-            QString tieLogStr = LOG_EVENT_PRELIMINARY_FIRST_TIE_BENIGN.arg(firstPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInFirst);
+            QString tieLogStr = LOG_EVENT_SCORING_ROUND_FIRST_TIE_BENIGN.arg(firstPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInFirst);
             emit calculationDetail(tieLogStr);
 
             leaders = candidatesInFirst;
         }
         else // N-way
         {
-            QString tieLogStr = LOG_EVENT_PRELIMINARY_FIRST_TIE.arg(candidatesInFirst.size()).arg(firstPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInFirst);
+            QString tieLogStr = LOG_EVENT_SCORING_ROUND_FIRST_TIE.arg(candidatesInFirst.size()).arg(firstPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInFirst);
             emit calculationDetail(tieLogStr);
 
             // Tiebreak
@@ -67,7 +67,7 @@ QSet<QString> Calculator::determinePreliminaryLeaders(const QList<Rank>& scoreRa
     {
         // First place uncontested
         QString first = *candidatesInFirst.constBegin();
-        emit calculationDetail(LOG_EVENT_PRELIMINARY_FIRST_NO_TIE.arg(first));
+        emit calculationDetail(LOG_EVENT_SCORING_ROUND_FIRST_NO_TIE.arg(first));
         leaders.insert(first);
 
         // Check second place
@@ -76,7 +76,7 @@ QSet<QString> Calculator::determinePreliminaryLeaders(const QList<Rank>& scoreRa
         {
             int secondPlaceScore = scoreRankings.at(1).value;
 
-            QString tieLogStr = LOG_EVENT_PRELIMINARY_SECOND_TIE.arg(candidatesInSecond.size()).arg(secondPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInSecond);
+            QString tieLogStr = LOG_EVENT_SCORING_ROUND_SECOND_TIE.arg(candidatesInSecond.size()).arg(secondPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInSecond);
             emit calculationDetail(tieLogStr);
 
             // Tiebreak
@@ -89,12 +89,12 @@ QSet<QString> Calculator::determinePreliminaryLeaders(const QList<Rank>& scoreRa
         {
             // Second place uncontested
             QString second = *candidatesInSecond.constBegin();
-            emit calculationDetail(LOG_EVENT_PRELIMINARY_SECOND_NO_TIE.arg(second));
+            emit calculationDetail(LOG_EVENT_SCORING_ROUND_SECOND_NO_TIE.arg(second));
             leaders.insert(second);
         }
     }
 
-    emit calculationDetail(LOG_EVENT_PRELIMINARY_LEADERS + '\n' + createCandidateToalScoreSetString(leaders));
+    emit calculationDetail(LOG_EVENT_SCORING_ROUND_LEADERS + '\n' + createCandidateToalScoreSetString(leaders));
     return leaders;
 }
 
@@ -103,22 +103,22 @@ QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) con
     emit calculationDetail(LOG_EVENT_PERFORM_PRIMARY_RUNOFF);
 
     // Check for clear winner
-    emit calculationDetail(LOG_EVENT_PRIMARY_HEAD_TO_HEAD_WINNER_CHECK);
+    emit calculationDetail(LOG_EVENT_RUNOFF_HEAD_TO_HEAD_WINNER_CHECK);
     QString winner = mHeadToHeadResults->winner(candidates.first, candidates.second);
     if(winner.isNull())
     {
-        emit calculationDetail(LOG_EVENT_PRIMARY_TIE);
+        emit calculationDetail(LOG_EVENT_RUNOFF_TIE);
         QSet<QString> cTied = {candidates.first, candidates.second};
 
         // Try to break tie by original score
-        emit calculationDetail(LOG_EVENT_PRIMARY_HIGHER_SCORE_CHECK);
+        emit calculationDetail(LOG_EVENT_RUNOFF_HIGHER_SCORE_CHECK);
         QSet<QString> highestScore = breakTieHighestScore(cTied);
         if(highestScore.size() == 1)
             winner = *highestScore.cbegin();
         else
         {
             // Try to break tie by five star votes
-            emit calculationDetail(LOG_EVENT_PRIMARY_MORE_FIVE_STAR_CHECK);
+            emit calculationDetail(LOG_EVENT_RUNOFF_MORE_FIVE_STAR_CHECK);
             QSet<QString> mostFiveStar = breakTieMostFiveStar(cTied);
             if(mostFiveStar.size() == 1)
                 winner = *mostFiveStar.cbegin();
@@ -127,17 +127,17 @@ QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) con
                 // Randomly choose a winner if allowed
                 if(!mOptions.testFlag(Option::AllowTrueTies))
                 {
-                    emit calculationDetail(LOG_EVENT_PRIMARY_CHOOSING_RANDOM_WINNER);
+                    emit calculationDetail(LOG_EVENT_RUNOFF_CHOOSING_RANDOM_WINNER);
                     winner = breakTieRandom(cTied);
                 }
                 else
-                    emit calculationDetail(LOG_EVENT_PRIMARY_NO_RANDOM);
+                    emit calculationDetail(LOG_EVENT_RUNOFF_NO_RANDOM);
             }
         }
     }
 
     // Note results
-    emit calculationDetail(winner.isNull() ? LOG_EVENT_PRIMARY_UNRESOLVED : LOG_EVENT_PRIMARY_WINNER.arg(winner));
+    emit calculationDetail(winner.isNull() ? LOG_EVENT_RUNOFF_UNRESOLVED : LOG_EVENT_RUNOFF_WINNER.arg(winner));
 
     // Return result
     return winner;
@@ -157,7 +157,7 @@ QSet<QString> Calculator::preliminaryCandidateTieReduction(QSet<QString> candida
     relevantHthResults.narrow(candidates, HeadToHeadResults::Inclusive);
 
     // Eliminate the weakest candidates in turn until at the desired amount
-    emit calculationDetail(LOG_EVENT_PRELIMINARY_TIE_REDUCTION.arg(candidates.size()).arg(desiredCount));
+    emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION.arg(candidates.size()).arg(desiredCount));
     while(candidates.size() != desiredCount)
     {
         QString toBeCut;
@@ -199,26 +199,26 @@ QSet<QString> Calculator::preliminaryCandidateTieReduction(QSet<QString> candida
                 if(toBeCut.isNull() && !mOptions.testFlag(Option::AllowTrueTies))
                     toBeCut = breakTieRandom(remainingPool);
                 else
-                    emit calculationDetail(LOG_EVENT_PRELIMINARY_NO_RANDOM);
+                    emit calculationDetail(LOG_EVENT_SCORING_ROUND_NO_RANDOM);
             }
         }
 
         // Cut candidate if the tie was resolvable
         if(!toBeCut.isNull())
         {
-            emit calculationDetail(LOG_EVENT_PPRELIMINARY_TIE_CUT_CANDIDATE.arg(toBeCut));
+            emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_CUT_CANDIDATE.arg(toBeCut));
             candidates.remove(toBeCut);
             relevantHthResults.narrow({toBeCut}, HeadToHeadResults::Exclusive);
         }
         else
         {
-            emit calculationDetail(LOG_EVENT_PPRELIMINARY_TIE_REDUCTION_UNSUCCESSFUL);
+            emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_UNSUCCESSFUL);
             break;
         }
     }
 
     // Return the reduced candidate set, ideally at target size
-    emit calculationDetail(LOG_EVENT_PPRELIMINARY_TIE_REDUCTION_RESULT + '\n' + createCandidateToalScoreSetString(candidates));
+    emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_RESULT + '\n' + createCandidateToalScoreSetString(candidates));
     return candidates;
 }
 
@@ -535,10 +535,10 @@ ElectionResult Calculator::calculateResult()
 
         QString seatWinner;
 
-        // Determine preliminary leaders based on raw score
-        QSet<QString> preliminaryLeaders = determinePreliminaryLeaders(candidateRankings);
+        // Determine scoring round leaders based on raw score
+        QSet<QString> preliminaryLeaders = determineScoringRoundLeaders(candidateRankings);
 
-        // Check for an unresolved preliminary tie that prevented a runoff
+        // Check for an unresolved scoring round tie that prevented a runoff
         if(preliminaryLeaders.size() != 2)
         {
             emit calculationDetail(LOG_EVENT_NO_RUNOFF);
