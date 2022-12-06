@@ -5,8 +5,6 @@ on:
     branches:
     - 'master'
 env:
-  ci_bot_username: ObyBotCI
-  ci_bot_email: 104651589+ObyBotCI@users.noreply.github.com
   starcalc_qts_win_artifact_path: ${{ github.workspace }}/StarCalcQtSWin
   starcalc_qts_linux_artifact_path: ${{ github.workspace }}/StarCalcQtSLinux
   
@@ -16,48 +14,28 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: windows-latest
     outputs:
-      version_tag: ${{ steps.tag_master.outputs.new_tag }}
+      new_version: ${{ steps.get-proj-ver.outputs.version }}
     steps:
     - name: Get project version
       id: get-proj-ver
       uses: oblivioncth/actions/cmake/get-project-version@dev
     - name: Set Git user to ObyBotCI
       uses: oblivioncth/actions/git/set-git-user-to-oby-bot@dev
-    - name: Checkout Project
-      id: proj-checkout
-      uses: oblivioncth/actions/git/smart-checkout@dev
     - name: Tag master with new version tag
-      id: tag_master
-      working-directory: ${{ steps.proj-checkout.outputs.path }}
-      env:
-        new_version: ${{ steps.get-proj-ver.outputs.version }}
-      run: |
-        $new_tag = "v${Env:new_version}"
-        echo "new_tag=$new_tag" >> $Env:GITHUB_OUTPUT
-        git tag -a $new_tag -m "Release $new_tag"
-        git push --tags
+      uses: oblivioncth/actions/git/tag@dev
+      with:
+        tag: 'v${{ steps.get-proj-ver.outputs.version }}'
+        message: 'Release v${{ steps.get-proj-ver.outputs.version }}'
     - name: Move 'latest' tag
-      working-directory: ${{ steps.proj-checkout.outputs.path }}
-      run: |
-        echo "Checking for 'latest' tag..."
-        if(git tag -l latest){
-          echo "Removing previous 'latest' tag..."
-          git tag -d latest # Delete tag locally
-          git push origin :refs/tags/latest # Delete tag remotely
-        }
-        else{
-          echo "No tag to remove."
-        }
-        git tag -a latest -m "Latest Release"
-        git push origin latest
+      uses: oblivioncth/actions/git/move-latest-tag@dev
     - name: Fast-forward merge master into to dev
       if: always()
-      working-directory: ${{ steps.proj-checkout.outputs.path }}
-      run: |
-        git checkout dev
-        git merge master --ff-only
-        git push
-  
+      uses: oblivioncth/actions/git/merge-branches@dev
+      with:
+        source_branch: master
+        target_branch: dev
+        ff: only
+        
   build_starcalc_release_windows:
     name: Build StarCalc Release (Windows)
     needs: tag_master_and_sync_dev
@@ -101,8 +79,8 @@ jobs:
     - name: Generate release
       uses: softprops/action-gh-release@v1
       with:
-        name: "StarCalc Release ${{ needs.tag_master_and_sync_dev.outputs.version_tag }}"
-        tag_name: "${{ needs.tag_master_and_sync_dev.outputs.version_tag }}"
+        name: "StarCalc Release v${{ needs.tag_master_and_sync_dev.outputs.new_version }}"
+        tag_name: "v${{ needs.tag_master_and_sync_dev.outputs.new_version }}"
         fail_on_unmatched_files: true
         generate_release_notes: true
         files: |
