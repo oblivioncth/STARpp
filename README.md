@@ -12,47 +12,41 @@ The original motivation for this project was to facilitate automated election re
 
  - Reference command-line application for running elections
  - Full implementation of the STAR voting system
- - Determination of election winner, as well as runner-up
- - Ability to select a final tiebreak method:
-	 - None
-	 - Five-Star
-	 - Head-to-Head Wins
-	 - Head-to-Head Preference Count
-	 - Head-to-Head Preference Margin
-	 - Random
-	 - Condorcet (combines the previous three methods sequentially)
-  - Optional Qt signal connection that details calculation steps
+ - Supports Bloc STAR Voting (determining the winner(s) for one or more seats)
+ - Can be configured to allow true-ties instead of employing a random tiebreak when other tiebreaks have faield
+ - Optional extra Condorcet Protocol tiebreaker for Scoring Round ties
+ - Optional Qt signal connection that details calculation steps
 
 ## Library
-The public API of the library is not currently documented (it can be if interest is shown), though its usage is fairly straight forward as shown in the following minimal example:
+The public API of the library is not currently documented (it likely will be in time or given interest), though its usage is fairly straight forward as shown in the following minimal example:
 
 ```cpp
-   #include <star/election.h>
-   #include <star/calculator.h>
-   #include <iostream>
-   
-   int main()
-   {
+#include <star/election.h>
+#include <star/calculator.h>
+#include <iostream>
+
+int main()
+{
     // Setup ballots
     Star::Election::Voter jim{.name = "Jim", .anonymousName = "Voter 1"};
     QList<Star::Election::Vote> jimVotes{
-        {.nominee = "Candidate 1", .score = 3},
-        {.nominee = "Candidate 2", .score = 1},
-        {.nominee = "Candidate 3", .score = 5}
+        {.candidate = "Candidate 1", .score = 3},
+        {.candidate = "Candidate 2", .score = 1},
+        {.candidate = "Candidate 3", .score = 5}
     };
 
     Star::Election::Voter sarah{.name = "Sarah", .anonymousName = "Voter 2"};
     QList<Star::Election::Vote> sarahVotes{
-        {.nominee = "Candidate 1", .score = 4},
-        {.nominee = "Candidate 2", .score = 0},
-        {.nominee = "Candidate 3", .score = 2}
+        {.candidate = "Candidate 1", .score = 4},
+        {.candidate = "Candidate 2", .score = 0},
+        {.candidate = "Candidate 3", .score = 2}
     };
 
     Star::Election::Voter ted{.name = "Ted", .anonymousName = "Voter 3"};
     QList<Star::Election::Vote> tedVotes{
-        {.nominee = "Candidate 1", .score = 3},
-        {.nominee = "Candidate 2", .score = 2},
-        {.nominee = "Candidate 3", .score = 1}
+        {.candidate = "Candidate 1", .score = 3},
+        {.candidate = "Candidate 2", .score = 2},
+        {.candidate = "Candidate 3", .score = 1}
     };
 
     // Setup election
@@ -60,12 +54,14 @@ The public API of the library is not currently documented (it can be if interest
     eb.wBallot(ted, tedVotes)
       .wBallot(sarah, sarahVotes)
       .wBallot(ted, tedVotes);
+    eb.wSeatCount(3);
 
     Star::Election election = eb.build();
     assert(election.isValid());
 
     // Setup Calculator
     Star::Calculator calculator(&election);
+
     //If you want calculation details...
     QObject::connect(&calculator, &Star::Calculator::calculationDetail, [](const QString& detail){
         std::cout << detail.toStdString() << std::endl;
@@ -76,8 +72,9 @@ The public API of the library is not currently documented (it can be if interest
     assert(!result.isNull());
 
     std::cout << "Winner(s): " << result.winners().join(", ").toStdString() << std::endl;
-    std::cout << "Runner-up(s): " << result.runnerUps().join(", ").toStdString() << std::endl;
-   }
+
+    return 0;
+}
 ```
 You can also refer to the reference application source to get a better understanding of how to use the library.
 
@@ -93,13 +90,16 @@ X,Jim,0,3,5,4,2
 X,Sarah,5,2,2,1,4
 X,Ted,3,0,0,5,0
 ```
-Second, it expects an INI file, along with how many candidates are in the category, in the same order as they are listed in the CSV. These details are to be place under the singular section "Categories".
+Second, it expects an INI file that indicates how many candidates are in the category, in the same order as they are listed in the CSV. These details are to be place under the section "Categories". Additionally, a value for the singular key "Seats" must be specified under the section "General" in order to specify how many candidates are to be elected (Bloc voting). Simply use "1" for a typical election with a single winner.
 
 **Example:**
 ```
 [Categories]
 Category A = 3
 Category B = 2
+
+[General]
+Seats = 3
 ```
 Lastly, the files are loaded via the application's command-line parameters as shown in the following section.
 
@@ -109,11 +109,12 @@ The application uses the following syntax scheme:
     StarCalc <options>
 
 **Options**:
- -  **-h | --help | -?:** Prints usage information
- -  **-v | --version:** Prints the current version of the tool
- -  **-c | --config:** Specifies the path to the category config INI file
- -  **-b | --box:** Specifies the path to the ballot box CSV file
- - **-e | --extra:** Performs an extra tiebreaker, if necessary. Select from (FiveStar | Condorcet)
+ - **-h | --help | -?:** Prints usage information
+ - **-v | --version:** Prints the current version of the tool
+ - **-c | --config:** Specifies the path to the category config INI file
+ - **-b | --box:** Specifies the path to the ballot box CSV file
+ - **-t | --true-ties:** Ends an election prematurely instead of using a random tiebreaker when an unresolvable tie occurs.
+ - **-e | --extra-tiebreak:** Uses the Condorcet protocol tiebreaker during the scoring round before the random tiebreaker if necessary
  - **-m | --minimal:** Only show the results summary
 
 **Example:**
@@ -125,7 +126,7 @@ The application uses the following syntax scheme:
 ### Summary
 
  - C++20
- - CMake 3.24.0
+ - CMake >= 3.24.0
  - Targets:
 	 - Windows 10+
 	 - Linux (Tested on Ubuntu 20.04)
