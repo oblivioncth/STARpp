@@ -14,7 +14,10 @@ Election::Election() {}
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-bool Election::isValid() const { return nominees().count() > 1 && ballots().count() > 1 && seatCount() > 0; }
+bool Election::isValid() const
+{
+    return nominees().count() > 1 && ballots().count() > 1 && seatCount() > 0 && seatCount() <= nominees().count();
+}
 
 QString Election::name() const { return mName; }
 QStringList Election::nominees() const { return mTotals.keys(); }
