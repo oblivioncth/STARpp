@@ -30,7 +30,7 @@
 # https://stackoverflow.com/questions/45777734/install-export-requires-target-from-subproject
 
 # Add executable target
-qt_add_library(${LIB_TARGET_NAME})
+qt_add_library(${LIB_TARGET_NAME} STATIC)
 
 # Make alias target so target can be referred to with its friendly
 # export name both internally and when part of another build tree
