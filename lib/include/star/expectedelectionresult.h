@@ -20,7 +20,7 @@ private:
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     ExpectedElectionResult();
-    ExpectedElectionResult(const QStringList& winners, const QSet<QString> unresolved);
+    ExpectedElectionResult(const QStringList& winners, const QSet<QString> unresolved = {});
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
