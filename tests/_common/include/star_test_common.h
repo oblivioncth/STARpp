@@ -11,17 +11,25 @@
 namespace Star
 {
 
+QString elecResStr(const QStringList& winners, const QSet<QString>& unres)
+{
+    static const QString templ = QStringLiteral("Winners = {%1} | Unresolved = {%2}");
+
+    QString winStr = winners.isEmpty() ? QString() : '"' + winners.join(R"(", ")") + '"';
+    QString unresStr = unres.isEmpty() ? QString() : '"' + Qx::String::join(unres, R"(", ")") + '"';
+
+    return templ.arg(winStr, unresStr);
+}
+
 char* toString(const ExpectedElectionResult& eer)
 {
-    QString string = "Winners = {" + eer.winners().join(", ") + "} | "
-                     "Unresolved = {" + Qx::String::join(eer.unresolvedCandidates(), ", ") + '}';
+    QString string = elecResStr(eer.winners(), eer.unresolvedCandidates());
     return qstrdup(string.toUtf8().constData());
 }
 
 char* toString(const ElectionResult& er)
 {
-    QString string = "Winners = {" + er.winners().join(", ") + "} | "
-                     "Unresolved = {" + Qx::String::join(er.unresolvedCandidates(), ", ") + '}';
+    QString string = elecResStr(er.winners(), er.unresolvedCandidates());
     return qstrdup(string.toUtf8().constData());
 }
 
