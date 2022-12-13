@@ -525,7 +525,10 @@ ElectionResult Calculator::calculateResult()
 
         // Check for unresolved runoff tie
         if(seatWinner.isNull())
+        {
             unresolvedCandidates = preliminaryLeaders;
+            break;
+        }
 
         // Record seat winner
         winners.append(seatWinner);
