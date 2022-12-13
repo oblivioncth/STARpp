@@ -63,8 +63,6 @@ void tst_ties::all_tie_cases_data()
 
     //-Populate test table rows with each case-----------------------------
 
-    //################################### PRELIMINARY ####################################################
-
     addTestRow("Scoring Round - First place 2-way tie",
                {
                    {
@@ -87,39 +85,10 @@ void tst_ties::all_tie_cases_data()
                    }
                },
                Star::ExpectedElectionResult({candidate1}),
-               Star::Calculator::NoOptions
+               Star::Calculator::AllowTrueTies
     );
 
-
-
-
-
-    addTestRow("Preliminary - First place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 4},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate4}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Preliminary - First place N-way tie, unsuccessful break",
+    addTestRow("Scoring Round - First place 3-way tie, breaks from most head-to-head losses",
                {
                    {
                        {.candidate = candidate1, .score = 1},
@@ -140,125 +109,36 @@ void tst_ties::all_tie_cases_data()
                        {.candidate = candidate4, .score = 4}
                    }
                },
-               Star::ExpectedElectionResult({candidate1}, {candidate4}),
-               Star::Calculator::NoOptions
-    );
+               Star::ExpectedElectionResult({candidate1}),
+               Star::Calculator::AllowTrueTies
+               );
 
-    addTestRow("Preliminary - Second place N-way tie, successful break",
+    addTestRow("Scoring Round - First place 3-way tie, breaks from least five star",
                {
                    {
                        {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
                        {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 0}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 4},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3}, {candidate1}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Preliminary - Second place N-way tie, unsuccessful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 4},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 3}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3}, {candidate1}),
-               Star::Calculator::NoOptions
-    );
-
-    //################################### RUNOFF ####################################################
-
-    addTestRow("Runoff - First place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 4},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 3}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3}, {candidate1}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Runoff - First place N-way tie, unsuccessful break, single fallback for second",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
                        {.candidate = candidate3, .score = 1},
                        {.candidate = candidate4, .score = 5}
                    },
                    {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 5}
+                       {.candidate = candidate1, .score = 5},
+                       {.candidate = candidate2, .score = 3},
+                       {.candidate = candidate3, .score = 2},
+                       {.candidate = candidate4, .score = 1}
+                   },
+                   {
+                       {.candidate = candidate1, .score = 5},
+                       {.candidate = candidate2, .score = 4},
+                       {.candidate = candidate3, .score = 3},
+                       {.candidate = candidate4, .score = 4}
                    }
                },
-               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3}),
-               Star::Calculator::NoOptions
+               Star::ExpectedElectionResult({candidate1}),
+               Star::Calculator::AllowTrueTies
     );
 
-    addTestRow("Runoff - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
+    addTestRow("Scoring Round - Second place 4-way tie, breaks from least head-to-head preferences",
                {
                    {
                        {.candidate = candidate1, .score = 5},
@@ -303,11 +183,38 @@ void tst_ties::all_tie_cases_data()
                        {.candidate = candidate5, .score = 5}
                    }
                },
-               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3}),
-               Star::Calculator::NoOptions
-    );
+               Star::ExpectedElectionResult({candidate3}),
+               Star::Calculator::AllowTrueTies | Star::Calculator::CondorcetProtocol
+               );
 
-    addTestRow("Runoff - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
+    // TODO: addTestRow("Scoring Round - ..., breaks from least head-to-head preferences", ...
+
+    addTestRow("Scoring Round - Second place 3-way tie, never breaks (with Condorcet)",
+               {
+                   {
+                       {.candidate = candidate1, .score = 0},
+                       {.candidate = candidate2, .score = 1},
+                       {.candidate = candidate3, .score = 5},
+                       {.candidate = candidate4, .score = 4}
+                   },
+                   {
+                       {.candidate = candidate1, .score = 4},
+                       {.candidate = candidate2, .score = 4},
+                       {.candidate = candidate3, .score = 3},
+                       {.candidate = candidate4, .score = 1}
+                   },
+                   {
+                       {.candidate = candidate1, .score = 4},
+                       {.candidate = candidate2, .score = 3},
+                       {.candidate = candidate3, .score = 5},
+                       {.candidate = candidate4, .score = 3}
+                   }
+               },
+               Star::ExpectedElectionResult({}, {candidate1, candidate2, candidate3}),
+               Star::Calculator::AllowTrueTies | Star::Calculator::CondorcetProtocol
+               );
+
+    addTestRow("Scoring Round - Second place 3-way tie, never breaks (without Condorcet)",
                {
                    {
                        {.candidate = candidate1, .score = 5},
@@ -352,11 +259,36 @@ void tst_ties::all_tie_cases_data()
                        {.candidate = candidate5, .score = 5}
                    }
                },
-               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3, candidate4}),
-               Star::Calculator::NoOptions
-    );
+               Star::ExpectedElectionResult({}, {{candidate1, candidate3, candidate4}}),
+               Star::Calculator::AllowTrueTies
+               );
 
-    addTestRow("Runoff - First place N-way tie, unsuccessful break, no fallback for second",
+    addTestRow("Head-to-head narrowing test (multiple tied candidates to cut in scoring round)",
+               {
+                   {
+                       {.candidate = candidate1, .score = 0},
+                       {.candidate = candidate2, .score = 2},
+                       {.candidate = candidate3, .score = 5},
+                       {.candidate = candidate4, .score = 5}
+                   },
+                   {
+                       {.candidate = candidate1, .score = 4},
+                       {.candidate = candidate2, .score = 3},
+                       {.candidate = candidate3, .score = 5},
+                       {.candidate = candidate4, .score = 0}
+                   },
+                   {
+                       {.candidate = candidate1, .score = 5},
+                       {.candidate = candidate2, .score = 4},
+                       {.candidate = candidate3, .score = 5},
+                       {.candidate = candidate4, .score = 4}
+                   }
+               },
+               Star::ExpectedElectionResult({candidate3}),
+               Star::Calculator::AllowTrueTies | Star::Calculator::CondorcetProtocol
+               );
+
+    addTestRow("Runoff - Tie, breaks from original score",
                {
                    {
                        {.candidate = candidate1, .score = 3},
@@ -368,207 +300,20 @@ void tst_ties::all_tie_cases_data()
                        {.candidate = candidate1, .score = 3},
                        {.candidate = candidate2, .score = 4},
                        {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3, candidate4}, {}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Runoff - Second place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3}, {candidate1}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Runoff - Second place N-way tie, unsuccessful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate3, candidate4}),
-               Star::Calculator::NoOptions
-    );
-
-    //################################### EXTENDED - FIVESTAR ####################################################
-
-    addTestRow("Extended [FiveStar] - First place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
                        {.candidate = candidate4, .score = 1}
                    },
                    {
                        {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 1},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 5}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate2}, {candidate1}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [FiveStar] - First place N-way tie, unsuccessful break, single fallback for second",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
                        {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 5},
                        {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 5}
+                       {.candidate = candidate4, .score = 3}
                    }
                },
-               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3}),
-               Star::Calculator::NoOptions
-    );
+               Star::ExpectedElectionResult({candidate3}),
+               Star::Calculator::AllowTrueTies
+               );
 
-        addTestRow("Extended [FiveStar] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
-                   {
-                       {
-                           {.candidate = candidate1, .score = 5},
-                           {.candidate = candidate2, .score = 3},
-                           {.candidate = candidate3, .score = 4},
-                           {.candidate = candidate4, .score = 3},
-                           {.candidate = candidate5, .score = 3}
-                       },
-                       {
-                           {.candidate = candidate1, .score = 2},
-                           {.candidate = candidate2, .score = 5},
-                           {.candidate = candidate3, .score = 3},
-                           {.candidate = candidate4, .score = 3},
-                           {.candidate = candidate5, .score = 2}
-                       },
-                       {
-                           {.candidate = candidate1, .score = 3},
-                           {.candidate = candidate2, .score = 2},
-                           {.candidate = candidate3, .score = 4},
-                           {.candidate = candidate4, .score = 3},
-                           {.candidate = candidate5, .score = 3}
-                       },
-                       {
-                           {.candidate = candidate1, .score = 3},
-                           {.candidate = candidate2, .score = 2},
-                           {.candidate = candidate3, .score = 2},
-                           {.candidate = candidate4, .score = 5},
-                           {.candidate = candidate5, .score = 2}
-                       },
-                       {
-                           {.candidate = candidate1, .score = 5},
-                           {.candidate = candidate2, .score = 3},
-                           {.candidate = candidate3, .score = 4},
-                           {.candidate = candidate4, .score = 2},
-                           {.candidate = candidate5, .score = 5}
-                       },
-                       {
-                           {.candidate = candidate1, .score = 2},
-                           {.candidate = candidate2, .score = 5},
-                           {.candidate = candidate3, .score = 3},
-                           {.candidate = candidate4, .score = 4},
-                           {.candidate = candidate5, .score = 5}
-                       }
-                   },
-                   Star::ExpectedElectionResult({candidate2, candidate1}, {candidate4}),
-                   Star::Calculator::NoOptions
-        );
-
-    addTestRow("Extended [FiveStar] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
+    addTestRow("Runoff - Tie, breaks from five star",
                {
                    {
                        {.candidate = candidate1, .score = 5},
@@ -587,7 +332,7 @@ void tst_ties::all_tie_cases_data()
                    {
                        {.candidate = candidate1, .score = 3},
                        {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 5},
+                       {.candidate = candidate3, .score = 4},
                        {.candidate = candidate4, .score = 3},
                        {.candidate = candidate5, .score = 3}
                    },
@@ -608,449 +353,16 @@ void tst_ties::all_tie_cases_data()
                    {
                        {.candidate = candidate1, .score = 2},
                        {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
+                       {.candidate = candidate3, .score = 3},
                        {.candidate = candidate4, .score = 4},
                        {.candidate = candidate5, .score = 5}
                    }
                },
-               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3, candidate4}),
-               Star::Calculator::NoOptions
-    );
+               Star::ExpectedElectionResult({candidate1}),
+               Star::Calculator::AllowTrueTies
+               );
 
-    addTestRow("Extended [FiveStar] - First place N-way tie, unsuccessful break, no fallback for second",
-               {
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate2, candidate1, candidate4}, {}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [FiveStar] - Second place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 0},
-                       {.candidate = candidate4, .score = 0}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate3}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [FiveStar] - Second place N-way tie, unsuccessful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate3, candidate4}),
-               Star::Calculator::NoOptions
-    );
-
-    //################################### EXTENDED - HEAD-TO-HEAD-WINS ####################################################
-
-    addTestRow("Extended [HTHWins] - First place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 3},
-                       {.candidate = candidate5, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 3},
-                       {.candidate = candidate5, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 3},
-                       {.candidate = candidate5, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 5},
-                       {.candidate = candidate5, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 2},
-                       {.candidate = candidate5, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 4},
-                       {.candidate = candidate5, .score = 5}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate2}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHWins] - First place N-way tie, unsuccessful break, single fallback for second",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 5}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHWins] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 2},
-                       {.candidate = candidate5, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2},
-                       {.candidate = candidate5, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 1},
-                       {.candidate = candidate5, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5},
-                       {.candidate = candidate5, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 5},
-                       {.candidate = candidate5, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 0},
-                       {.candidate = candidate4, .score = 0},
-                       {.candidate = candidate5, .score = 5}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate5}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHWins] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 2},
-                       {.candidate = candidate5, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2},
-                       {.candidate = candidate5, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 1},
-                       {.candidate = candidate5, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5},
-                       {.candidate = candidate5, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 5},
-                       {.candidate = candidate5, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 0},
-                       {.candidate = candidate4, .score = 0},
-                       {.candidate = candidate5, .score = 5}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate2, candidate1}, {candidate3, candidate5}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHWins] - First place N-way tie, unsuccessful break, no fallback for second",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 0}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 1},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 0}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 1},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 0}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate2, candidate3, candidate1}, {}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHWins] - Second place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 1},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 4},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 4},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3}, {candidate1}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHWins] - Second place N-way tie, unsuccessful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate3, candidate4}),
-               Star::Calculator::NoOptions
-    );
-
-    //################################### EXTENDED - HEAD-TO-HEAD PREF COUNT ####################################################
-
-    addTestRow("Extended [HTHCount] - First place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 5}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate2}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, single fallback for second",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 0},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 0}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3, candidate4}, {candidate1}),
-               Star::Calculator::NoOptions
-    );
-
-    // TODO: addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
-    // TODO: addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
-
-    addTestRow("Extended [HTHCount] - First place N-way tie, unsuccessful break, no fallback for second",
+    addTestRow("Runoff - Tie, never breaks",
                {
                    {
                        {.candidate = candidate1, .score = 3},
@@ -1071,254 +383,9 @@ void tst_ties::all_tie_cases_data()
                        {.candidate = candidate4, .score = 4}
                    }
                },
-               Star::ExpectedElectionResult({candidate3, candidate4}, {}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHCount] - Second place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate3}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHCount] - Second place N-way tie, unsuccessful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 0},
-                       {.candidate = candidate4, .score = 0}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate4, candidate3}),
-               Star::Calculator::NoOptions
-    );
-
-    //################################### EXTENDED - HEAD-TO-HEAD MARGIN ####################################################
-
-    addTestRow("Extended [HTHMargin] - First place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 2},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 0},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 5}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate2}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHMargin] - First place N-way tie, unsuccessful break, no fallback for second",
-               {
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 4},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3, candidate4}, {}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHMargin] - First place N-way tie, unsuccessful break, single fallback for second",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 0}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 4},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 1},
-                       {.candidate = candidate2, .score = 3},
-                       {.candidate = candidate3, .score = 0},
-                       {.candidate = candidate4, .score = 5}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 5}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate3, candidate4}, {candidate1}),
-               Star::Calculator::NoOptions
-    );
-
-    // TODO: addTestRow("Extended [HTHMargin] - First place N-way tie, unsuccessful break, tied fallback for second that successfully breaks",
-    // TODO: addTestRow("Extended [HTHMargin] - First place N-way tie, unsuccessful break, tied fallback for second that doesn't break",
-
-    addTestRow("Extended [HTHMargin] - Second place N-way tie, successful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 3}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 3},
-                       {.candidate = candidate4, .score = 1}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate3}),
-               Star::Calculator::NoOptions
-    );
-
-    addTestRow("Extended [HTHMargin] - Second place N-way tie, unsuccessful break",
-               {
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 5},
-                       {.candidate = candidate3, .score = 1},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 1},
-                       {.candidate = candidate3, .score = 5},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 4},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 2},
-                       {.candidate = candidate4, .score = 2}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 3},
-                       {.candidate = candidate2, .score = 2},
-                       {.candidate = candidate3, .score = 4},
-                       {.candidate = candidate4, .score = 4}
-                   },
-                   {
-                       {.candidate = candidate1, .score = 5},
-                       {.candidate = candidate2, .score = 0},
-                       {.candidate = candidate3, .score = 0},
-                       {.candidate = candidate4, .score = 0}
-                   }
-               },
-               Star::ExpectedElectionResult({candidate1}, {candidate4, candidate3}),
-               Star::Calculator::NoOptions
-    );
-
-    //################################### EXTENDED - RANDOM ####################################################
-
-    /* NOTE: A separate test for this would need to be made if the lib could be accessed with fine enough
-     * granularity to check just the result of the tiebreak itself, though that would be really jank. The method
-     * is simple enough and always results in a winner, with all other candidates that were part of the break being
-     * set to runner-up, so it should be ok.
-     *
-     * Otherwise, a separate case within this test target could be made that just ensures that the results
-     * after using the method several times is fairly random (i.e. check for at least 2-3 different results).
-     */
+               Star::ExpectedElectionResult({}, {candidate3, candidate4}),
+               Star::Calculator::AllowTrueTies
+               );
 }
 
 void tst_ties::all_tie_cases()
