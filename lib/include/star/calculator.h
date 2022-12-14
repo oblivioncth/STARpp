@@ -48,7 +48,9 @@ private:
 
     // Logging - Scoring round Candidate Tie Reduction
     static inline const QString LOG_EVENT_SCORING_ROUND_TIE_REDUCTION = QStringLiteral("Resolving %1-way tie down to the target of %2 candidates...");
-    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_CUT_CANDIDATE = QStringLiteral(R"(Cutting candidate "%1")");
+    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_TOP = QStringLiteral("Trying to determine remaining %1 candidate(s) to advance between:");
+    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_CUT_CANDIDATES = QStringLiteral("Cutting candidate(s):");
+    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_ADVANCE_CANDIDATES = QStringLiteral("Advancing candidate(s):");
     static inline const QString LOG_EVENT_SCORING_ROUND_NO_RANDOM = QStringLiteral("Random tiebreaker is disabled.");
     static inline const QString LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_UNSUCCESSFUL = QStringLiteral(R"(Unable to resolve scoring round tie to reach the target number of candidates.)");
     static inline const QString LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_RESULT = QStringLiteral("Scoring round tie reduced to:");
@@ -79,10 +81,6 @@ private:
 
     // Logging - Tiebreak
     static inline const QString LOG_EVENT_BREAK_TIE_MOST_FIVE_STAR = QStringLiteral("Breaking %1-way tie according to most five star votes...");
-    static inline const QString LOG_EVENT_BREAK_TIE_LEAST_FIVE_STAR = QStringLiteral("Breaking %1-way tie according to most least star votes...");
-    static inline const QString LOG_EVENT_BREAK_TIE_MOST_HEAD_TO_HEAD_LOSSES = QStringLiteral("Breaking %1-way tie according to most head-to-head losses...");
-    static inline const QString LOG_EVENT_BREAK_TIE_LEAST_HEAD_TO_HEAD_PREFERENCES = QStringLiteral("Breaking %1-way tie according to least head-to-head preferences...");
-    static inline const QString LOG_EVENT_BREAK_TIE_SMALLEST_HEAD_TO_HEAD_MARGIN = QStringLiteral("Breaking %1-way tie according to smallest head-to-head margin...");
     static inline const QString LOG_EVENT_BREAK_TIE_HIGHEST_SCORE = QStringLiteral("Breaking %1-way tie according to highest score...");
     static inline const QString LOG_EVENT_BREAK_TIE_RANDOM = QStringLiteral("Breaking %1-way tie randomly...");
     static inline const QString LOG_EVENT_BREAK_RESULT = QStringLiteral("Tie Break Winner(s) - { %1 }");
@@ -147,12 +145,7 @@ private:
 
     QSet<QString> rankBasedTiebreak(const QList<Rank>& rankings, const QString& note) const;
     QSet<QString> breakTieMostFiveStar(const QSet<QString>& candidates) const;
-    QSet<QString> breakTieLeastFiveStar(const QSet<QString>& candidates) const;
-    QSet<QString> breakTieMostHeadToHeadLosses(const QSet<QString>& candidates, const HeadToHeadResults* hth) const;
-    QSet<QString> breakTieLeastHeadToHeadPreferences(const QSet<QString>& candidates, const HeadToHeadResults* hth) const;
-    QSet<QString> breakTieSmallestHeadToHeadMargin(const QSet<QString>& candidates, const HeadToHeadResults* hth) const;
     QSet<QString> breakTieHighestScore(const QSet<QString>& candidates) const;
-    //QSet<QString> breakTieCondorcetProtocol(const QSet<QString>& candidates, const HeadToHeadResults* hth);
     QString breakTieRandom(const QSet<QString>& candidates) const;
 
     // Logging
