@@ -133,4 +133,11 @@ void HeadToHeadResults::narrow(QSet<QString> candidates, NarrowMode mode)
     }
 }
 
+HeadToHeadResults HeadToHeadResults::narrowed(QSet<QString> candidates, NarrowMode mode)
+{
+    HeadToHeadResults cpy(*this);
+    cpy.narrow(candidates, mode);
+    return cpy;
+}
+
 }

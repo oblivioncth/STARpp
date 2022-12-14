@@ -47,6 +47,7 @@ public:
     QString winner(const QString& candidateA, const QString& candidateB) const;
 
     void narrow(QSet<QString> candidates, NarrowMode mode);
+    HeadToHeadResults narrowed(QSet<QString> candidates, NarrowMode mode);
 };
 
 }
