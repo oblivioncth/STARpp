@@ -152,6 +152,8 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
      * one candidate can be set aside.
      */
 
+    emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION.arg(tiedCandidates.size()).arg(desiredCount));
+
     // This function should never be called in these situation, but account for it anyway
     if(tiedCandidates.size() <= desiredCount)
     {
