@@ -148,7 +148,7 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
     /* Overall this function attempts to break the tied candidates by selecting the winner(s) of the tie in
      * a similar fashion to Bloc voting. One candidate is selected as the winner and then if a second
      * candidate is needed (i.e. tie for first place score) the process is repeated with the first winner
-     * remove. There is an exception/shortcut during the 5-star tiebreaker step however, in which more than
+     * removed. There is an exception/shortcut during the 5-star tiebreaker step however, in which more than
      * one candidate can be set aside.
      */
 
@@ -183,6 +183,27 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
         // Determine number of needed candidates
         qsizetype candidatesNeeded = desiredCount - advancingCandidates.size();
 
+        // Convenience functions for candidate culling and advancement
+        const auto cullLosers = [&remainingHtH](const QList<Rank>& loserFirstRankings){
+            if(loserFirstRankings.size() > 1)
+            {
+                remainingHtH.narrow(loserFirstRankings.front().candidates, HeadToHeadResults::Exclusive);
+                return true;
+            }
+            else
+                return false;
+        };
+
+        const auto advanceRemaining = [&remainingHtH, &candidatesNeeded, &advanceCandidates]{
+            if(remainingHtH.candidateCount() <= candidatesNeeded)
+            {
+                advanceCandidates(remainingHtH.candidates());
+                return true;
+            }
+            else
+                return false;
+        };
+
         // First reduce candidates by removing those with the most head-to-head losses until there is an across the board tie
         forever
         {
@@ -190,35 +211,26 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
             const QList<Rank> lossRankings = rankByHeadToHeadLosses(remainingHtH.candidates(), &remainingHtH, Rank::Descending);
 
             // If possible, remove the candidates with the most losses, adjust the head-to-head results, then repeat
-            if(lossRankings.size() > 1)
-            {
-                remainingHtH.narrow(lossRankings.front().candidates, HeadToHeadResults::Exclusive);
+            if(cullLosers(lossRankings))
                 continue;
-            }
 
             // If the remaining candidates have been reduced below the required amount advance them, then restart whole process
-            if(remainingHtH.candidateCount() <= candidatesNeeded)
-            {
-                advanceCandidates(remainingHtH.candidates());
+            if(advanceRemaining())
                 break;
-            }
 
             // Sort remaining by 5-star votes
-            const QList<Rank> fiveStarRankings = rankByVotesOfMaxScore(remainingHtH.candidates(), Rank::Descending);
+            const QList<Rank> fiveStarRankings = rankByVotesOfMaxScore(remainingHtH.candidates(), Rank::Ascending);
 
             // If possible, advance the clear 5-star winner(s), then restart the whole process
-            if(fiveStarRankings.front().candidates.size() <= candidatesNeeded)
+            if(fiveStarRankings.back().candidates.size() <= candidatesNeeded)
             {
-                advanceCandidates(fiveStarRankings.front().candidates);
+                advanceCandidates(fiveStarRankings.back().candidates);
                 break;
             }
 
             // If there are clear 5-star losers, remove them and then repeat this sub process
-            if(fiveStarRankings.size() > 1)
-            {
-                remainingHtH.narrow(fiveStarRankings.back().candidates, HeadToHeadResults::Exclusive);
+            if(cullLosers(fiveStarRankings))
                 continue;
-            }
 
             // Handle Condorcet protocol specific steps if enabled
             if(mOptions.testFlag(Option::CondorcetProtocol))
@@ -231,35 +243,23 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
                 const QList<Rank> prefRankings = rankByHeadToHeadPreferences(remainingHtH.candidates(), &remainingHtH, Rank::Ascending);
 
                 // If possible, remove the candidates with the least preferences, adjust the head-to-head results, then repeat this sub process
-                if(prefRankings.size() > 1)
-                {
-                    remainingHtH.narrow(prefRankings.front().candidates, HeadToHeadResults::Exclusive);
+                if(cullLosers(prefRankings))
                     continue;
-                }
 
                 // If the remaining candidates have been reduced below the required amount advance them, then restart whole process
-                if(remainingHtH.candidateCount() <= candidatesNeeded)
-                {
-                    advanceCandidates(remainingHtH.candidates());
+                if(advanceRemaining())
                     break;
-                }
 
                 // Sort remaining by head-to-head margin
                 const QList<Rank> marginRankings = rankByHeadToHeadMargin(remainingHtH.candidates(), &remainingHtH, Rank::Ascending);
 
                 // If possible, remove the candidates with the lowest margin, adjust the head-to-head results, then repeat this sub process
-                if(marginRankings.size() > 1)
-                {
-                    remainingHtH.narrow(marginRankings.front().candidates, HeadToHeadResults::Exclusive);
+                if(cullLosers(marginRankings))
                     continue;
-                }
 
                 // If the remaining candidates have been reduced below the required amount advance them, then restart whole process
-                if(remainingHtH.candidateCount() <= candidatesNeeded)
-                {
-                    advanceCandidates(remainingHtH.candidates());
+                if(advanceRemaining())
                     break;
-                }
             }
 
             // If true ties are not allowed, use a random tiebreak to select one to advance; otherwise, simply "advance" the remaining candidates
