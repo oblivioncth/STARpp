@@ -60,7 +60,7 @@ QSet<QString> Calculator::determineScoringRoundLeaders(const QList<Rank>& scoreR
             emit calculationDetail(tieLogStr);
 
             // Tiebreak
-            leaders = preliminaryCandidateTieReduction(candidatesInFirst, 2);
+            leaders = scoringRoundTieReduction(candidatesInFirst, 2);
         }
     }
     else
@@ -80,7 +80,7 @@ QSet<QString> Calculator::determineScoringRoundLeaders(const QList<Rank>& scoreR
             emit calculationDetail(tieLogStr);
 
             // Tiebreak
-            QSet<QString> secondPlaceTiebreak = preliminaryCandidateTieReduction(candidatesInSecond, 1);
+            QSet<QString> secondPlaceTiebreak = scoringRoundTieReduction(candidatesInSecond, 1);
 
             // Insert all from the tiebreak, fully resolved or not
             leaders.unite(secondPlaceTiebreak);
@@ -143,83 +143,136 @@ QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) con
     return winner;
 }
 
-QSet<QString> Calculator::preliminaryCandidateTieReduction(QSet<QString> candidates, qsizetype desiredCount) const
+QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCandidates, qsizetype desiredCount) const
 {
-    // This function should never be called in this situation, but account for it anyway
-    if(candidates.size() <= desiredCount)
+    /* Overall this function attempts to break the tied candidates by selecting the winner(s) of the tie in
+     * a similar fashion to Bloc voting. One candidate is selected as the winner and then if a second
+     * candidate is needed (i.e. tie for first place score) the process is repeated with the first winner
+     * remove. There is an exception/shortcut during the 5-star tiebreaker step however, in which more than
+     * one candidate can be set aside.
+     */
+
+    // This function should never be called in these situation, but account for it anyway
+    if(tiedCandidates.size() <= desiredCount)
     {
         qWarning("called with a set of candidates that is already at or less than the desired count.");
-        return candidates;
+        return tiedCandidates;
     }
 
-    // Get copy of head-to-head results and reduce it to only include tied candidates
-    HeadToHeadResults relevantHthResults = *mHeadToHeadResults;
-    relevantHthResults.narrow(candidates, HeadToHeadResults::Inclusive);
+    // Get copy of head-to-head results reduced to only include tied candidates
+    HeadToHeadResults tiedHtH = mHeadToHeadResults->narrowed(tiedCandidates, HeadToHeadResults::Inclusive);
 
-    // Eliminate the weakest candidates in turn until at the desired amount
-    emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION.arg(candidates.size()).arg(desiredCount));
-    while(candidates.size() != desiredCount)
+    // Result to fill
+    QSet<QString> advancingCandidates;
+
+    // Convenience function for advancing candidates
+    const auto advanceCandidates = [&advancingCandidates, &tiedHtH](const QSet<QString>& c){
+        advancingCandidates.unite(c);
+        tiedHtH.narrow(c, HeadToHeadResults::Exclusive);
+    };
+
+    // Determine tiebreak winner(s) until at the desired amount
+    while(advancingCandidates.size() < desiredCount)
     {
-        QString toBeCut;
+        /* After setting candidate(s) aside, if another candidate is needed any candidates eliminated in the previous
+         * tiebreaker need to be reconsidered; therefore, a second HeadToHeadResults instance is needed so that that the
+         * original can be restored after.
+         */
+        HeadToHeadResults remainingHtH(tiedHtH);
 
-        // Check for clear head-to-head loser
-        QSet<QString> mostLosses = breakTieMostHeadToHeadLosses(candidates, &relevantHthResults);
-        if(mostLosses.size() == 1)
-            toBeCut = *mostLosses.begin();
-        else
+        // Determine number of needed candidates
+        qsizetype candidatesNeeded = desiredCount - advancingCandidates.size();
+
+        // First reduce candidates by removing those with the most head-to-head losses until there is an across the board tie
+        forever
         {
-            // Check for clear Five Star loser
-            QSet<QString> leastFiveStars = breakTieLeastFiveStar(mostLosses);
-            if(leastFiveStars.size() == 1)
-                toBeCut = *leastFiveStars.begin();
-            else
+            // Sort remaining by head-to-head losses
+            const QList<Rank> lossRankings = rankByHeadToHeadLosses(remainingHtH.candidates(), &remainingHtH, Rank::Descending);
+
+            // If possible, remove the candidates with the most losses, adjust the head-to-head results, then repeat
+            if(lossRankings.size() > 1)
             {
-                QSet<QString> remainingPool = leastFiveStars;
+                remainingHtH.narrow(lossRankings.front().candidates, HeadToHeadResults::Exclusive);
+                continue;
+            }
 
-                // Follow Condorcet protocol if enabled
-                if(mOptions.testFlag(Option::CondorcetProtocol))
+            // If the remaining candidates have been reduced below the required amount advance them, then restart whole process
+            if(remainingHtH.candidateCount() <= candidatesNeeded)
+            {
+                advanceCandidates(remainingHtH.candidates());
+                break;
+            }
+
+            // Sort remaining by 5-star votes
+            const QList<Rank> fiveStarRankings = rankByVotesOfMaxScore(remainingHtH.candidates(), Rank::Descending);
+
+            // If possible, advance the clear 5-star winner(s), then restart the whole process
+            if(fiveStarRankings.front().candidates.size() <= candidatesNeeded)
+            {
+                advanceCandidates(fiveStarRankings.front().candidates);
+                break;
+            }
+
+            // If there are clear 5-star losers, remove them and then repeat this sub process
+            if(fiveStarRankings.size() > 1)
+            {
+                remainingHtH.narrow(fiveStarRankings.back().candidates, HeadToHeadResults::Exclusive);
+                continue;
+            }
+
+            // Handle Condorcet protocol specific steps if enabled
+            if(mOptions.testFlag(Option::CondorcetProtocol))
+            {
+                /* These steps are not officially part of the new tiebreak procedure, but they've been adapted to fit
+                 * the rest of the process as best as possible
+                 */
+
+                // Sort remaining by head-to-head preferences
+                const QList<Rank> prefRankings = rankByHeadToHeadPreferences(remainingHtH.candidates(), &remainingHtH, Rank::Ascending);
+
+                // If possible, remove the candidates with the least preferences, adjust the head-to-head results, then repeat this sub process
+                if(prefRankings.size() > 1)
                 {
-                    // Check for clear preference loser
-                    QSet<QString> leastPreferences = breakTieLeastHeadToHeadPreferences(leastFiveStars, &relevantHthResults);
-                    if(leastPreferences.size() == 1)
-                        toBeCut = *leastPreferences.begin();
-                    else
-                    {
-                        // Check for clear head-to-head win margin loser
-                        QSet<QString> smallestMargin = breakTieSmallestHeadToHeadMargin(leastPreferences, &relevantHthResults);
-                        if(smallestMargin.size() == 1)
-                            toBeCut = *smallestMargin.begin();
-                        else
-                            remainingPool = smallestMargin;
-                    }
-
+                    remainingHtH.narrow(prefRankings.front().candidates, HeadToHeadResults::Exclusive);
+                    continue;
                 }
 
-                // Randomly choose a candidate to cut if required and allowed
-                if(toBeCut.isNull() && !mOptions.testFlag(Option::AllowTrueTies))
-                    toBeCut = breakTieRandom(remainingPool);
-                else
-                    emit calculationDetail(LOG_EVENT_SCORING_ROUND_NO_RANDOM);
-            }
-        }
+                // If the remaining candidates have been reduced below the required amount advance them, then restart whole process
+                if(remainingHtH.candidateCount() <= candidatesNeeded)
+                {
+                    advanceCandidates(remainingHtH.candidates());
+                    break;
+                }
 
-        // Cut candidate if the tie was resolvable
-        if(!toBeCut.isNull())
-        {
-            emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_CUT_CANDIDATE.arg(toBeCut));
-            candidates.remove(toBeCut);
-            relevantHthResults.narrow({toBeCut}, HeadToHeadResults::Exclusive);
-        }
-        else
-        {
-            emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_UNSUCCESSFUL);
+                // Sort remaining by head-to-head margin
+                const QList<Rank> marginRankings = rankByHeadToHeadMargin(remainingHtH.candidates(), &remainingHtH, Rank::Ascending);
+
+                // If possible, remove the candidates with the lowest margin, adjust the head-to-head results, then repeat this sub process
+                if(marginRankings.size() > 1)
+                {
+                    remainingHtH.narrow(marginRankings.front().candidates, HeadToHeadResults::Exclusive);
+                    continue;
+                }
+
+                // If the remaining candidates have been reduced below the required amount advance them, then restart whole process
+                if(remainingHtH.candidateCount() <= candidatesNeeded)
+                {
+                    advanceCandidates(remainingHtH.candidates());
+                    break;
+                }
+            }
+
+            // If true ties are not allowed, use a random tiebreak to select one to advance; otherwise, simply "advance" the remaining candidates
+            QSet<QString> toAdvance = !mOptions.testFlag(Option::AllowTrueTies) ? QSet<QString>({breakTieRandom(remainingHtH.candidates())}) :
+                                                                                  remainingHtH.candidates();
+            advanceCandidates(toAdvance);
             break;
         }
     }
 
     // Return the reduced candidate set, ideally at target size
-    emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_RESULT + '\n' + createCandidateToalScoreSetString(candidates));
-    return candidates;
+    emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_RESULT + '\n' + createCandidateToalScoreSetString(advancingCandidates));
+    return advancingCandidates;
 }
 
 QList<Rank> Calculator::rankByScore(const QSet<QString>& candidates, Rank::Order order) const
