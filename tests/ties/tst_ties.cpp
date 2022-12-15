@@ -42,6 +42,7 @@ void tst_ties::all_tie_cases_data()
     QString candidate2 = "CanTwo";
     QString candidate3 = "CanThree";
     QString candidate4 = "CanFour";
+    QString candidate5 = "CanFive";
 
     // Helper
     auto addTestRow = [&](const QString& testName,
@@ -174,9 +175,99 @@ void tst_ties::all_tie_cases_data()
         Star::Calculator::AllowTrueTies
     );
 
-    // TODO: addTestRow("Scoring Round - ... place N-way tie [Reaches preference-based culling]",
+    addTestRow("Scoring Round - First place N-way tie [Reaches preference-based culling]",
+        {
+            {
+                {.candidate = candidate1, .score = 3},
+                {.candidate = candidate2, .score = 0},
+                {.candidate = candidate3, .score = 1},
+                {.candidate = candidate4, .score = 0},
+                {.candidate = candidate5, .score = 2}
+            },
+            {
+                {.candidate = candidate1, .score = 3},
+                {.candidate = candidate2, .score = 5},
+                {.candidate = candidate3, .score = 0},
+                {.candidate = candidate4, .score = 3},
+                {.candidate = candidate5, .score = 2}
+            },
+            {
+                {.candidate = candidate1, .score = 2},
+                {.candidate = candidate2, .score = 1},
+                {.candidate = candidate3, .score = 5},
+                {.candidate = candidate4, .score = 0},
+                {.candidate = candidate5, .score = 0}
+            },
+            {
+                {.candidate = candidate1, .score = 0},
+                {.candidate = candidate2, .score = 4},
+                {.candidate = candidate3, .score = 2},
+                {.candidate = candidate4, .score = 4},
+                {.candidate = candidate5, .score = 0}
+            },
+            {
+                {.candidate = candidate1, .score = 2},
+                {.candidate = candidate2, .score = 2},
+                {.candidate = candidate3, .score = 4},
+                {.candidate = candidate4, .score = 5},
+                {.candidate = candidate5, .score = 5}
+            }
+        },
+        Star::ExpectedElectionResult({candidate3}),
+        Star::Calculator::AllowTrueTies | Star::Calculator::CondorcetProtocol
+    );
+
     // TODO: addTestRow("Scoring Round - ... place N-way tie [Reaches preference-based advancement]",
-    // TODO: addTestRow("Scoring Round - ... place N-way tie [Reaches margin-based culling]",
+
+    addTestRow("Scoring Round - Second place N-way tie [Reaches margin-based culling]",
+        {
+            {
+                {.candidate = candidate1, .score = 5},
+                {.candidate = candidate2, .score = 0},
+                {.candidate = candidate3, .score = 0},
+                {.candidate = candidate4, .score = 1},
+                {.candidate = candidate5, .score = 0}
+            },
+            {
+                {.candidate = candidate1, .score = 1},
+                {.candidate = candidate2, .score = 5},
+                {.candidate = candidate3, .score = 0},
+                {.candidate = candidate4, .score = 5},
+                {.candidate = candidate5, .score = 0}
+            },
+            {
+                {.candidate = candidate1, .score = 1},
+                {.candidate = candidate2, .score = 0},
+                {.candidate = candidate3, .score = 5},
+                {.candidate = candidate4, .score = 0},
+                {.candidate = candidate5, .score = 4}
+            },
+            {
+                {.candidate = candidate1, .score = 0},
+                {.candidate = candidate2, .score = 1},
+                {.candidate = candidate3, .score = 0},
+                {.candidate = candidate4, .score = 2},
+                {.candidate = candidate5, .score = 5}
+            },
+            {
+                {.candidate = candidate1, .score = 0},
+                {.candidate = candidate2, .score = 0},
+                {.candidate = candidate3, .score = 2},
+                {.candidate = candidate4, .score = 0},
+                {.candidate = candidate5, .score = 1}
+            },
+            {
+                {.candidate = candidate1, .score = 1},
+                {.candidate = candidate2, .score = 2},
+                {.candidate = candidate3, .score = 1},
+                {.candidate = candidate4, .score = 0},
+                {.candidate = candidate5, .score = 0}
+            }
+        },
+        Star::ExpectedElectionResult({candidate5}),
+        Star::Calculator::AllowTrueTies | Star::Calculator::CondorcetProtocol
+    );
+
     // TODO: addTestRow("Scoring Round - ... place N-way tie [Reaches margin-based advancement]",
 
     addTestRow("Scoring Round - Second place N-way tie [Reaches random-based advancement]",
