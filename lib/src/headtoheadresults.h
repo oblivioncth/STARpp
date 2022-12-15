@@ -46,7 +46,11 @@ public:
     int margin(const QString& candidate) const;
     QString winner(const QString& candidateA, const QString& candidateB) const;
 
+    qsizetype candidateCount() const;
+    QSet<QString> candidates() const;
+
     void narrow(QSet<QString> candidates, NarrowMode mode);
+    HeadToHeadResults narrowed(QSet<QString> candidates, NarrowMode mode);
 };
 
 }

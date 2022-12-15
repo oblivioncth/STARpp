@@ -74,6 +74,7 @@ void tst_full_reference_election::various_ref_elections()
 
     // Create calculator
     Star::Calculator calculator;
+    calculator.setOptions(Star::Calculator::AllowTrueTies);
 
     // Check the results of each election
     for(qsizetype i = 0; i < elections.size(); i++)

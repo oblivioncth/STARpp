@@ -105,6 +105,16 @@ QString HeadToHeadResults::winner(const QString& candidateA, const QString& cand
                                                                QString();
 }
 
+qsizetype HeadToHeadResults::candidateCount() const { return mStats.size(); }
+
+QSet<QString> HeadToHeadResults::candidates() const
+{
+    QSet<QString> can;
+    for(auto itr = mStats.cbegin(); itr != mStats.cend(); itr++)
+        can.insert(itr.key());
+    return can;
+}
+
 void HeadToHeadResults::narrow(QSet<QString> candidates, NarrowMode mode)
 {
     auto shouldCull = [&](const QString& c){
@@ -131,6 +141,13 @@ void HeadToHeadResults::narrow(QSet<QString> candidates, NarrowMode mode)
             if(shouldCull(c))
                 stat.preferences.remove(c);
     }
+}
+
+HeadToHeadResults HeadToHeadResults::narrowed(QSet<QString> candidates, NarrowMode mode)
+{
+    HeadToHeadResults cpy(*this);
+    cpy.narrow(candidates, mode);
+    return cpy;
 }
 
 }
