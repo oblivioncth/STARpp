@@ -6,8 +6,6 @@
 // Project Includes
 #include "star/election.h"
 
-// TODO: Add operator==()
-
 namespace Star
 {
 

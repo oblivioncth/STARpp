@@ -9,7 +9,7 @@ option(STARCALC_TESTS "Build StarCalc tests" OFF)
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
 project(StarCalc
-    VERSION 0.0.9.4
+    VERSION 0.0.9.5
     LANGUAGES CXX
     DESCRIPTION "An application to determine the winner of an election using the STAR voting system"
 )

@@ -67,7 +67,7 @@ private:
 
     static inline const QString CL_OPT_EXTRA_TIEBREAK_S_NAME = QStringLiteral("e");
     static inline const QString CL_OPT_EXTRA_TIEBREAK_L_NAME = QStringLiteral("extra-tiebreak");
-    static inline const QString CL_OPT_EXTRA_TIEBREAK_DESC = QStringLiteral("Uses the Condercet protocol tiebreaker during the scoring round before the random tiebreaker if necessary.");
+    static inline const QString CL_OPT_EXTRA_TIEBREAK_DESC = QStringLiteral("Uses the Condorcet protocol tiebreaker during the scoring round before the random tiebreaker if necessary.");
 
     static inline const QString CL_OPT_MINIMAL_S_NAME = QStringLiteral("m");
     static inline const QString CL_OPT_MINIMAL_L_NAME = QStringLiteral("minimal");
