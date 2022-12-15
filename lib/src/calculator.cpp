@@ -246,15 +246,22 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
              * just taking Mandy and then restarting.
              */
             QSet<QString> fiveStarAdv;
-            for(const Rank& r : fiveStarRankings | std::views::reverse)
+
+            /* TODO: for(const Rank& r : fiveStarRankings | std::views::reverse)
+             *
+             * Ranges are broken in clang and the fix likely won't be available until clang16 (long time till that becomes standard)
+             *
+             * https://github.com/llvm/llvm-project/issues/44178
+             */
+            for(auto rItr = fiveStarRankings.crbegin(); rItr != fiveStarRankings.crend(); rItr++)
             {
                 qsizetype room = candidatesNeeded - fiveStarAdv.size();
 
                 if(room == 0)
                     break;
 
-                if(r.candidates.size() <= room)
-                    fiveStarAdv.unite(r.candidates);
+                if(rItr->candidates.size() <= room)
+                    fiveStarAdv.unite(rItr->candidates);
                 else
                     break;
             }
