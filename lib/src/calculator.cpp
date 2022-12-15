@@ -1,6 +1,9 @@
 // Unit Include
 #include "star/calculator.h"
 
+// Standard Library Includes
+#include <ranges>
+
 // Qt Includes
 #include <QRandomGenerator>
 
@@ -227,10 +230,45 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
             // Sort remaining by 5-star votes
             const QList<Rank> fiveStarRankings = rankByVotesOfMaxScore(remainingHtH.candidates(), Rank::Ascending);
 
-            // If possible, advance the clear 5-star winner(s), then restart the whole process
-            if(fiveStarRankings.back().candidates.size() <= candidatesNeeded)
+            /* If possible, advance the clear 5-star winner(s), then restart the whole process
+             *
+             * In this exception case, the intent is to take as many candidates from the lead (bottom here) backwards
+             * as possible in order to populate the advancing candidates, unlike other steps where only the top-most/bottom-most
+             * rank is considered. This is essentially just to cover this specific situation:
+             *
+             * 5-Star Ranks (Ascending)
+             * ------------------------
+             * 1) Adam, Jen (0)
+             * 2) Kyle (3)
+             * 3) Mandy (5)
+             *
+             * Here if two candidates are still needed, Mandy and Kyle would be set aside for advancement at the same time instead of
+             * just taking Mandy and then restarting.
+             */
+            QSet<QString> fiveStarAdv;
+
+            /* TODO: for(const Rank& r : fiveStarRankings | std::views::reverse)
+             *
+             * Ranges are broken in clang and the fix likely won't be available until clang16 (long time till that becomes standard)
+             *
+             * https://github.com/llvm/llvm-project/issues/44178
+             */
+            for(auto rItr = fiveStarRankings.crbegin(); rItr != fiveStarRankings.crend(); rItr++)
             {
-                advanceCandidates(fiveStarRankings.back().candidates);
+                qsizetype room = candidatesNeeded - fiveStarAdv.size();
+
+                if(room == 0)
+                    break;
+
+                if(rItr->candidates.size() <= room)
+                    fiveStarAdv.unite(rItr->candidates);
+                else
+                    break;
+            }
+
+            if(!fiveStarAdv.isEmpty())
+            {
+                advanceCandidates(fiveStarAdv);
                 break;
             }
 
