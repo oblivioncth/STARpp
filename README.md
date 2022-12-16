@@ -99,7 +99,7 @@ Category A = 3
 Category B = 2
 
 [General]
-Seats = 3
+Seats = 2
 ```
 Lastly, the files are loaded via the application's command-line parameters as shown in the following section.
 
