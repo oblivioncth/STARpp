@@ -47,6 +47,7 @@ HeadToHeadResults::HeadToHeadResults(const Election* election)
             else if(prefA < prefB)
                 statsA.defeats.insert(opponentB);
             statsA.preferences.increase(opponentB, prefA);
+            statsA.antiPreferences.increase(opponentB, prefB);
 
             // Update stats for candidate B
             CandidateStats& statsB = mStats[opponentB];
@@ -55,7 +56,7 @@ HeadToHeadResults::HeadToHeadResults(const Election* election)
             else if(prefB < prefA)
                 statsB.defeats.insert(opponentA);
             statsB.preferences.increase(opponentA, prefB);
-
+            statsB.antiPreferences.increase(opponentA, prefA);
         }
     }
 }
@@ -92,7 +93,7 @@ int HeadToHeadResults::margin(const QString& candidate) const
         return 0;
 
     auto stat = mStats[candidate];
-    return stat.victories.size() - stat.defeats.size();
+    return stat.preferences.total() - stat.antiPreferences.total();
 }
 
 QString HeadToHeadResults::winner(const QString& candidateA, const QString& candidateB) const
@@ -136,10 +137,17 @@ void HeadToHeadResults::narrow(QSet<QString> candidates, NarrowMode mode)
         stat.defeats.removeIf([&](const QString& c){ return shouldCull(c); });
         stat.victories.removeIf([&](const QString& c) { return shouldCull(c); });
 
+        // NOTE: Getting list from preferences is fine because the list should always be the same for pref and anti-pref
+        Q_ASSERT(stat.preferences.count() == stat.antiPreferences.count());
         QList<QString> cans = stat.preferences.components();
         for(const QString& c : cans)
+        {
             if(shouldCull(c))
+            {
                 stat.preferences.remove(c);
+                stat.antiPreferences.remove(c);
+            }
+        }
     }
 }
 
