@@ -35,6 +35,11 @@ private:
         "-------"
     );
 
+    static inline const QString HEADING_UNRESOLVED = QStringLiteral(
+        "UNRESOLVED\n"
+        "----------"
+    );
+
     static inline const QString HEADING_SCORE_RANKINGS = QStringLiteral(
         "Score Rankings\n"
         "--------------"
@@ -48,14 +53,16 @@ private:
 
     // Result Templates
     static inline const QString WINNER_TEMPLATE = QStringLiteral(R"(%1) "%2")");
+    static inline const QString UNRESOLVED_TEMPLATE = QStringLiteral(R"(- "%1")");
     static inline const QString RAW_SCORE_TEMPLATE = QStringLiteral(R"({"%1"} [%2])");
 
     // Summary
     static inline const QString SUMMARY_HEADING_CATEGORY = QStringLiteral(" Category ");
     static inline const QString SUMMARY_HEADING_WINNER = QStringLiteral(" Winner ");
     static inline const QString SUMMARY_HEADING_SECOND_SEAT = QStringLiteral(" Second Seat ");
-    static inline const QString SUMMARY_LIST_ITEM = QStringLiteral(R"( "%1" )");
+    static inline const QString SUMMARY_LIST_ITEM = QStringLiteral(" %1 ");
     static inline const QString SUMMARY_BLANK_FIELD = "*None*";
+    static inline const QString SUMMARY_UNRESOLVED_FIELD = "*Unresolved*";
     static inline const QChar SUMMARY_VERTICAL_SEP = '|';
     static inline const QChar SUMMARY_HORIZONTAL_SEP = '-';
 
