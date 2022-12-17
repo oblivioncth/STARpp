@@ -510,23 +510,36 @@ void Calculator::logElectionResults(const ElectionResult& results) const
 {
     // Create filled seats string
     QString seatListStr;
-    for(qsizetype i = 0; i < results.winners().size(); i++)
+    const QStringList cWinners = results.winners();
+
+    if(cWinners.isEmpty())
+        seatListStr = LIST_ITEM_NONE + '\n';
+    else
     {
-        QString seatWinner = results.winners().at(i);
-        QString seatStr = LIST_ITEM_SEAT.arg(i).arg(seatWinner);
-        seatStr += '\n';
-        seatListStr.append(seatStr);
+        for(qsizetype i = 0; i < results.winners().size(); i++)
+        {
+            QString seatWinner = results.winners().at(i);
+            QString seatStr = LIST_ITEM_SEAT.arg(i).arg(seatWinner);
+            seatStr += '\n';
+            seatListStr.append(seatStr);
+        }
     }
 
     // Create unresolved candidates string
     QString unresolvedListStr;
-    const QSet<QString>& cUnresolved = results.unresolvedCandidates();
-    for(auto itr = cUnresolved.cbegin(); itr != cUnresolved.cend(); itr++)
+    const QSet<QString> cUnresolved = results.unresolvedCandidates();
+
+    if(cUnresolved.isEmpty())
+        unresolvedListStr = LIST_ITEM_NONE + '\n';
+    else
     {
-        QString candidate = *itr;
-        QString unresolvedStr = LIST_ITEM_UNRESOLVED.arg(candidate);
-        unresolvedStr += '\n';
-        unresolvedListStr.append(unresolvedListStr);
+        for(auto itr = cUnresolved.cbegin(); itr != cUnresolved.cend(); itr++)
+        {
+            QString candidate = *itr;
+            QString unresolvedStr = LIST_ITEM_UNRESOLVED.arg(candidate);
+            unresolvedStr += '\n';
+            unresolvedListStr.append(unresolvedStr);
+        }
     }
 
     // Log

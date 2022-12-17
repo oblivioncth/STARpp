@@ -92,7 +92,6 @@ private:
 
     // Logging - Final Results
     static inline const QString LOG_EVENT_FINAL_RESULTS = QStringLiteral("Final Results:\n"
-                                                                         "--------------\n"
                                                                          "\n"
                                                                          "Filled Seats:\n"
                                                                          "%1"
@@ -110,6 +109,7 @@ private:
     static inline const QString LIST_ITEM_RANK = QStringLiteral("\t%1) { \"%2\" } <%3>");
     static inline const QString LIST_ITEM_SEAT = QStringLiteral("\t%1) \"%2\"");
     static inline const QString LIST_ITEM_UNRESOLVED = QStringLiteral("\t- \"%1\"");
+    static inline const QString LIST_ITEM_NONE = QStringLiteral("\t *NONE*");
 
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
