@@ -54,13 +54,21 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     // Wait on user confirm
     pause();
 
-    // Print result
-    const QStringList& winners = result.winners();
+    // Print winners
+    const QStringList winners = result.winners();
     cout << HEADING_WINNERS << endl;
     for(qsizetype w = 0; w < winners.size(); w++)
         cout << WINNER_TEMPLATE.arg(w).arg(winners.at(w)) << endl;
     cout << endl;
 
+    if(!result.isComplete())
+    {
+        const QSet<QString> unres = result.unresolvedCandidates();
+        cout << HEADING_UNRESOLVED << endl;
+        for(const QString& c : unres)
+            cout << UNRESOLVED_TEMPLATE.arg(c) << endl;
+        cout << endl;
+    }
 
     // Print raw score rankings
     cout << HEADING_SCORE_RANKINGS << endl;
@@ -93,7 +101,17 @@ void ResultPresenter::printSummary()
     summaryTable.at(0, 1) = SUMMARY_HEADING_WINNER;
     summaryTable.at(0, 2) = SUMMARY_HEADING_SECOND_SEAT;
 
-    // Add results
+    // Result helper
+    auto getSeatText = [&](const Star::ElectionResult& r, qsizetype s){
+        if(r.filledSeatCount() > s)
+            return '"' + r.winners().at(s) + '"';
+        else if(s >= r.election()->seatCount())
+            return SUMMARY_BLANK_FIELD;
+        else
+            return SUMMARY_UNRESOLVED_FIELD;
+    };
+
+    // Add results    
     for(int res = 0, row = 1; res < mResults->size(); res++, row++)
     {
         // Result
@@ -101,8 +119,8 @@ void ResultPresenter::printSummary()
 
         // Category, winner, runner-up
         summaryTable.at(row, 0) = ' ' + result.election()->name() + ' ';
-        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(result.filledSeatCount() > 0 ? result.winners().at(0) : SUMMARY_BLANK_FIELD);
-        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(result.filledSeatCount() > 1 ? result.winners().at(1) : SUMMARY_BLANK_FIELD);
+        summaryTable.at(row, 1) = SUMMARY_LIST_ITEM.arg(getSeatText(result, 0));
+        summaryTable.at(row, 2) = SUMMARY_LIST_ITEM.arg(getSeatText(result, 1));
     }
 
     // Determine field widths
