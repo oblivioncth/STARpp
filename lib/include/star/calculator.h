@@ -59,7 +59,7 @@ private:
     static inline const QString LOG_EVENT_RUNOFF_CANDIDATES = QStringLiteral(R"("%1" & "%2" advance to the runoff.)");
     static inline const QString LOG_EVENT_PERFORM_PRIMARY_RUNOFF = QStringLiteral("Performing primary runoff...");
     static inline const QString LOG_EVENT_RUNOFF_HEAD_TO_HEAD_WINNER_CHECK = QStringLiteral("Checking for clear winner of head-to-head.");
-    static inline const QString LOG_EVENT_RUNOFF_TIE = QStringLiteral("There candidates in the runoff are tied in terms of preference.");
+    static inline const QString LOG_EVENT_RUNOFF_TIE = QStringLiteral("The candidates in the runoff are tied in terms of preference.");
     static inline const QString LOG_EVENT_RUNOFF_HIGHER_SCORE_CHECK = QStringLiteral("Checking for the candidate with the higher score.");
     static inline const QString LOG_EVENT_RUNOFF_MORE_FIVE_STAR_CHECK = QStringLiteral("Checking for the candidate with more five star votes.");
     static inline const QString LOG_EVENT_RUNOFF_CHOOSING_RANDOM_WINNER = QStringLiteral("Choosing runoff winner randomly.");
