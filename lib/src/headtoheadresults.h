@@ -28,6 +28,7 @@ private:
         QSet<QString> victories;
         QSet<QString> defeats;
         Qx::Cumulation<QString, int> preferences;
+        Qx::Cumulation<QString, int> antiPreferences;
     };
 
 //-Instance Variables--------------------------------------------------------------------------------------------------
