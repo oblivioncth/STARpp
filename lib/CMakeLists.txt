@@ -42,6 +42,7 @@ set(CXX_PUBLIC_HEADERS
     election.h
     electionresult.h
     expectedelectionresult.h
+    qualifierresult.h
     rank.h
     reference.h
 )
@@ -59,6 +60,7 @@ set(CXX_IMPLEMENTATION
     electionresult.cpp
     expectedelectionresult.cpp
     headtoheadresults.cpp
+    qualifierresult.cpp
     rank.cpp
     reference.cpp
     reference/ballotbox_p.cpp

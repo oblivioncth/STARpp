@@ -38,69 +38,6 @@ Calculator::~Calculator() = default;
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Private:
-QSet<QString> Calculator::determineScoringRoundLeaders(const QList<Rank>& scoreRankings)
-{
-    emit calculationDetail(LOG_EVENT_DETERMINE_SCORING_ROUND_LEADERS);
-
-    QSet<QString> leaders;
-
-    // Handle tie & non-tie cases
-    QSet<QString> candidatesInFirst = scoreRankings.front().candidates;
-    if(candidatesInFirst.size() > 1) // First place tie
-    {
-        int firstPlaceScore = scoreRankings.front().value;
-
-        if(candidatesInFirst.size() == 2) // Two-way
-        {
-            QString tieLogStr = LOG_EVENT_SCORING_ROUND_FIRST_TIE_BENIGN.arg(firstPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInFirst);
-            emit calculationDetail(tieLogStr);
-
-            leaders = candidatesInFirst;
-        }
-        else // N-way
-        {
-            QString tieLogStr = LOG_EVENT_SCORING_ROUND_FIRST_TIE.arg(candidatesInFirst.size()).arg(firstPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInFirst);
-            emit calculationDetail(tieLogStr);
-
-            // Tiebreak
-            leaders = scoringRoundTieReduction(candidatesInFirst, 2);
-        }
-    }
-    else
-    {
-        // First place uncontested
-        QString first = *candidatesInFirst.constBegin();
-        emit calculationDetail(LOG_EVENT_SCORING_ROUND_FIRST_NO_TIE.arg(first));
-        leaders.insert(first);
-
-        // Check second place
-        QSet<QString> candidatesInSecond = scoreRankings.at(1).candidates;
-        if(candidatesInSecond.size() > 1) // Second place tie
-        {
-            int secondPlaceScore = scoreRankings.at(1).value;
-
-            QString tieLogStr = LOG_EVENT_SCORING_ROUND_SECOND_TIE.arg(candidatesInSecond.size()).arg(secondPlaceScore) + '\n' + createCandidateGeneralSetString(candidatesInSecond);
-            emit calculationDetail(tieLogStr);
-
-            // Tiebreak
-            QSet<QString> secondPlaceTiebreak = scoringRoundTieReduction(candidatesInSecond, 1);
-
-            // Insert all from the tiebreak, fully resolved or not
-            leaders.unite(secondPlaceTiebreak);
-        }
-        else
-        {
-            // Second place uncontested
-            QString second = *candidatesInSecond.constBegin();
-            emit calculationDetail(LOG_EVENT_SCORING_ROUND_SECOND_NO_TIE.arg(second));
-            leaders.insert(second);
-        }
-    }
-
-    emit calculationDetail(LOG_EVENT_SCORING_ROUND_LEADERS + '\n' + createCandidateToalScoreSetString(leaders));
-    return leaders;
-}
-
 QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) const
 {
     emit calculationDetail(LOG_EVENT_PERFORM_PRIMARY_RUNOFF);
@@ -146,7 +83,7 @@ QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) con
     return winner;
 }
 
-QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCandidates, qsizetype desiredCount) const
+QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRankings) const
 {
     /* Overall this function attempts to break the tied candidates by selecting the winner(s) of the tie in
      * a similar fashion to Bloc voting. One candidate is selected as the winner and then if a second
@@ -155,40 +92,58 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
      * one candidate can be set aside.
      */
 
-    emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION.arg(tiedCandidates.size()).arg(desiredCount));
+    // TODO: Update emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION.arg(tiedCandidates.size()).arg(desiredCount));
 
-    // This function should never be called in these situation, but account for it anyway
-    if(tiedCandidates.size() <= desiredCount)
-    {
-        qWarning("called with a set of candidates that is already at or less than the desired count.");
-        return tiedCandidates;
-    }
+    // Only the first two score ranks are ever relevant
+    QList<Rank> contenderRankings = scoreRankings.first(2);
 
-    // Get copy of head-to-head results reduced to only include tied candidates
-    HeadToHeadResults tiedHtH = mHeadToHeadResults->narrowed(tiedCandidates, HeadToHeadResults::Inclusive);
+    // Results to fill
+    QStringList seededCandidates;
+    QSet<QString> overflow;
 
-    // Result to fill
-    QSet<QString> advancingCandidates;
+    // Need tracker
+    qsizetype candidatesNeeded = 2;
 
-    // Convenience function for advancing candidates
-    const auto advanceCandidates = [&](const QSet<QString>& c){
-        emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_ADVANCE_CANDIDATES + '\n' + createCandidateGeneralSetString(c));
-        advancingCandidates.unite(c);
-        tiedHtH.narrow(c, HeadToHeadResults::Exclusive);
+    // Convenience functions for manipulating candidates
+    const auto removeContenders = [&](const QSet<QString>& c){
+        Rank& topRank = contenderRankings.first();
+        topRank.candidates.subtract(c);
+        if(topRank.candidates.isEmpty())
+            contenderRankings.removeFirst();
     };
 
-    // Determine tiebreak winner(s) until at the desired amount
-    while(advancingCandidates.size() < desiredCount)
-    {
-        /* After setting candidate(s) aside, if another candidate is needed any candidates eliminated in the previous
-         * tiebreaker need to be reconsidered; therefore, a second HeadToHeadResults instance is needed so that that the
-         * original can be restored after.
-         */
-        HeadToHeadResults remainingHtH(tiedHtH);
+    const auto advanceCandidates = [&](const QSet<QString>& c){
+        emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_ADVANCE_CANDIDATES + '\n' + createCandidateGeneralSetString(c));
 
-        // Determine number of needed candidates
-        qsizetype candidatesNeeded = desiredCount - advancingCandidates.size();
-        emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_TOP.arg(candidatesNeeded) + '\n' + createCandidateGeneralSetString(remainingHtH.candidates()));
+        if(c.size() > candidatesNeeded)
+            overflow = c;
+        else
+        {
+            for(auto itr = c.cbegin(); itr != c.cend(); itr++)
+                seededCandidates.append(*itr);
+        }
+
+        removeContenders(c);
+        candidatesNeeded -= c.size();
+    };
+
+    // Seed candidates until at 2
+    while(candidatesNeeded > 0)
+    {
+        //TODO: Update emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_TOP.arg(candidatesNeeded) + '\n' + createCandidateGeneralSetString({remainingHtH.candidates()}}));
+
+        // Get candidates from top score rank
+        QSet<QString> topCandidates = contenderRankings.front().candidates;
+
+        // Advance candidates directly if possible
+        if(topCandidates.size() <= candidatesNeeded)
+        {
+            advanceCandidates(topCandidates);
+            continue;
+        }
+
+        // Get head-to-head results of score tied candidates
+        HeadToHeadResults tiedHtH = mHeadToHeadResults->narrowed(topCandidates, HeadToHeadResults::Inclusive);
 
         // Convenience functions for candidate culling and advancement
         const auto tryCullLosers = [&](const QList<Rank>& loserFirstRankings){
@@ -196,7 +151,7 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
             {
                 const QSet<QString>& toCut = loserFirstRankings.front().candidates;
                 emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_CUT_CANDIDATES + '\n' + createCandidateGeneralSetString(toCut));
-                remainingHtH.narrow(toCut, HeadToHeadResults::Exclusive);
+                tiedHtH.narrow(toCut, HeadToHeadResults::Exclusive);
                 return true;
             }
             else
@@ -204,9 +159,9 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
         };
 
         const auto tryAdvanceRemaining = [&]{
-            if(remainingHtH.candidateCount() <= candidatesNeeded)
+            if(tiedHtH.candidateCount() <= candidatesNeeded)
             {
-                advanceCandidates(remainingHtH.candidates());
+                advanceCandidates(tiedHtH.candidates());
                 return true;
             }
             else
@@ -217,7 +172,7 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
         forever
         {
             // Sort remaining by head-to-head losses
-            const QList<Rank> lossRankings = rankByHeadToHeadLosses(remainingHtH.candidates(), &remainingHtH, Rank::Descending);
+            const QList<Rank> lossRankings = rankByHeadToHeadLosses(tiedHtH.candidates(), &tiedHtH, Rank::Descending);
 
             // If possible, remove the candidates with the most losses, adjust the head-to-head results, then repeat
             if(tryCullLosers(lossRankings))
@@ -228,7 +183,7 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
                 break;
 
             // Sort remaining by 5-star votes
-            const QList<Rank> fiveStarRankings = rankByVotesOfMaxScore(remainingHtH.candidates(), Rank::Ascending);
+            const QList<Rank> fiveStarRankings = rankByVotesOfMaxScore(tiedHtH.candidates(), Rank::Ascending);
 
             /* If possible, advance the clear 5-star winner(s), then restart the whole process
              *
@@ -284,7 +239,7 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
                  */
 
                 // Sort remaining by head-to-head preferences
-                const QList<Rank> prefRankings = rankByHeadToHeadPreferences(remainingHtH.candidates(), &remainingHtH, Rank::Ascending);
+                const QList<Rank> prefRankings = rankByHeadToHeadPreferences(tiedHtH.candidates(), &tiedHtH, Rank::Ascending);
 
                 // If possible, remove the candidates with the least preferences, adjust the head-to-head results, then repeat this sub process
                 if(tryCullLosers(prefRankings))
@@ -295,7 +250,7 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
                     break;
 
                 // Sort remaining by head-to-head margin
-                const QList<Rank> marginRankings = rankByHeadToHeadMargin(remainingHtH.candidates(), &remainingHtH, Rank::Ascending);
+                const QList<Rank> marginRankings = rankByHeadToHeadMargin(tiedHtH.candidates(), &tiedHtH, Rank::Ascending);
 
                 // If possible, remove the candidates with the lowest margin, adjust the head-to-head results, then repeat this sub process
                 if(tryCullLosers(marginRankings))
@@ -308,24 +263,29 @@ QSet<QString> Calculator::scoringRoundTieReduction(const QSet<QString>& tiedCand
 
             // If true ties are not allowed, use a random tiebreak to select one to advance; otherwise, simply "advance" the remaining candidates
             if(!mOptions.testFlag(Option::AllowTrueTies))
-                advanceCandidates({breakTieRandom(remainingHtH.candidates())});
+                advanceCandidates({breakTieRandom(tiedHtH.candidates())});
             else
             {
                 emit calculationDetail(LOG_EVENT_SCORING_ROUND_NO_RANDOM);
-                advanceCandidates(remainingHtH.candidates());
+                advanceCandidates(tiedHtH.candidates());
             }
 
             break;
         }
     }
 
+    // Create qualifier result
+    QualifierResult res(seededCandidates.size() > 0 ? seededCandidates.at(0) : QString(),
+                        seededCandidates.size() > 1 ? seededCandidates.at(1) : QString(),
+                        overflow);
+
     // Note if a true tie occurred
-    if(advancingCandidates.size() != desiredCount)
+    if(!res.isComplete())
         emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_UNSUCCESSFUL);
 
-    // Return the reduced candidate set, ideally at target size
-    emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_RESULT + '\n' + createCandidateToalScoreSetString(advancingCandidates));
-    return advancingCandidates;
+    // Return the qualifier result set, ideally complete
+    // TODO: Update emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_RESULT + '\n' + createCandidateToalScoreSetString(advancingCandidates));
+    return res;
 }
 
 QList<Rank> Calculator::rankByScore(const QSet<QString>& candidates, Rank::Order order) const
@@ -602,30 +562,25 @@ ElectionResult Calculator::calculateResult()
         QString seatWinner;
 
         // Determine scoring round leaders based on raw score
-        QSet<QString> preliminaryLeaders = determineScoringRoundLeaders(candidateRankings);
+        QualifierResult runoffQualifiers = performRunoffQualifier(candidateRankings);
 
         // Check for an unresolved scoring round tie that prevented a runoff
-        if(preliminaryLeaders.size() != 2)
+        if(!runoffQualifiers.isComplete())
         {
             emit calculationDetail(LOG_EVENT_NO_RUNOFF);
-            unresolvedCandidates = preliminaryLeaders;
+            unresolvedCandidates = runoffQualifiers.overflow();
             break;
         }
 
-        // Segment out runoff candidates
-        QPair<QString, QString> runoffCandidates;
-        auto pItr = preliminaryLeaders.cbegin();
-        runoffCandidates.first = *(pItr++);
-        runoffCandidates.second = *pItr;
-        emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffCandidates.first, runoffCandidates.second));
+        emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffQualifiers.firstSeed(), runoffQualifiers.secondSeed()));
 
         // Perform primary runoff
-        seatWinner = performPrimaryRunoff(runoffCandidates);
+        seatWinner = performPrimaryRunoff(runoffQualifiers.seeds());
 
         // Check for unresolved runoff tie
         if(seatWinner.isNull())
         {
-            unresolvedCandidates = preliminaryLeaders;
+            unresolvedCandidates = {runoffQualifiers.firstSeed(), runoffQualifiers.secondSeed()};
             break;
         }
 

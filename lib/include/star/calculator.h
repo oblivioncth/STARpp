@@ -8,6 +8,7 @@
 // Project Includes
 #include "star/election.h"
 #include "star/electionresult.h"
+#include "star/qualifierresult.h"
 
 namespace Star
 {
@@ -132,9 +133,8 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
     // Main steps
-    QSet<QString> determineScoringRoundLeaders(const QList<Rank>& scoreRankings);
     QString performPrimaryRunoff(QPair<QString, QString> candidates) const;
-    QSet<QString> scoringRoundTieReduction(const QSet<QString>& candidates, qsizetype desiredCount) const;
+    QualifierResult performRunoffQualifier(const QList<Rank>& scoreRankings) const;
 
     // Utility
     QList<Rank> rankByScore(const QSet<QString>& candidates, Rank::Order order) const;
