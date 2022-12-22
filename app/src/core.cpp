@@ -11,7 +11,6 @@
 // Macros
 #define ENUM_NAME(eenum) QString(magic_enum::enum_name(eenum).data())
 
-
 //===============================================================================================================
 // CORE
 //===============================================================================================================
@@ -119,7 +118,7 @@ ErrorCode Core::initialize()
     }
     else if(clParser.isSet(CL_OPTION_CONFIG) && clParser.isSet(CL_OPTION_BOX))
     {
-        // Setup options container
+        // Setup election data container
         mRefElectionCfg = ReferenceElectionConfig{
             .ccPath = clParser.value(CL_OPTION_CONFIG),
             .bbPath = clParser.value(CL_OPTION_BOX),
@@ -129,15 +128,24 @@ ErrorCode Core::initialize()
 
         // Handle calculator options
         QStringList selectedOpts;
-        if(clParser.isSet(CL_OPTION_TRUE_TIES))
+        if(clParser.isSet(CL_OPTION_CALC_OPTIONS))
         {
-            selectedOpts.append(ENUM_NAME(Star::Calculator::AllowTrueTies));
-            mCalcOptions.setFlag(Star::Calculator::AllowTrueTies);
-        }
-        if(clParser.isSet(CL_OPTION_EXTRA_TIEBREAK))
-        {
-            selectedOpts.append(ENUM_NAME(Star::Calculator::CondorcetProtocol));
-            mCalcOptions.setFlag(Star::Calculator::CondorcetProtocol);
+            QStringList optStrs = clParser.value(CL_OPTION_CALC_OPTIONS).split(',', Qt::SkipEmptyParts);
+            for(const QString& optStr : optStrs)
+            {
+                auto potentialOpt = magic_enum::enum_cast<Star::Calculator::Option>(optStr.toStdString());
+                if(potentialOpt.has_value())
+                {
+                    selectedOpts.append(optStr);
+                    mCalcOptions.setFlag(potentialOpt.value());
+                }
+                else
+                {
+                    postError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_CALC_OPTION, optStr));
+                    return ErrorCode::INVALID_CALC_OPT;
+                }
+            }
+
         }
 
         QString optStr = !selectedOpts.isEmpty() ? selectedOpts.join(',') : ENUM_NAME(Star::Calculator::NoOptions);
