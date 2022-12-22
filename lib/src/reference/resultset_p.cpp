@@ -51,34 +51,56 @@ Qx::GenericError ResultSetReader::readInto()
     // Iterate array to fill target list
     for(const QJsonValue& value : jArray)
     {
-        // Get object
-        if(!value.isObject())
-            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_WRONG_ARRAY_ITEM_TYPE);
-        QJsonObject expectedResultObj = value.toObject();
+        // Get array
+        if(!value.isArray())
+            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_WRONG_ROOT_ARRAY_ITEM_TYPE);
+        QJsonArray expectedResultSeatArray = value.toArray();
 
-        // Get expected keys
-        Qx::GenericError convError;
+        // Iterate seat array to create expected result
+        Star::ExpectedElectionResult::Builder eerb;
+        for(const QJsonValue& jValueSeat : expectedResultSeatArray)
+        {
+            // Get object
+            if(!jValueSeat.isObject())
+                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_WRONG_SEAT_ARRAY_ITEM_TYPE);
+            QJsonObject seatObj = jValueSeat.toObject();
 
-        QJsonArray jWinnerArray;
-        QJsonArray jUnresolvedArray;
-        if((convError = Qx::Json::checkedKeyRetrieval(jWinnerArray, expectedResultObj, KEY_WINNERS_ARRAY)).isValid())
-            return convError;
-        if((convError = Qx::Json::checkedKeyRetrieval(jUnresolvedArray, expectedResultObj, KEY_UNRESOLVED_ARRAY)).isValid())
-            return convError;
+            // Get expected keys
+            Qx::GenericError convError;
 
-        // Convert arrays to string lists
-        QList<QString> winners;
-        QList<QString> unresolved;
-        if((convError = Qx::Json::checkedArrayConversion(winners, jWinnerArray)).isValid())
-            return convError;
-        if((convError = Qx::Json::checkedArrayConversion(unresolved, jUnresolvedArray)).isValid())
-            return convError;
+            QString winner;
+            QJsonObject jQualifierObj;
+            if((convError = Qx::Json::checkedKeyRetrieval(winner, seatObj, KEY_WINNER_STR)).isValid())
+                return convError;
+            if((convError = Qx::Json::checkedKeyRetrieval(jQualifierObj, seatObj, KEY_QUALIFIER_OBJ)).isValid())
+                return convError;
 
-        // Convert to set
-        QSet<QString> unresolvedSet = QSet<QString>(unresolved.constBegin(), unresolved.constEnd());
+            // Get expected keys for qualifier
+            QJsonArray jFirstAdvArray;
+            QJsonArray jSecondAdvArray;
+            if((convError = Qx::Json::checkedKeyRetrieval(jFirstAdvArray, jQualifierObj, KEY_QUALIFIER_FIRST_ADV_ARRAY)).isValid())
+                return convError;
+            if((convError = Qx::Json::checkedKeyRetrieval(jSecondAdvArray, jQualifierObj, KEY_QUALIFIER_SECOND_ADV_ARRAY)).isValid())
+                return convError;
 
-        // Add expected result to list
-        mTargetList->append(ExpectedElectionResult(winners, unresolvedSet));
+            // Convert qualifier arrays to string lists
+            QList<QString> firstAdv;
+            QList<QString> secondAdv;
+            if((convError = Qx::Json::checkedArrayConversion(firstAdv, jFirstAdvArray)).isValid())
+                return convError;
+            if((convError = Qx::Json::checkedArrayConversion(secondAdv, jSecondAdvArray)).isValid())
+                return convError;
+
+            // Convert to set
+            QSet<QString> firstAdvSet = QSet<QString>(firstAdv.constBegin(), firstAdv.constEnd());
+            QSet<QString> secondAdvSet = QSet<QString>(secondAdv.constBegin(), secondAdv.constEnd());
+
+            // Add seat to builder
+            eerb.wSeat(Seat(winner, QualifierResult(firstAdvSet, secondAdvSet)));
+        }
+
+        // Build expected result and add to target list
+        mTargetList->append(eerb.build());
     }
 
     return Qx::GenericError();

@@ -45,6 +45,7 @@ set(CXX_PUBLIC_HEADERS
     qualifierresult.h
     rank.h
     reference.h
+    seat.h
 )
 
 set(CXX_PRIVATE_HEADERS
@@ -66,6 +67,7 @@ set(CXX_IMPLEMENTATION
     reference/ballotbox_p.cpp
     reference/categoryconfig_p.cpp
     reference/resultset_p.cpp
+    seat.cpp
 )
 
 # Build pathed implementation file list

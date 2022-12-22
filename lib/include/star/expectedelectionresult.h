@@ -12,28 +12,46 @@ namespace Star
 
 class ExpectedElectionResult
 {
+//-Inner Classes----------------------------------------------------------------------------------------------------
+public:
+    class Builder;
+
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
-    QStringList mWinners;
-    QSet<QString> mUnresolvedCandidates;
+    QList<Seat> mSeats;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     ExpectedElectionResult();
-    ExpectedElectionResult(const QStringList& winners, const QSet<QString> unresolved = {});
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     bool isNull() const;
+    bool sameOutcomeAs(const ElectionResult& result);
 
-    QStringList winners() const;
-    QSet<QString> unresolvedCandidates() const;
-
-    void setWinners(const QStringList& winners);
-    void setUnresolvedCandidates(QSet<QString> unresolved);
+    qsizetype seatCount() const;
+    QList<Seat> seats() const;
 
     bool operator==(const ElectionResult& result) const;
     bool operator!=(const ElectionResult& result) const;
+};
+
+class ExpectedElectionResult::Builder
+{
+//-Instance Variables--------------------------------------------------------------------------------------------------
+private:
+    ExpectedElectionResult mConstruct;
+
+//-Constructor---------------------------------------------------------------------------------------------------------
+public:
+    Builder();
+
+//-Instance Functions-------------------------------------------------------------------------------------------------
+public:
+    Builder& wSeat(const Seat& seat);
+    Builder& wWinner(const QString& winner);
+
+    ExpectedElectionResult build();
 };
 
 }

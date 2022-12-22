@@ -92,14 +92,14 @@ QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRanki
      * one candidate can be set aside.
      */
 
-    // TODO: Update emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION.arg(tiedCandidates.size()).arg(desiredCount));
+    emit calculationDetail(LOG_EVENT_QUALIFIER);
 
     // Only the first two score ranks are ever relevant
-    QList<Rank> contenderRankings = scoreRankings.first(2);
+    QList<Rank> contenderRankings = scoreRankings.first(std::min(scoreRankings.size(), qsizetype(2)));
 
     // Results to fill
-    QStringList seededCandidates;
-    QSet<QString> overflow;
+    QSet<QString> firstAdvancement;
+    QSet<QString> secondAdvancement;
 
     // Need tracker
     qsizetype candidatesNeeded = 2;
@@ -113,15 +113,14 @@ QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRanki
     };
 
     const auto advanceCandidates = [&](const QSet<QString>& c){
-        emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_ADVANCE_CANDIDATES + '\n' + createCandidateGeneralSetString(c));
+        emit calculationDetail(LOG_EVENT_QUALIFIER_ADVANCE_CANDIDATES + '\n' + createCandidateGeneralSetString(c));
 
-        if(c.size() > candidatesNeeded)
-            overflow = c;
+        if(firstAdvancement.isEmpty())
+            firstAdvancement = c;
+        else if(secondAdvancement.isEmpty())
+            secondAdvancement = c;
         else
-        {
-            for(auto itr = c.cbegin(); itr != c.cend(); itr++)
-                seededCandidates.append(*itr);
-        }
+            qFatal("attempted to advance candidates more than twice!");
 
         removeContenders(c);
         candidatesNeeded -= c.size();
@@ -130,10 +129,9 @@ QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRanki
     // Seed candidates until at 2
     while(candidatesNeeded > 0)
     {
-        //TODO: Update emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_TOP.arg(candidatesNeeded) + '\n' + createCandidateGeneralSetString({remainingHtH.candidates()}}));
-
         // Get candidates from top score rank
         QSet<QString> topCandidates = contenderRankings.front().candidates;
+        emit calculationDetail(LOG_EVENT_QUALIFIER_TOP.arg(candidatesNeeded) + '\n' + createCandidateGeneralSetString(topCandidates));
 
         // Advance candidates directly if possible
         if(topCandidates.size() <= candidatesNeeded)
@@ -150,7 +148,7 @@ QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRanki
             if(loserFirstRankings.size() > 1)
             {
                 const QSet<QString>& toCut = loserFirstRankings.front().candidates;
-                emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_CUT_CANDIDATES + '\n' + createCandidateGeneralSetString(toCut));
+                emit calculationDetail(LOG_EVENT_QUALIFIER_CUT_CANDIDATES + '\n' + createCandidateGeneralSetString(toCut));
                 tiedHtH.narrow(toCut, HeadToHeadResults::Exclusive);
                 return true;
             }
@@ -266,7 +264,7 @@ QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRanki
                 advanceCandidates({breakTieRandom(tiedHtH.candidates())});
             else
             {
-                emit calculationDetail(LOG_EVENT_SCORING_ROUND_NO_RANDOM);
+                emit calculationDetail(LOG_EVENT_QUALIFIER_NO_RANDOM);
                 advanceCandidates(tiedHtH.candidates());
             }
 
@@ -275,16 +273,14 @@ QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRanki
     }
 
     // Create qualifier result
-    QualifierResult res(seededCandidates.size() > 0 ? seededCandidates.at(0) : QString(),
-                        seededCandidates.size() > 1 ? seededCandidates.at(1) : QString(),
-                        overflow);
+    QualifierResult res(firstAdvancement, secondAdvancement);
 
     // Note if a true tie occurred
     if(!res.isComplete())
-        emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_UNSUCCESSFUL);
+        emit calculationDetail(LOG_EVENT_QUALIFIER_UNSUCCESSFUL);
 
     // Return the qualifier result set, ideally complete
-    // TODO: Update emit calculationDetail(LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_RESULT + '\n' + createCandidateToalScoreSetString(advancingCandidates));
+    logQualifierResult(res);
     return res;
 }
 
@@ -466,6 +462,16 @@ QString Calculator::createCandidateRankListString(const QList<Rank>& ranks) cons
     return listStr;
 }
 
+void Calculator::logQualifierResult(const QualifierResult& result) const
+{
+    QString strFs = result.firstSeed().isNull() ? "" : '"' + result.firstSeed() + '"';
+    QString strSs = result.secondSeed().isNull() ? "" : '"' + result.secondSeed() + '"';
+    QString strOf = result.overflow().isEmpty() ? "" : '"' + Qx::String::join(result.overflow(), R"(", ")") + '"';
+
+    // Log
+    emit calculationDetail(LOG_EVENT_QUALIFIER_RESULT.arg(strFs, strSs, result.isSeededSimultaneously() ? "true" : "false", strOf));
+}
+
 void Calculator::logElectionResults(const ElectionResult& results) const
 {
     // Create filled seats string
@@ -536,9 +542,8 @@ ElectionResult Calculator::calculateResult()
     emit calculationDetail(LOG_EVENT_CALC_HEAD_TO_HEAD);
     mHeadToHeadResults = std::make_unique<HeadToHeadResults>(mElection);
 
-    // Results holders
-    QStringList winners;
-    QSet<QString> unresolvedCandidates;
+    // Results holder
+    QList<Seat> filledSeats;
 
     // Active candidate rankings
     QList<Rank> candidateRankings = mElection->scoreRankings();
@@ -554,7 +559,7 @@ ElectionResult Calculator::calculateResult()
             if(frontCandidates.size() == 1)
             {
                 emit calculationDetail(LOG_EVENT_DIRECT_SEAT_FILL);
-                winners.append(*frontCandidates.cbegin());
+                filledSeats.append(Seat(*frontCandidates.cbegin()));
                 break;
             }
         }
@@ -562,30 +567,30 @@ ElectionResult Calculator::calculateResult()
         QString seatWinner;
 
         // Determine scoring round leaders based on raw score
-        QualifierResult runoffQualifiers = performRunoffQualifier(candidateRankings);
+        QualifierResult runoffQualifier = performRunoffQualifier(candidateRankings);
 
         // Check for an unresolved scoring round tie that prevented a runoff
-        if(!runoffQualifiers.isComplete())
+        if(!runoffQualifier.isComplete())
         {
             emit calculationDetail(LOG_EVENT_NO_RUNOFF);
-            unresolvedCandidates = runoffQualifiers.overflow();
+            filledSeats.append(runoffQualifier);
             break;
         }
 
-        emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffQualifiers.firstSeed(), runoffQualifiers.secondSeed()));
+        emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffQualifier.firstSeed(), runoffQualifier.secondSeed()));
 
         // Perform primary runoff
-        seatWinner = performPrimaryRunoff(runoffQualifiers.seeds());
+        seatWinner = performPrimaryRunoff(runoffQualifier.seeds());
 
         // Check for unresolved runoff tie
         if(seatWinner.isNull())
         {
-            unresolvedCandidates = {runoffQualifiers.firstSeed(), runoffQualifiers.secondSeed()};
+            filledSeats.append(runoffQualifier);
             break;
         }
 
         // Record seat winner
-        winners.append(seatWinner);
+        filledSeats.append(Seat(seatWinner, runoffQualifier));
 
         /* Remove seat winner from remaining rankings
          *
@@ -611,7 +616,7 @@ ElectionResult Calculator::calculateResult()
         }
     }
 
-    ElectionResult finalResults(mElection, winners, unresolvedCandidates);
+    ElectionResult finalResults(mElection, filledSeats);
 
     // Note final results
     logElectionResults(finalResults);

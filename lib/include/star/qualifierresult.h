@@ -17,21 +17,25 @@ private:
     QString mFirstSeed;
     QString mSecondSeed;
     QSet<QString> mOverflow;
+    bool mSimultaneous;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     QualifierResult();
-    QualifierResult(const QString& f, const QString& s, const QSet<QString>& o);
+    QualifierResult(const QSet<QString>& firstAdv, const QSet<QString>& secondAdv = {});
+    QualifierResult(const QString& f, const QString& s, bool sim, const QSet<QString>& o);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     bool isNull() const;
     bool isComplete() const;
+    bool isSeededSimultaneously() const;
 
     QString firstSeed() const;
     QString secondSeed() const;
     std::pair<QString, QString> seeds();
     QSet<QString> overflow() const;
+    QSet<QString> unresolved() const;
 
     bool operator==(const QualifierResult& other) const;
     bool operator!=(const QualifierResult& other) const;
