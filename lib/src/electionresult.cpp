@@ -59,7 +59,7 @@ qsizetype ElectionResult::filledSeatCount() const
     if(isNull())
         return 0;
 
-    int count = mSeats.size();
+    qsizetype count = mSeats.size();
     if(mSeats.back().winner().isNull())
         count--;
 

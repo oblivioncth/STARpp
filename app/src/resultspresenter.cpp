@@ -112,7 +112,7 @@ void ResultPresenter::printSummary()
     };
 
     // Add results    
-    for(int res = 0, row = 1; res < mResults->size(); res++, row++)
+    for(qsizetype res = 0, row = 1; res < mResults->size(); res++, row++)
     {
         // Result
         const Star::ElectionResult& result = mResults->at(res);
