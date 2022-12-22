@@ -543,7 +543,7 @@ ElectionResult Calculator::calculateResult()
     mHeadToHeadResults = std::make_unique<HeadToHeadResults>(mElection);
 
     // Results holder
-    QList<Seat> filledSeats;
+    QList<Seat> processedSeats;
 
     // Active candidate rankings
     QList<Rank> candidateRankings = mElection->scoreRankings();
@@ -559,7 +559,7 @@ ElectionResult Calculator::calculateResult()
             if(frontCandidates.size() == 1)
             {
                 emit calculationDetail(LOG_EVENT_DIRECT_SEAT_FILL);
-                filledSeats.append(Seat(*frontCandidates.cbegin()));
+                processedSeats.append(Seat(*frontCandidates.cbegin()));
                 break;
             }
         }
@@ -573,7 +573,7 @@ ElectionResult Calculator::calculateResult()
         if(!runoffQualifier.isComplete())
         {
             emit calculationDetail(LOG_EVENT_NO_RUNOFF);
-            filledSeats.append(runoffQualifier);
+            processedSeats.append(runoffQualifier);
             break;
         }
 
@@ -585,12 +585,12 @@ ElectionResult Calculator::calculateResult()
         // Check for unresolved runoff tie
         if(seatWinner.isNull())
         {
-            filledSeats.append(runoffQualifier);
+            processedSeats.append(runoffQualifier);
             break;
         }
 
         // Record seat winner
-        filledSeats.append(Seat(seatWinner, runoffQualifier));
+        processedSeats.append(Seat(seatWinner, runoffQualifier));
 
         /* Remove seat winner from remaining rankings
          *
@@ -616,7 +616,7 @@ ElectionResult Calculator::calculateResult()
         }
     }
 
-    ElectionResult finalResults(mElection, filledSeats);
+    ElectionResult finalResults(mElection, processedSeats);
 
     // Note final results
     logElectionResults(finalResults);
