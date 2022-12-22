@@ -36,6 +36,9 @@ private:
     QHash<QString, CandidateStats> mStats;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
+private:
+    HeadToHeadResults();
+
 public:
     HeadToHeadResults(const Election* election);
 
