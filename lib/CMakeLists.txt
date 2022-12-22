@@ -29,7 +29,7 @@
 # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
 # https://stackoverflow.com/questions/45777734/install-export-requires-target-from-subproject
 
-# Add executable target
+# Add library target
 qt_add_library(${LIB_TARGET_NAME} STATIC)
 
 # Make alias target so target can be referred to with its friendly
