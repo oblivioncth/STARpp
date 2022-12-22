@@ -5,6 +5,7 @@
 
 // Project Includes
 #include "star/election.h"
+#include "star/seat.h"
 
 namespace Star
 {
@@ -14,22 +15,26 @@ class ElectionResult
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
     const Election* mElection;
-    QStringList mWinners;
-    QSet<QString> mUnresolvedCandidates;
+    QList<Seat> mSeats;
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
     ElectionResult();
-    ElectionResult(const Election* election, const QStringList& winners, const QSet<QString> unresolved);
+    ElectionResult(const Election* election, const QList<Seat>& seats);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
     bool isNull() const;
     bool isComplete() const;
+
+    const Seat& seatAt(qsizetype i) const;
+    QList<Seat> seats() const;
     QStringList winners() const;
     QSet<QString> unresolvedCandidates() const;
-    int filledSeatCount() const;
-    int unfilledSeatCount() const;
+    Seat unresolvedSeat() const;
+    qsizetype seatCount() const;
+    qsizetype filledSeatCount() const;
+    qsizetype unfilledSeatCount() const;
     const Election* election() const;
 
     bool operator==(const ElectionResult& other) const;

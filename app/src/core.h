@@ -33,6 +33,7 @@ private:
 
     // Logging - Errors
     static inline const QString LOG_ERR_INVALID_ARGS = QStringLiteral("Invalid arguments provided.");
+    static inline const QString LOG_ERR_INVALID_CALC_OPTION = QStringLiteral("Invalid calculator option provided.");
 
     // Logging - Messages
     static inline const QString LOG_EVENT_INIT = QStringLiteral("Initializing " PROJECT_SHORT_NAME "...");
@@ -61,13 +62,26 @@ private:
     static inline const QString CL_OPT_BOX_L_NAME = QStringLiteral("box");
     static inline const QString CL_OPT_BOX_DESC = QStringLiteral("Specifies the path to the ballot box CSV file.");
 
-    static inline const QString CL_OPT_TRUE_TIES_S_NAME = QStringLiteral("t");
-    static inline const QString CL_OPT_TRUE_TIES_L_NAME = QStringLiteral("true-ties");
-    static inline const QString CL_OPT_TRUE_TIES_DESC = QStringLiteral("Ends an election prematurely instead of using a random tiebreaker when an unresovable tie occurs.");
-
-    static inline const QString CL_OPT_EXTRA_TIEBREAK_S_NAME = QStringLiteral("e");
-    static inline const QString CL_OPT_EXTRA_TIEBREAK_L_NAME = QStringLiteral("extra-tiebreak");
-    static inline const QString CL_OPT_EXTRA_TIEBREAK_DESC = QStringLiteral("Uses the Condorcet protocol tiebreaker during the scoring round before the random tiebreaker if necessary.");
+    static inline const QString CL_OPT_CALC_OPTIONS_S_NAME = QStringLiteral("o");
+    static inline const QString CL_OPT_CALC_OPTIONS_L_NAME = QStringLiteral("calc-options");
+    static inline const QString CL_OPT_CALC_OPTIONS_DESC = QStringLiteral(
+        "Comma separated list of calculator options:\n"
+        "\n"
+        ">AllowTrueTies - Ends an election prematurely instead of using a random tiebreaker when an unresolvable tie occurs\n"
+        ">CondorcetProtocol - Uses the protocol during the scoring round before the random tiebreaker if necessary\n"
+        ">DefactoWinner - If true ties are enabled and an unresolvable tie occurs for second seed in the qualifier, gives the win to the first seed if they would defeat all of them in the runoff\n"
+    );
+    /* NOTE: This will cause a compilation error when changing Star::Calculator::Options in order to prompt the developer
+     * to ensure any new options have been described above and then manually check them off here
+     */
+    static_assert(magic_enum::enum_values<Star::Calculator::Option>() == std::array<Star::Calculator::Option, 4>{
+            Star::Calculator::NoOptions,
+            Star::Calculator::AllowTrueTies,
+            Star::Calculator::CondorcetProtocol,
+            Star::Calculator::DefactoWinner
+        },
+        "Missing description for a calculator option"
+    );
 
     static inline const QString CL_OPT_MINIMAL_S_NAME = QStringLiteral("m");
     static inline const QString CL_OPT_MINIMAL_L_NAME = QStringLiteral("minimal");
@@ -78,12 +92,11 @@ private:
     static inline const QCommandLineOption CL_OPTION_VERSION{{CL_OPT_VERSION_S_NAME, CL_OPT_VERSION_L_NAME}, CL_OPT_VERSION_DESC}; // Boolean option
     static inline const QCommandLineOption CL_OPTION_CONFIG{{CL_OPT_CONFIG_S_NAME, CL_OPT_CONFIG_L_NAME}, CL_OPT_CONFIG_DESC, "config"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_BOX{{CL_OPT_BOX_S_NAME, CL_OPT_BOX_L_NAME}, CL_OPT_BOX_DESC, "box"}; // Takes value
-    static inline const QCommandLineOption CL_OPTION_TRUE_TIES{{CL_OPT_TRUE_TIES_S_NAME, CL_OPT_TRUE_TIES_L_NAME}, CL_OPT_TRUE_TIES_DESC}; // Boolean option
-    static inline const QCommandLineOption CL_OPTION_EXTRA_TIEBREAK{{CL_OPT_EXTRA_TIEBREAK_S_NAME, CL_OPT_EXTRA_TIEBREAK_L_NAME}, CL_OPT_EXTRA_TIEBREAK_DESC}; // Boolean option
+    static inline const QCommandLineOption CL_OPTION_CALC_OPTIONS{{CL_OPT_CALC_OPTIONS_S_NAME, CL_OPT_CALC_OPTIONS_L_NAME}, CL_OPT_CALC_OPTIONS_DESC, "calc-options"}; // Takes value
     static inline const QCommandLineOption CL_OPTION_MINIMAL{{CL_OPT_MINIMAL_S_NAME, CL_OPT_MINIMAL_L_NAME}, CL_OPT_MINIMAL_DESC}; // Boolean option
 
     static inline const QList<const QCommandLineOption*> CL_OPTIONS_ALL{&CL_OPTION_HELP, &CL_OPTION_VERSION, &CL_OPTION_CONFIG, &CL_OPTION_BOX,
-                                                                        &CL_OPTION_MINIMAL, &CL_OPTION_TRUE_TIES, &CL_OPTION_EXTRA_TIEBREAK};
+                                                                        &CL_OPTION_MINIMAL, &CL_OPTION_CALC_OPTIONS};
 
     // Help template
     static inline const QString HELP_TEMPL = "Usage:\n"

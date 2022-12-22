@@ -84,7 +84,9 @@ void tst_ties::all_tie_cases_data()
                 {.candidate = candidate4, .score = 0}
             }
         },
-        Star::ExpectedElectionResult({candidate1}),
+        Star::ExpectedElectionResult::Builder()
+               .wSeat(Star::Seat(candidate1, Star::QualifierResult({candidate1, candidate2})))
+               .build(),
         Star::Calculator::AllowTrueTies
     );
 
@@ -109,7 +111,9 @@ void tst_ties::all_tie_cases_data()
                 {.candidate = candidate4, .score = 4}
             }
         },
-        Star::ExpectedElectionResult({candidate1}),
+        Star::ExpectedElectionResult::Builder()
+               .wSeat(Star::Seat(candidate1, Star::QualifierResult({candidate1, candidate2})))
+               .build(),
         Star::Calculator::AllowTrueTies
     );
 
@@ -134,7 +138,9 @@ void tst_ties::all_tie_cases_data()
                 {.candidate = candidate4, .score = 4}
             }
         },
-        Star::ExpectedElectionResult({candidate1}),
+        Star::ExpectedElectionResult::Builder()
+               .wSeat(Star::Seat(candidate1, Star::QualifierResult({candidate1}, {candidate4})))
+               .build(),
         Star::Calculator::AllowTrueTies
     );
 
@@ -171,7 +177,9 @@ void tst_ties::all_tie_cases_data()
                 {.candidate = candidate4, .score = 0},
             }
         },
-        Star::ExpectedElectionResult({candidate4}),
+        Star::ExpectedElectionResult::Builder()
+               .wSeat(Star::Seat(candidate4, Star::QualifierResult({candidate4}, {candidate2})))
+               .build(),
         Star::Calculator::AllowTrueTies
     );
 
@@ -213,7 +221,9 @@ void tst_ties::all_tie_cases_data()
                 {.candidate = candidate5, .score = 5}
             }
         },
-        Star::ExpectedElectionResult({candidate3}),
+        Star::ExpectedElectionResult::Builder()
+               .wSeat(Star::Seat(candidate3, Star::QualifierResult({candidate3}, {candidate2})))
+               .build(),
         Star::Calculator::AllowTrueTies | Star::Calculator::CondorcetProtocol
     );
 
@@ -264,7 +274,9 @@ void tst_ties::all_tie_cases_data()
                 {.candidate = candidate5, .score = 0}
             }
         },
-        Star::ExpectedElectionResult({candidate5}),
+        Star::ExpectedElectionResult::Builder()
+               .wSeat(Star::Seat(candidate5, Star::QualifierResult({candidate5}, {candidate1})))
+               .build(),
         Star::Calculator::AllowTrueTies | Star::Calculator::CondorcetProtocol
     );
 
@@ -291,7 +303,9 @@ void tst_ties::all_tie_cases_data()
                 {.candidate = candidate4, .score = 3}
             }
         },
-        Star::ExpectedElectionResult({}, {candidate1, candidate2, candidate3}),
+        Star::ExpectedElectionResult::Builder()
+               .wSeat(Star::Seat(Star::QualifierResult({candidate3}, {candidate1, candidate2})))
+               .build(),
         Star::Calculator::AllowTrueTies
     );
 }

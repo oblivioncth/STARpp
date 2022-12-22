@@ -1,74 +1,290 @@
 [
-  {
-    "winners": ["Sixth film", "Seventh film"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Fourth Director", "Fifth Director"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Fifth Cheesesteak", "Fourth Cheesesteak"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Sixth Actress", "Fifth Actress"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Fifth Actor", "First Actor"],
-	"unresolved": []
-  },
-  {
-    "winners": ["First Supporting Actress", "Fourth Supporting Actress"],
-	"unresolved": []
-  },
-  {
-    "winners": ["First Supporting Actor", "Second Supporting Actor"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Fifth Documentary", "Second Documentary"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Third Script"],
-	"unresolved": ["Second Script", "Fourth Script", "Fifth Script"]
-  },
-  {
-    "winners": ["Fifth Soundtrack", "Third Soundtrack"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Fourth Directorial Debut", "Fifth Directorial Debut"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Fourth Breakthrough", "First Breakthrough"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Fourth Cinematography", "Fifth Cinematography"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Second Foreign", "Fifth Foreign"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Second Animated", "First Animated"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Third Ensemble", "Second Ensemble"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Second Friedman", "Third Friedman"],
-	"unresolved": []
-  },
-  {
-    "winners": ["Second May", "First May"],
-	"unresolved": []
-  }
+  [
+    {
+      "winner": "Sixth film",
+      "qualifier": {
+        "firstAdv": ["Sixth film", "Eighth film"],
+        "secondAdv": []       
+      }
+    },
+    {
+      "winner": "Seventh film",
+      "qualifier": {
+        "firstAdv": ["Eighth film"],
+        "secondAdv": ["Seventh film"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Fourth Director",
+      "qualifier": {
+        "firstAdv": ["Fourth Director"],
+        "secondAdv": ["Fifth Director"]       
+      }
+    },
+    {
+      "winner": "Fifth Director",
+      "qualifier": {
+        "firstAdv": ["Fifth Director"],
+        "secondAdv": ["Second Director"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Fifth Cheesesteak",
+      "qualifier": {
+        "firstAdv": ["Fifth Cheesesteak"],
+        "secondAdv": ["Fourth Cheesesteak"]       
+      }
+    },
+    {
+      "winner": "Fourth Cheesesteak",
+      "qualifier": {
+        "firstAdv": ["Second Cheesesteak", "Fourth Cheesesteak"],
+        "secondAdv": []       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Sixth Actress",
+      "qualifier": {
+        "firstAdv": ["Sixth Actress"],
+        "secondAdv": ["Fifth Actress"]       
+      }
+    },
+    {
+      "winner": "Fifth Actress",
+      "qualifier": {
+        "firstAdv": ["Fifth Actress", "Second Actress"],
+        "secondAdv": []       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Fifth Actor",
+      "qualifier": {
+        "firstAdv": ["Fifth Actor"],
+        "secondAdv": ["First Actor"]       
+      }
+    },
+    {
+      "winner": "First Actor",
+      "qualifier": {
+        "firstAdv": ["First Actor"],
+        "secondAdv": ["Third Actor"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "First Supporting Actress",
+      "qualifier": {
+        "firstAdv": ["First Supporting Actress"],
+        "secondAdv": ["Fourth Supporting Actress"]       
+      }
+    },
+    {
+      "winner": "Fourth Supporting Actress",
+      "qualifier": {
+        "firstAdv": ["Fourth Supporting Actress"],
+        "secondAdv": ["Second Supporting Actress"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "First Supporting Actor",
+      "qualifier": {
+        "firstAdv": ["First Supporting Actor"],
+        "secondAdv": ["Second Supporting Actor"]       
+      }
+    },
+    {
+      "winner": "Second Supporting Actor",
+      "qualifier": {
+        "firstAdv": ["Second Supporting Actor"],
+        "secondAdv": ["Fifth Supporting Actor"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Fifth Documentary",
+      "qualifier": {
+        "firstAdv": ["Fifth Documentary"],
+        "secondAdv": ["Second Documentary"]       
+      }
+    },
+    {
+      "winner": "Second Documentary",
+      "qualifier": {
+        "firstAdv": ["Second Documentary", "Third Documentary"],
+        "secondAdv": []       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Third Script",
+      "qualifier": {
+        "firstAdv": ["Third Script"],
+        "secondAdv": ["Second Script"]       
+      }
+    },
+    {
+      "winner": "",
+      "qualifier": {
+        "firstAdv": ["Second Script"],
+        "secondAdv": ["Fifth Script", "Fourth Script"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Fifth Soundtrack",
+      "qualifier": {
+        "firstAdv": ["Fifth Soundtrack", "Third Soundtrack"],
+        "secondAdv": []       
+      }
+    },
+    {
+      "winner": "Third Soundtrack",
+      "qualifier": {
+        "firstAdv": ["Third Soundtrack"],
+        "secondAdv": ["Fourth Soundtrack"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Fourth Directorial Debut",
+      "qualifier": {
+        "firstAdv": ["Fourth Directorial Debut"],
+        "secondAdv": ["Fifth Directorial Debut"]       
+      }
+    },
+    {
+      "winner": "Fifth Directorial Debut",
+      "qualifier": {
+        "firstAdv": ["Fifth Directorial Debut"],
+        "secondAdv": ["Second Directorial Debut"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Fourth Breakthrough",
+      "qualifier": {
+        "firstAdv": ["Fourth Breakthrough"],
+        "secondAdv": ["First Breakthrough"]       
+      }
+    },
+    {
+      "winner": "First Breakthrough",
+      "qualifier": {
+        "firstAdv": ["First Breakthrough"],
+        "secondAdv": ["Third Breakthrough"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Fourth Cinematography",
+      "qualifier": {
+        "firstAdv": ["Fourth Cinematography"],
+        "secondAdv": ["Fifth Cinematography"]       
+      }
+    },
+    {
+      "winner": "Fifth Cinematography",
+      "qualifier": {
+        "firstAdv": ["Fifth Cinematography"],
+        "secondAdv": ["First Cinematography"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Second Foreign",
+      "qualifier": {
+        "firstAdv": ["Second Foreign"],
+        "secondAdv": ["Fourth Foreign"]       
+      }
+    },
+    {
+      "winner": "Fifth Foreign",
+      "qualifier": {
+        "firstAdv": ["Fourth Foreign"],
+        "secondAdv": ["Fifth Foreign"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Second Animated",
+      "qualifier": {
+        "firstAdv": ["Second Animated"],
+        "secondAdv": ["First Animated"]       
+      }
+    },
+    {
+      "winner": "First Animated",
+      "qualifier": {
+        "firstAdv": ["First Animated"],
+        "secondAdv": ["Fifth Animated"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Third Ensemble",
+      "qualifier": {
+        "firstAdv": ["Third Ensemble"],
+        "secondAdv": ["Second Ensemble"]       
+      }
+    },
+    {
+      "winner": "Second Ensemble",
+      "qualifier": {
+        "firstAdv": ["Second Ensemble"],
+        "secondAdv": ["Fourth Ensemble"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Second Friedman",
+      "qualifier": {
+        "firstAdv": ["Second Friedman", "Third Friedman"],
+        "secondAdv": []       
+      }
+    },
+    {
+      "winner": "Third Friedman",
+      "qualifier": {
+        "firstAdv": ["Third Friedman"],
+        "secondAdv": ["First Friedman"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Second May",
+      "qualifier": {
+        "firstAdv": ["First May", "Second May"],
+        "secondAdv": []       
+      }
+    },
+    {
+      "winner": "First May",
+      "qualifier": {
+        "firstAdv": [],
+        "secondAdv": []       
+      }
+    }
+  ]
 ]
