@@ -38,51 +38,6 @@ Calculator::~Calculator() = default;
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Private:
-QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) const
-{
-    emit calculationDetail(LOG_EVENT_PERFORM_PRIMARY_RUNOFF);
-
-    // Check for clear winner
-    emit calculationDetail(LOG_EVENT_RUNOFF_HEAD_TO_HEAD_WINNER_CHECK);
-    QString winner = mHeadToHeadResults->winner(candidates.first, candidates.second);
-    if(winner.isNull())
-    {
-        emit calculationDetail(LOG_EVENT_RUNOFF_TIE);
-        QSet<QString> cTied = {candidates.first, candidates.second};
-
-        // Try to break tie by original score
-        emit calculationDetail(LOG_EVENT_RUNOFF_HIGHER_SCORE_CHECK);
-        QSet<QString> highestScore = breakTieHighestScore(cTied);
-        if(highestScore.size() == 1)
-            winner = *highestScore.cbegin();
-        else
-        {
-            // Try to break tie by five star votes
-            emit calculationDetail(LOG_EVENT_RUNOFF_MORE_FIVE_STAR_CHECK);
-            QSet<QString> mostFiveStar = breakTieMostFiveStar(cTied);
-            if(mostFiveStar.size() == 1)
-                winner = *mostFiveStar.cbegin();
-            else
-            {
-                // Randomly choose a winner if allowed
-                if(!mOptions.testFlag(Option::AllowTrueTies))
-                {
-                    emit calculationDetail(LOG_EVENT_RUNOFF_CHOOSING_RANDOM_WINNER);
-                    winner = breakTieRandom(cTied);
-                }
-                else
-                    emit calculationDetail(LOG_EVENT_RUNOFF_NO_RANDOM);
-            }
-        }
-    }
-
-    // Note results
-    emit calculationDetail(winner.isNull() ? LOG_EVENT_RUNOFF_UNRESOLVED : LOG_EVENT_RUNOFF_WINNER.arg(winner));
-
-    // Return result
-    return winner;
-}
-
 QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRankings) const
 {
     /* Overall this function attempts to break the tied candidates by selecting the winner(s) of the tie in
@@ -282,6 +237,51 @@ QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRanki
     // Return the qualifier result set, ideally complete
     logQualifierResult(res);
     return res;
+}
+
+QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) const
+{
+    emit calculationDetail(LOG_EVENT_PERFORM_PRIMARY_RUNOFF);
+
+    // Check for clear winner
+    emit calculationDetail(LOG_EVENT_RUNOFF_HEAD_TO_HEAD_WINNER_CHECK);
+    QString winner = mHeadToHeadResults->winner(candidates.first, candidates.second);
+    if(winner.isNull())
+    {
+        emit calculationDetail(LOG_EVENT_RUNOFF_TIE);
+        QSet<QString> cTied = {candidates.first, candidates.second};
+
+        // Try to break tie by original score
+        emit calculationDetail(LOG_EVENT_RUNOFF_HIGHER_SCORE_CHECK);
+        QSet<QString> highestScore = breakTieHighestScore(cTied);
+        if(highestScore.size() == 1)
+            winner = *highestScore.cbegin();
+        else
+        {
+            // Try to break tie by five star votes
+            emit calculationDetail(LOG_EVENT_RUNOFF_MORE_FIVE_STAR_CHECK);
+            QSet<QString> mostFiveStar = breakTieMostFiveStar(cTied);
+            if(mostFiveStar.size() == 1)
+                winner = *mostFiveStar.cbegin();
+            else
+            {
+                // Randomly choose a winner if allowed
+                if(!mOptions.testFlag(Option::AllowTrueTies))
+                {
+                    emit calculationDetail(LOG_EVENT_RUNOFF_CHOOSING_RANDOM_WINNER);
+                    winner = breakTieRandom(cTied);
+                }
+                else
+                    emit calculationDetail(LOG_EVENT_RUNOFF_NO_RANDOM);
+            }
+        }
+    }
+
+    // Note results
+    emit calculationDetail(winner.isNull() ? LOG_EVENT_RUNOFF_UNRESOLVED : LOG_EVENT_RUNOFF_WINNER.arg(winner));
+
+    // Return result
+    return winner;
 }
 
 QList<Rank> Calculator::rankByScore(const QSet<QString>& candidates, Rank::Order order) const

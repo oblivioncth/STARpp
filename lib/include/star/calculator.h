@@ -141,8 +141,8 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
     // Main steps
-    QString performPrimaryRunoff(QPair<QString, QString> candidates) const;
     QualifierResult performRunoffQualifier(const QList<Rank>& scoreRankings) const;
+    QString performPrimaryRunoff(QPair<QString, QString> candidates) const;
 
     // Utility
     QList<Rank> rankByScore(const QSet<QString>& candidates, Rank::Order order) const;
