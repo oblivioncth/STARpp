@@ -100,8 +100,8 @@ ErrorCode Core::initialize()
     // Parse
     if(!clParser.parse(mArguments))
     {
+        postError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_ARGS, clParser.errorText()));
         showHelp();
-        logError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_ARGS, clParser.errorText()));
         return ErrorCode::INVALID_ARGS;
     }
 
