@@ -53,15 +53,6 @@ private:
         "Overflow: {%4}\n"
     );
 
-    // Logging - Determine Scoring round Leaders
-    static inline const QString LOG_EVENT_DETERMINE_SCORING_ROUND_LEADERS = QStringLiteral("Determining scoring round score leaders...");
-    static inline const QString LOG_EVENT_SCORING_ROUND_FIRST_TIE_BENIGN = QStringLiteral("There is a benign 2-way tie for scoring round first place <%1>:");
-    static inline const QString LOG_EVENT_SCORING_ROUND_FIRST_TIE = QStringLiteral("There is a %1-way tie for scoring round first place <%2>:");
-    static inline const QString LOG_EVENT_SCORING_ROUND_FIRST_NO_TIE = QStringLiteral(R"(Scoring round first place is uncontested: "%1")");
-    static inline const QString LOG_EVENT_SCORING_ROUND_SECOND_TIE = QStringLiteral("There is a %1-way tie for scoring round second place <%2>:");
-    static inline const QString LOG_EVENT_SCORING_ROUND_SECOND_NO_TIE = QStringLiteral(R"(Scoring round second place is uncontested: "%1")");
-    static inline const QString LOG_EVENT_SCORING_ROUND_LEADERS = QStringLiteral("Scoring round leaders are:");
-
     // Logging - Main Runoff
     static inline const QString LOG_EVENT_RUNOFF_CANDIDATES = QStringLiteral(R"("%1" & "%2" advance to the runoff.)");
     static inline const QString LOG_EVENT_PERFORM_PRIMARY_RUNOFF = QStringLiteral("Performing primary runoff...");
