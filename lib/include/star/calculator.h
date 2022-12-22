@@ -25,7 +25,8 @@ public:
     {
         NoOptions = 0x00,
         AllowTrueTies = 0x01,
-        CondorcetProtocol = 0x02
+        CondorcetProtocol = 0x02,
+        DefactoWinner = 0x04
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -53,9 +54,14 @@ private:
         "Overflow: {%4}\n"
     );
 
-    // Logging - Main Runoff
-    static inline const QString LOG_EVENT_RUNOFF_CANDIDATES = QStringLiteral(R"("%1" & "%2" advance to the runoff.)");
-    static inline const QString LOG_EVENT_PERFORM_PRIMARY_RUNOFF = QStringLiteral("Performing primary runoff...");
+    // Logging - Defacto Winner Check
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_CHECK = QStringLiteral(R"(Simulating runoff for potential defacto winner "%1" between:)");
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_CHECK_WIN = QStringLiteral(R"(The first seed won against "%1".)");
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_CHECK_FAIL = QStringLiteral(R"(The first seed lost to "%1".)");
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_CHECK_SUCCESS = QStringLiteral("The first seed wins all simulated runoffs.");
+
+    // Logging - Runoff
+    static inline const QString LOG_EVENT_RUNOFF = QStringLiteral(R"(Observing runoff between "%1" and "%2".)");
     static inline const QString LOG_EVENT_RUNOFF_HEAD_TO_HEAD_WINNER_CHECK = QStringLiteral("Checking for clear winner of head-to-head.");
     static inline const QString LOG_EVENT_RUNOFF_TIE = QStringLiteral("The candidates in the runoff are tied in terms of preference.");
     static inline const QString LOG_EVENT_RUNOFF_HIGHER_SCORE_CHECK = QStringLiteral("Checking for the candidate with the higher score.");
@@ -86,7 +92,10 @@ private:
     // Logging - Main
     static inline const QString LOG_EVENT_FILLING_SEAT = QStringLiteral("Filling seat %1...");
     static inline const QString LOG_EVENT_DIRECT_SEAT_FILL = QStringLiteral("Only one candidate remains, seat can be filled directly.");
+    static inline const QString LOG_EVENT_RUNOFF_CANDIDATES = QStringLiteral(R"("%1" & "%2" advance to the runoff.)");
     static inline const QString LOG_EVENT_NO_RUNOFF = QStringLiteral("The number of candidates could not be narrowed to two in order to perform the runoff.");
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_SEAT_FILL = QStringLiteral(R"(Filling seat with defacto winner "%1")");
+    static inline const QString LOG_EVENT_PERFORM_PRIMARY_RUNOFF = QStringLiteral("Performing primary runoff...");
 
     // Logging - Final Results
     static inline const QString LOG_EVENT_FINAL_RESULTS = QStringLiteral(
@@ -133,7 +142,8 @@ public:
 private:
     // Main steps
     QualifierResult performRunoffQualifier(const QList<Rank>& scoreRankings) const;
-    QString performPrimaryRunoff(QPair<QString, QString> candidates) const;
+    bool checkForDefactoWinner(const QString& firstSeed, const QSet<QString>& overflow) const;
+    QString performRunoff(std::pair<QString, QString> candidates) const;
 
     // Utility
     QList<Rank> rankByScore(const QSet<QString>& candidates, Rank::Order order) const;

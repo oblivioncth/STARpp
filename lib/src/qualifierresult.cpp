@@ -65,6 +65,8 @@ QualifierResult::QualifierResult(const QSet<QString>& firstAdv, const QSet<QStri
 bool QualifierResult::isNull() const { return mFirstSeed.isNull() && mSecondSeed.isNull() && mOverflow.isEmpty(); }
 bool QualifierResult::isComplete() const { return !mFirstSeed.isEmpty() && !mSecondSeed.isEmpty() && mOverflow.isEmpty();}
 bool QualifierResult::isSeededSimultaneously() const { return mSimultaneous; }
+bool QualifierResult::hasFirstSeed() const { return !mFirstSeed.isNull(); }
+bool QualifierResult::hasSecondSeed() const { return !mSecondSeed.isNull(); }
 
 QString QualifierResult::firstSeed() const { return mFirstSeed; }
 QString QualifierResult::secondSeed() const { return mSecondSeed; }

@@ -239,9 +239,30 @@ QualifierResult Calculator::performRunoffQualifier(const QList<Rank>& scoreRanki
     return res;
 }
 
-QString Calculator::performPrimaryRunoff(QPair<QString, QString> candidates) const
+bool Calculator::checkForDefactoWinner(const QString& firstSeed, const QSet<QString>& overflow) const
 {
-    emit calculationDetail(LOG_EVENT_PERFORM_PRIMARY_RUNOFF);
+    emit calculationDetail(LOG_EVENT_DEFACTO_WINNER_CHECK.arg(firstSeed) + '\n' + createCandidateGeneralSetString(overflow));
+
+    for(const QString& other : overflow)
+    {
+        std::pair<QString, QString> matchup = std::make_pair(firstSeed, other);
+
+        if(performRunoff(matchup) == firstSeed)
+            emit calculationDetail(LOG_EVENT_DEFACTO_WINNER_CHECK_WIN.arg(other));
+        else
+        {
+            emit calculationDetail(LOG_EVENT_DEFACTO_WINNER_CHECK_FAIL.arg(other));
+            return false;
+        }
+    }
+
+    emit calculationDetail(LOG_EVENT_DEFACTO_WINNER_CHECK_SUCCESS);
+    return true;
+}
+
+QString Calculator::performRunoff(std::pair<QString, QString> candidates) const
+{
+    emit calculationDetail(LOG_EVENT_RUNOFF.arg(candidates.first, candidates.second));
 
     // Check for clear winner
     emit calculationDetail(LOG_EVENT_RUNOFF_HEAD_TO_HEAD_WINNER_CHECK);
@@ -464,9 +485,9 @@ QString Calculator::createCandidateRankListString(const QList<Rank>& ranks) cons
 
 void Calculator::logQualifierResult(const QualifierResult& result) const
 {
-    QString strFs = result.firstSeed().isNull() ? "" : '"' + result.firstSeed() + '"';
-    QString strSs = result.secondSeed().isNull() ? "" : '"' + result.secondSeed() + '"';
-    QString strOf = result.overflow().isEmpty() ? "" : '"' + Qx::String::join(result.overflow(), R"(", ")") + '"';
+    QString strFs = !result.hasFirstSeed() ? "" : '"' + result.firstSeed() + '"';
+    QString strSs = !result.hasSecondSeed() ? "" : '"' + result.secondSeed() + '"';
+    QString strOf = result.isComplete() ? "" : '"' + Qx::String::join(result.overflow(), R"(", ")") + '"';
 
     // Log
     emit calculationDetail(LOG_EVENT_QUALIFIER_RESULT.arg(strFs, strSs, result.isSeededSimultaneously() ? "true" : "false", strOf));
@@ -573,14 +594,26 @@ ElectionResult Calculator::calculateResult()
         if(!runoffQualifier.isComplete())
         {
             emit calculationDetail(LOG_EVENT_NO_RUNOFF);
-            processedSeats.append(runoffQualifier);
+
+            // Check if runoff sim is possible
+            if(mOptions.testFlag(Option::DefactoWinner) && runoffQualifier.hasFirstSeed())
+            {
+                if(checkForDefactoWinner(runoffQualifier.firstSeed(), runoffQualifier.overflow()))
+                    seatWinner = runoffQualifier.firstSeed();
+
+                emit calculationDetail(LOG_EVENT_DEFACTO_WINNER_SEAT_FILL.arg(seatWinner));
+            }
+
+            // Stop election
+            processedSeats.append(Seat(seatWinner, runoffQualifier));
             break;
         }
 
         emit calculationDetail(LOG_EVENT_RUNOFF_CANDIDATES.arg(runoffQualifier.firstSeed(), runoffQualifier.secondSeed()));
 
         // Perform primary runoff
-        seatWinner = performPrimaryRunoff(runoffQualifier.seeds());
+        emit calculationDetail(LOG_EVENT_PERFORM_PRIMARY_RUNOFF);
+        seatWinner = performRunoff(runoffQualifier.seeds());
 
         // Check for unresolved runoff tie
         if(seatWinner.isNull())
@@ -605,7 +638,7 @@ ElectionResult Calculator::calculateResult()
             if(rank.candidates.contains(seatWinner))
             {
                 if(rank.candidates.size() == 1)
-                    candidateRankings.erase(rItr);
+                    candidateRankings.erase(rItr); // clazy:exclude=strict-iterators
                 else
                     rank.candidates.remove(seatWinner);
 

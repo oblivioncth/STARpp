@@ -30,6 +30,8 @@ public:
     bool isNull() const;
     bool isComplete() const;
     bool isSeededSimultaneously() const;
+    bool hasFirstSeed() const;
+    bool hasSecondSeed() const;
 
     QString firstSeed() const;
     QString secondSeed() const;
