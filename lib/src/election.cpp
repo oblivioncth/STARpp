@@ -26,12 +26,10 @@ int Election::seatCount() const { return mSeats; }
 
 int Election::totalScore(const QString& candidate) const
 {
-    // NOTE: This could instead return a std::optional<int> for if *candidate* is missing, but that
-    // would indicate a bug elsewhere and should never happen, so instead this just throws.
     if(!mTotals.contains(candidate))
-        qFatal(" the desired candidate is not present.");
+        qWarning("the desired candidate is not present.");
 
-    return mTotals[candidate];
+    return mTotals.value(candidate, 0);
 }
 
 const QList<Rank>& Election::scoreRankings() const { return mScoreRankings; }
