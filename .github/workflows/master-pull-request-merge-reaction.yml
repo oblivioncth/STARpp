@@ -5,6 +5,8 @@ on:
     branches:
     - 'master'
 env:
+  ci_bot_username: ObyBotCI
+  ci_bot_email: 104651589+ObyBotCI@users.noreply.github.com
   starcalc_qts_win_artifact_path: ${{ github.workspace }}/StarCalcQtSWin
   starcalc_qts_linux_artifact_path: ${{ github.workspace }}/StarCalcQtSLinux
   
@@ -52,9 +54,31 @@ jobs:
     secrets:
       qt_static_url: ${{ secrets.QT_LINUX_STATIC_URL }}
 
+  update-docs:
+    name: Update gh-pages
+    needs: [build_starcalc_release_windows]
+    if: github.event.pull_request.merged == true
+    runs-on: windows-latest
+    steps:
+    - name: Download built static StarCalc artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ needs.build_starcalc_release_windows.outputs.qt_static_artifact_name }}
+        path: ${{ env.starcalc_qts_win_artifact_path }}
+    - name: Upload docs to gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: ${{ env.starcalc_qts_win_artifact_path }}/doc/html
+        destination_dir: ./docs
+        allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
+        enable_jekyll: false
+        user_name: '${{ env.ci_bot_username}}'
+        user_email: '${{ env.ci_bot_email }}'
   create-release:
     name: Create GitHub release
-    needs: [build_starcalc_release_windows, build_starcalc_release_linux, tag_master_and_sync_dev]
+    needs: [update-docs, build_starcalc_release_windows, build_starcalc_release_linux, tag_master_and_sync_dev]
     if: github.event.pull_request.merged == true
     runs-on: windows-latest
     steps:
