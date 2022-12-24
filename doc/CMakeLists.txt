@@ -12,6 +12,7 @@ set(DOC_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Source
 set(DOC_RESOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/res")
+set(DOC_GENERAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/general")
 set(DOC_GENERATED_PATH "${CMAKE_CURRENT_BINARY_DIR}/docin")
 
 # Build
@@ -32,6 +33,7 @@ configure_file("${DOC_TEMPLATES_PATH}/doc_mainpage.md.in"
 # Doc Input
 set(DOC_INPUT_LIST
     "${DOC_GENERATED_PATH}/mainpage.md"
+    "${DOC_GENERAL_PATH}/namespace.dox"
     "${LIB_TARGET_PATH}/src"
     "${LIB_TARGET_PATH}/include"
 )
