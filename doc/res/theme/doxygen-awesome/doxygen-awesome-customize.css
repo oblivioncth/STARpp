@@ -8,9 +8,9 @@ html {
 html.dark-mode {
     color-scheme: dark;
 
-    --primary-color: #E06B2C;
-    --primary-dark-color: #DB8855;
-    --primary-light-color: #A56A45;
+    --primary-color: #2BAAC6;
+    --primary-dark-color: #4FACC1;
+    --primary-light-color: #3A7F91;
 }
 
 .github-corner svg {
