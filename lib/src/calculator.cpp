@@ -27,13 +27,126 @@ namespace Star
 // Calculator
 //===============================================================================================================
 
+/*!
+ *  @class Calculator star/calculator.h
+ *
+ *  @brief The Calculator class provides the means to determine the result of an election.
+ *
+ *  A Calculator acts as the actual apparatus through which election results are computed. Once an Election has
+ *  been prepared, its outcome can be realized by constructing a Calculator instance for it via
+ *  Calculator(const Election*), followed by calling calculateResult().
+ *
+ *  If running multiple elections, there is no need to create a Calculator for each one, as a single Calculator
+ *  can be reused for subsequent elections by using setElection().
+ *
+ *  @note An ElectionResult created by calculateResult() requires referring to the Election it originated from
+ *  in order to return the correct values from some of its methods; therefore, generally one should guarantee
+ *  that Elections provided to a Calculator will not be deleted as long as their corresponding results are in
+ *  use.
+ *
+ *  @par Options
+ *  @parblock
+ *  A Calculator features several configurable options that alter some aspects of winner determination. They
+ *  can be set through setOptions() and queried by options(). Some of these options are directly sanctioned
+ *  by the STAR voting project, while others are specific to this library; however, STAR voting ultimately
+ *  allows alteration of fine election details as long as all parties involved agree upon them before an
+ *  election is run.
+ *
+ *  @c NoOptions
+ *  This is the default and leads Calculator to elect candidates by exactly following standard STAR
+ *  procedure.
+ *
+ *  @c AllowTrueTies
+ *  By default, the STAR election procedure will resort to breaking ties randomly if all other tiebreak
+ *  procedures have been exhausted and a tie still remains. If this isn't acceptable for your particular
+ *  purposes, this option instead leaves the current seat unfilled and ends the election prematurely if
+ *  this situation occurs.
+ *
+ *  While not standard, this option is recognized by the STAR project.
+ *
+ *  @c CondorcetProtocol
+ *  This adds the "Condorcet Protocol" as a fallback tiebreaker that is used before resorting to a random
+ *  tiebreaker during a tie. First, this attempts to break the tie by checking which candidate had highest
+ *  preference count (preferred the most times total) among all their head-to-head matchups. Then, if that
+ *  fails, it tries to break the tie by checking which candidate had the greatest preference margin (their
+ *  total preference count minus the total number of times they were preferred against).
+ *
+ *  While not standard, and also not recommended due to the added complexity, this option is recognized
+ *  by the STAR project.
+ *
+ *  @c DefactoWinner
+ *  This option was specifically created to solve a specific issue that is more likely to occur with smaller
+ *  elections when AllowTrueTies is also turned on.
+ *
+ *  It it quite common that the first candidate seeded into the runoff for a given seat will end up winning
+ *  that seat; however, if an unresolvable tie for second seed occurs then the runoff never happens and so
+ *  that fact ends up being irrelevant. But because of that same fact, if a runoff was evaluated by hand between
+ *  the first seed and each of the remainder stuck battling for second seed, one will find that much of the
+ *  time the first seed wins against all of them.
+ *
+ *  Ending the election prematurely in this circumstance would be unfortunate, since it is essentially known
+ *  that the first seed should would the seat anyway.
+ *
+ *  Enabling this option avoids the issue by simulating the runoffs between the first seed and each of the
+ *  candidates tied for second seed. If the first does win all of the simulations, then they are declared
+ *  the winner of that seat.
+ *
+ *  This option is completely non-standard and not recognized by the STAR project.
+ *  @endparblock
+ *
+ *  @sa Election.
+ */
+
+//-Class Enums-----------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @enum Calculator::Option
+ *
+ *  This enum represents the various rules that can be applied to a Calculator when determining the results
+ *  of an Election.
+ */
+
+/*!
+ *  @var Calculator::Option Calculator::NoOptions
+ *  Use the default STAR determination procedure.
+ */
+
+/*!
+ *  @var Calculator::Option Calculator::AllowTrueTies
+ *  Ends an election prematurely instead of using a random tiebreaker when an unresolvable tie occurs.
+ */
+
+/*!
+ *  @var Calculator::Option Calculator::CondorcetProtocol
+ *  Uses the Condorcet protocol during the scoring round before the random tiebreaker if necessary.
+ */
+
+/*!
+ *  @var Calculator::Option Calculator::DefactoWinner
+ *  If an unresolvable tie occurs for second seed in the qualifier, gives the win to the first seed if
+ *  they would defeat each tied candidate independently in the runoff. Has no effect if AllowTrueTies is
+ *  not enabled.
+ */
+
+/*!
+ *  @qflag{Calculator::Options, Calculator::Option}
+ */
+
 //-Constructor---------------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ * Creates a calculator set to evaluate the Election @a election.
+ *
+ * @sa setElection().
+ */
 Calculator::Calculator(const Election* election) :
     mElection(election),
     mOptions(Option::NoOptions)
 {}
 
+/*!
+ * Destroys the calculator
+ */
 Calculator::~Calculator() = default;
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
@@ -534,11 +647,42 @@ void Calculator::logElectionResults(const ElectionResult& results) const
 }
 
 //Public:
+/*!
+ *  Returns the current election that the calculator is set to evaluate, or @c nullptr if none is set.
+ *
+ *  @sa Calculator(), and setElection().
+ */
 const Election* Calculator::election() const { return mElection; }
+
+/*!
+ *  Returns the current option set of the calculator.
+ *
+ *  @sa setOptions().
+ */
 Calculator::Options Calculator::options() const { return mOptions; }
+
+/*!
+ *  Sets the calculator to evaluate the Election @a election.
+ *
+ *  @sa election().
+ */
 void Calculator::setElection(const Election* election) { mElection = election; }
+
+/*!
+ *  Sets the calculator options set to @a options.
+ *
+ *  @sa options().
+ */
 void Calculator::setOptions(Options options) { mOptions = options; }
 
+/*!
+ *  Determines the outcome of the currently set election in accordance with the current options set
+ *  and returns it as an ElectionResult.
+ *
+ *  If no election is set or the current one is invalid, a null ElectionResult is returned.
+ *
+ *  @sa isNull() and calculationDetail.
+ */
 ElectionResult Calculator::calculateResult()
 {
     // Check for valid election
@@ -661,5 +805,15 @@ ElectionResult Calculator::calculateResult()
     return finalResults;
 }
 
+/*!
+ *  @fn void Calculator::calculationDetail(const QString& detail)
+ *
+ *  This signal is emitted at various points during the execution of calculateResult().
+ *
+ *  It provides numerous details about the entire calculation process that are useful for logging and
+ *  gaining insight into the STAR election procedure.
+ *
+ *  @sa calculateResult().
+ */
 
 }

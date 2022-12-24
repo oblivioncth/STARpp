@@ -11,7 +11,7 @@
 
 namespace Star
 {
-
+/*! @cond */
 // Forward Declarations
 class Election;
 
@@ -56,7 +56,7 @@ public:
     void narrow(QSet<QString> candidates, NarrowMode mode);
     HeadToHeadResults narrowed(QSet<QString> candidates, NarrowMode mode);
 };
-
+/*! @endcond */
 }
 
 #endif // HEADTOHEADRESULTS_H

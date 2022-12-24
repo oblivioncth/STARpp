@@ -12,7 +12,7 @@
 
 namespace Star
 {
-
+/*! @cond */
 class ResultSetReader
 {
 //-Class Variables--------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ public:
 public:
     Qx::GenericError readInto();
 };
-
+/*! @endcond */
 }
 
 #endif // RESULTSSET_P_H
