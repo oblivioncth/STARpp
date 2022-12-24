@@ -12,7 +12,7 @@ option(STARCALC_DOCS "Build StarCalc documentation" OFF)
 project(StarCalc
     VERSION 0.1.0.1
     LANGUAGES CXX
-    DESCRIPTION "An application to determine the winner of an election using the STAR voting system"
+    DESCRIPTION "C++ implementation of the STAR voting system"
 )
 set(FORMAL_NAME "STAR Calculator")
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
