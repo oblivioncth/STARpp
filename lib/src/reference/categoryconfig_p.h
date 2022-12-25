@@ -11,6 +11,7 @@
 
 namespace Star
 {
+/*! @cond */
 
 struct RefCategoryHeader
 {
@@ -84,6 +85,6 @@ public:
 public:
     Qx::GenericError readInto();
 };
-
+/*! @endcond */
 }
 #endif // CATEGORYCONFIG_P_H

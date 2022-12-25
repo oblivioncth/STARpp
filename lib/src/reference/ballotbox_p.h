@@ -12,6 +12,7 @@
 
 namespace Star
 {
+/*! @cond */
 
 // Project Forward Declarations
 class RefCategoryConfig;
@@ -91,7 +92,7 @@ private:
 public:
     Qx::GenericError readInto();
 };
-
+/*! @endcond */
 }
 
 #endif //BALLOTBOX_P_H

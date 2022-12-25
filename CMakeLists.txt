@@ -5,13 +5,14 @@ cmake_minimum_required(VERSION 3.24.0)
 
 # Configuration options
 option(STARCALC_TESTS "Build StarCalc tests" OFF)
+option(STARCALC_DOCS "Build StarCalc documentation" OFF)
 
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
 project(StarCalc
     VERSION 0.1.0.1
     LANGUAGES CXX
-    DESCRIPTION "An application to determine the winner of an election using the STAR voting system"
+    DESCRIPTION "C++ implementation of the STAR voting system"
 )
 set(FORMAL_NAME "STAR Calculator")
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
@@ -87,7 +88,9 @@ if(STARCALC_TESTS)
     list(APPEND QT_COMPONENTS Test)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
+# Find Qt package
+include(OB/BetterFindQt6)
+find_qt6_package(REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 # Disable deprecated code
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
@@ -105,11 +108,17 @@ set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_base)
 set(LIB_ALIAS_NAME ${PROJECT_NAME}::Base)
 set(LIB_EXPORT_NAME Base)
 set(LIB_INCLUDE_ROOT_NAME star)
+set(LIB_TARGET_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_subdirectory(lib)
 
 set(APP_TARGET_NAME ${PROJECT_NAME_LC}_frontend)
 set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)
 add_subdirectory(app)
+
+if(STARCALC_DOCS)
+    set(DOC_TARGET_NAME ${PROJECT_NAME_LC}_docs)
+    add_subdirectory(doc)
+endif()
 
 if(STARCALC_TESTS)
     enable_testing()

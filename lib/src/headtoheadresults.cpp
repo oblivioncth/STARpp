@@ -6,7 +6,7 @@
 
 namespace Star
 {
-
+/*! @cond */
 //===============================================================================================================
 // HeadToHeadResults
 //===============================================================================================================
@@ -203,5 +203,5 @@ HeadToHeadResults HeadToHeadResults::narrowed(QSet<QString> candidates, NarrowMo
 
     return narrowedCopy;
 }
-
+/*! @endcond */
 }
