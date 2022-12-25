@@ -237,6 +237,13 @@ Election::Builder& Election::Builder::wBallot(const Voter& voter, const QList<Vo
 }
 
 /*!
+ *  Sets the seat name of the work-in-progress election to @a name.
+ *
+ *  Returns a reference to the builder.
+ */
+Election::Builder& Election::Builder::wName(const QString& name) { mConstruct.mName = name; return *this; }
+
+/*!
  *  Sets the seat count of the work-in-progress election to @a count.
  *
  *  Returns a reference to the builder.
