@@ -8,10 +8,12 @@
 namespace Star
 {
 
+/* TODO: Add an enum that is used for first and second seed that indicates how deep into the runoff qualifier
+ * process Calculator needed to go to fill both
+ */
+
 class QualifierResult
 {
-friend class Calculator;
-
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
     QString mFirstSeed;
