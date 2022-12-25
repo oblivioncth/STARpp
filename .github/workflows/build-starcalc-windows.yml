@@ -89,10 +89,14 @@ jobs:
         CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.starcalc_src_dir}}" -B "${{ env.starcalc_build_dir }}" -D STARCALC_TESTS=ON -D STARCALC_DOCS=ON
         echo "Changing to build directory..."
         cd "%starcalc_build_dir%"
+        echo "Building StarCalc Debug..."
+        cmake --build . --target all --config Debug
         echo "Building StarCalc Release..."
         cmake --build . --target all --config Release
         echo "Building StarCalc docs..."
         cmake --build . --target starcalc_docs --config Release
+        echo "Installing StarCalc Debug..."
+        cmake --build . --target install --config Debug
         echo "Installing StarCalc Release/Docs..."
         cmake --build . --target install --config Release
         echo "Packaging StarCalc..."
