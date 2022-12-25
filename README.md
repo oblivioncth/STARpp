@@ -65,8 +65,10 @@ The application uses the following syntax scheme:
  - **-v | --version:** Prints the current version of the tool
  - **-c | --config:** Specifies the path to the category config INI file
  - **-b | --box:** Specifies the path to the ballot box CSV file
- - **-t | --true-ties:** Ends an election prematurely instead of using a random tiebreaker when an unresolvable tie occurs.
- - **-e | --extra-tiebreak:** Uses the Condorcet protocol tiebreaker during the scoring round before the random tiebreaker if necessary
+ - **-o | --calc-options:** Comma seperated list of calculator options:
+    - AllowTrueTies > Ends an election prematurely instead of using a random tiebreaker when an unresolvable tie occurs
+    - CondorcetProtocol > Uses the protocol during the scoring round before the random tiebreaker if necessary
+    - DefactoWinner > If true ties are enabled and an unresolvable tie occurs for second seed in the qualifier, gives the win to the first seed if they would defeat all of them in the runoff
  - **-m | --minimal:** Only show the results summary
 
 **Example:**
