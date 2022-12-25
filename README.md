@@ -74,6 +74,8 @@ The application uses the following syntax scheme:
 **Example:**
 
     StarCalc -c path/to/cat_config.ini -b path/to/ballot_box.csv
+    
+Using no calculator options will result in the application following the recommended standard STAR protocol when determining winners.
 
 ## Source
 
