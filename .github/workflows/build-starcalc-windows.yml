@@ -96,9 +96,9 @@ jobs:
         echo "Building StarCalc docs..."
         cmake --build . --target starcalc_docs --config Release
         echo "Installing StarCalc Debug..."
-        cmake --build . --target install --config Debug
+        cmake --install . --config Debug
         echo "Installing StarCalc Release/Docs..."
-        cmake --build . --target install --config Release
+        cmake --install . --config Release
         echo "Packaging StarCalc..."
         cpack -C "Release"
         echo "Running tests..."
