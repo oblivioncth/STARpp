@@ -5,7 +5,13 @@ on:
       qt_static_url:
         description: 'MEGA Qt static install archive URL'
         required: true
+      qt_shared_url:
+        description: 'MEGA Qt shared install archive URL'
+        required: true
     outputs:
+      qt_shared_artifact_name:
+        description: "Qx (Qt shared) build artifact"
+        value: ${{ jobs.build-starcalc.outputs.qt_shared_artifact_name }}
       qt_static_artifact_name:
         description: "StarCalc (Qt static) build artifact"
         value: ${{ jobs.build-starcalc.outputs.qt_static_artifact_name }}
@@ -21,12 +27,13 @@ jobs:
     name: Build StarCalc - Windows (Release)
     strategy:
       matrix:
-        qt_linkage: [static]
+        qt_linkage: [shared, static]
     runs-on: windows-latest
     env:
       vs_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise
       cmake_gen: Ninja Multi-Config
     outputs:
+      qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
       qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
     steps:
     - name: Set matrix derived variables
@@ -35,6 +42,10 @@ jobs:
         key: ${{ matrix.qt_linkage }}
         map: |
           {
+            "shared": {
+              "qt_install_url": "${{ secrets.qt_shared_url }}",
+              "artifact_output_var": "qt_shared_artifact_name"
+            },
             "static": {
               "qt_install_url": "${{ secrets.qt_static_url }}",
               "artifact_output_var": "qt_static_artifact_name"

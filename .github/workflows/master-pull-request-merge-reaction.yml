@@ -7,7 +7,9 @@ on:
 env:
   ci_bot_username: ObyBotCI
   ci_bot_email: 104651589+ObyBotCI@users.noreply.github.com
+  starcalc_qtd_win_artifact_path: ${{ github.workspace }}/StarCalcQtDWin
   starcalc_qts_win_artifact_path: ${{ github.workspace }}/StarCalcQtSWin
+  starcalc_qtd_linux_artifact_path: ${{ github.workspace }}/StarCalcQtDLinux
   starcalc_qts_linux_artifact_path: ${{ github.workspace }}/StarCalcQtSLinux
   
 jobs:
@@ -84,13 +86,25 @@ jobs:
     steps:
     - name: Set release artifact names
       run: |
+        echo "release_qtd_win_package_name=${{ needs.build_starcalc_release_windows.outputs.qt_shared_artifact_name }}" >> $Env:GITHUB_ENV
         echo "release_qts_win_package_name=${{ needs.build_starcalc_release_windows.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
+        echo "release_qtd_linux_package_name=${{ needs.build_starcalc_release_linux.outputs.qt_shared_artifact_name }}" >> $Env:GITHUB_ENV
         echo "release_qts_linux_package_name=${{ needs.build_starcalc_release_linux.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
+    - name: Download built shared Qx artifact (Windows)
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.release_qtd_win_package_name }}
+        path: ${{ env.starcalc_qtd_win_artifact_path }}  
     - name: Download built static StarCalc artifact (Windows)
       uses: actions/download-artifact@v3
       with:
         name: ${{ env.release_qts_win_package_name }}
         path: ${{ env.starcalc_qts_win_artifact_path }}
+    - name: Download built shared Qx artifact (Linux)
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.release_qtd_linux_package_name }}
+        path: ${{ env.starcalc_qtd_linux_artifact_path }}
     - name: Download built static StarCalc artifact (Linux)
       uses: actions/download-artifact@v3
       with:
@@ -98,7 +112,9 @@ jobs:
         path: ${{ env.starcalc_qts_linux_artifact_path }}
     - name: Zip up release artifacts
       run: |
+        7z a "${{ env.release_qtd_win_package_name }}.zip" "${{ env.starcalc_qtd_win_artifact_path }}/*"
         7z a "${{ env.release_qts_win_package_name }}.zip" "${{ env.starcalc_qts_win_artifact_path }}/*"
+        7z a "${{ env.release_qtd_linux_package_name }}.zip" "${{ env.starcalc_qtd_linux_artifact_path }}/*"
         7z a "${{ env.release_qts_linux_package_name }}.zip" "${{ env.starcalc_qts_linux_artifact_path }}/*"
     - name: Generate release
       uses: softprops/action-gh-release@v1
@@ -108,7 +124,9 @@ jobs:
         fail_on_unmatched_files: true
         generate_release_notes: true
         files: |
+          ${{ env.release_qtd_win_package_name }}.zip
           ${{ env.release_qts_win_package_name }}.zip
+          ${{ env.release_qtd_linux_package_name }}.zip
           ${{ env.release_qts_linux_package_name }}.zip
     
         
