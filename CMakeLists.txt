@@ -4,12 +4,12 @@
 cmake_minimum_required(VERSION 3.24.0)
 
 # Configuration options
-option(STARCALC_TESTS "Build StarCalc tests" OFF)
-option(STARCALC_DOCS "Build StarCalc documentation" OFF)
+option(STARPP_TESTS "Build STAR++ tests" OFF)
+option(STARPP_DOCS "Build STAR++ documentation" OFF)
 
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
-project(StarCalc
+project(STARpp
     VERSION 0.1.0.1
     LANGUAGES CXX
     DESCRIPTION "C++ implementation of the STAR voting system"
@@ -35,7 +35,7 @@ set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 
 # Get helper scripts
-include(StarCalc/FetchOBCMake)
+include(STARpp/FetchOBCMake)
 fetch_ob_cmake("v0.1.1")
 
 # General Variables
@@ -84,7 +84,7 @@ setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 set(QT_COMPONENTS
     Core
 )
-if(STARCALC_TESTS)
+if(STARPP_TESTS)
     list(APPEND QT_COMPONENTS Test)
 endif()
 
@@ -115,12 +115,12 @@ set(APP_TARGET_NAME ${PROJECT_NAME_LC}_frontend)
 set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)
 add_subdirectory(app)
 
-if(STARCALC_DOCS)
+if(STARPP_DOCS)
     set(DOC_TARGET_NAME ${PROJECT_NAME_LC}_docs)
     add_subdirectory(doc)
 endif()
 
-if(STARCALC_TESTS)
+if(STARPP_TESTS)
     enable_testing()
     set(TESTS_TARGET_PREFIX ${PROJECT_NAME_LC})
     set(TESTS_COMMON_ALIAS_NAME ${PROJECT_NAME}::TestCommon)

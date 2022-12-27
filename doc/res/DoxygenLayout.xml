@@ -3,9 +3,9 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title=""/>
-    <tab type="user" url="https://github.com/oblivioncth/StarCalc/releases" title="Downloads"/>
+    <tab type="user" url="https://github.com/oblivioncth/STARpp/releases" title="Downloads"/>
     <tab type="pages" visible="yes" title="" intro=""/>
-    <tab type="modules" visible="yes" title="Components" intro="Here is a list of the components in StarCalc:"/>
+    <tab type="modules" visible="yes" title="Components" intro="Here is a list of the components in STAR++:"/>
       <tab type="namespacelist" visible="yes" title="Namespaces" intro=""/>
     <tab type="namespaces" visible="no" title="">
       <tab type="namespacemembers" visible="no" title="" intro=""/>

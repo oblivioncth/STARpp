@@ -1,7 +1,7 @@
 /*!
  *  @namespace Star
  *
- *  @brief The @c Star namespace is the main namespace through which all functionality of the StarCalcc
+ *  @brief The @c Star namespace is the main namespace through which all functionality of the STAR++
  *  library is accessed.
  *
  *  All library features are nested within this namespace in a similar vein as @c std with the

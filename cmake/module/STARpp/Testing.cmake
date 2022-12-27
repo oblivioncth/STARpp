@@ -1,5 +1,5 @@
 # Adds a test and automatically adds the supplied Qt bin dir to its env when run
-macro(starcalc_add_test)
+macro(starpp_add_test)
 
     # Parse arguments (just NAME for now)
     cmake_parse_arguments(__CUS_ADD_TEST "" "NAME" "" ${ARGN})

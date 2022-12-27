@@ -33,7 +33,7 @@ target_sources(${APP_TARGET_NAME}
 # Link target to libraries
 target_link_libraries(${APP_TARGET_NAME}
     PRIVATE
-        StarCalc::Base
+        STARpp::Base
         Qx::Core
         Qx::Io
         magic_enum::magic_enum

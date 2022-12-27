@@ -7,10 +7,10 @@ on:
 env:
   ci_bot_username: ObyBotCI
   ci_bot_email: 104651589+ObyBotCI@users.noreply.github.com
-  starcalc_qtd_win_artifact_path: ${{ github.workspace }}/StarCalcQtDWin
-  starcalc_qts_win_artifact_path: ${{ github.workspace }}/StarCalcQtSWin
-  starcalc_qtd_linux_artifact_path: ${{ github.workspace }}/StarCalcQtDLinux
-  starcalc_qts_linux_artifact_path: ${{ github.workspace }}/StarCalcQtSLinux
+  starpp_qtd_win_artifact_path: ${{ github.workspace }}/STARppQtDWin
+  starpp_qts_win_artifact_path: ${{ github.workspace }}/STARppQtSWin
+  starpp_qtd_linux_artifact_path: ${{ github.workspace }}/STARppQtDLinux
+  starpp_qts_linux_artifact_path: ${{ github.workspace }}/STARppQtSLinux
   
 jobs:
   tag_master_and_sync_dev:
@@ -40,39 +40,39 @@ jobs:
         target_branch: dev
         ff: only
         
-  build_starcalc_release_windows:
-    name: Build StarCalc Release (Windows)
+  build_starpp_release_windows:
+    name: Build STARpp Release (Windows)
     needs: tag_master_and_sync_dev
     if: github.event.pull_request.merged == true
-    uses: ./.github/workflows/build-starcalc-windows.yml
+    uses: ./.github/workflows/build-starpp-windows.yml
     secrets:
       qt_static_url: ${{ secrets.QT_WINDOWS_STATIC_URL }}
       
-  build_starcalc_release_linux:
-    name: Build StarCalc Release (Linux)
+  build_starpp_release_linux:
+    name: Build STARpp Release (Linux)
     needs: tag_master_and_sync_dev
     if: github.event.pull_request.merged == true
-    uses: ./.github/workflows/build-starcalc-linux.yml
+    uses: ./.github/workflows/build-starpp-linux.yml
     secrets:
       qt_static_url: ${{ secrets.QT_LINUX_STATIC_URL }}
 
   update-docs:
     name: Update gh-pages
-    needs: [build_starcalc_release_windows]
+    needs: [build_starpp_release_windows]
     if: github.event.pull_request.merged == true
     runs-on: windows-latest
     steps:
-    - name: Download built static StarCalc artifact
+    - name: Download built static STARpp artifact
       uses: actions/download-artifact@v3
       with:
-        name: ${{ needs.build_starcalc_release_windows.outputs.qt_static_artifact_name }}
-        path: ${{ env.starcalc_qts_win_artifact_path }}
+        name: ${{ needs.build_starpp_release_windows.outputs.qt_static_artifact_name }}
+        path: ${{ env.starpp_qts_win_artifact_path }}
     - name: Upload docs to gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
-        publish_dir: ${{ env.starcalc_qts_win_artifact_path }}/doc/html
+        publish_dir: ${{ env.starpp_qts_win_artifact_path }}/doc/html
         destination_dir: ./docs
         allow_empty_commit: true # So that doc build date is always roughly synced with latest build date
         enable_jekyll: false
@@ -80,46 +80,46 @@ jobs:
         user_email: '${{ env.ci_bot_email }}'
   create-release:
     name: Create GitHub release
-    needs: [update-docs, build_starcalc_release_windows, build_starcalc_release_linux, tag_master_and_sync_dev]
+    needs: [update-docs, build_starpp_release_windows, build_starpp_release_linux, tag_master_and_sync_dev]
     if: github.event.pull_request.merged == true
     runs-on: windows-latest
     steps:
     - name: Set release artifact names
       run: |
-        echo "release_qtd_win_package_name=${{ needs.build_starcalc_release_windows.outputs.qt_shared_artifact_name }}" >> $Env:GITHUB_ENV
-        echo "release_qts_win_package_name=${{ needs.build_starcalc_release_windows.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
-        echo "release_qtd_linux_package_name=${{ needs.build_starcalc_release_linux.outputs.qt_shared_artifact_name }}" >> $Env:GITHUB_ENV
-        echo "release_qts_linux_package_name=${{ needs.build_starcalc_release_linux.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
+        echo "release_qtd_win_package_name=${{ needs.build_starpp_release_windows.outputs.qt_shared_artifact_name }}" >> $Env:GITHUB_ENV
+        echo "release_qts_win_package_name=${{ needs.build_starpp_release_windows.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
+        echo "release_qtd_linux_package_name=${{ needs.build_starpp_release_linux.outputs.qt_shared_artifact_name }}" >> $Env:GITHUB_ENV
+        echo "release_qts_linux_package_name=${{ needs.build_starpp_release_linux.outputs.qt_static_artifact_name }}" >> $Env:GITHUB_ENV
     - name: Download built shared Qx artifact (Windows)
       uses: actions/download-artifact@v3
       with:
         name: ${{ env.release_qtd_win_package_name }}
-        path: ${{ env.starcalc_qtd_win_artifact_path }}  
-    - name: Download built static StarCalc artifact (Windows)
+        path: ${{ env.starpp_qtd_win_artifact_path }}  
+    - name: Download built static STARpp artifact (Windows)
       uses: actions/download-artifact@v3
       with:
         name: ${{ env.release_qts_win_package_name }}
-        path: ${{ env.starcalc_qts_win_artifact_path }}
+        path: ${{ env.starpp_qts_win_artifact_path }}
     - name: Download built shared Qx artifact (Linux)
       uses: actions/download-artifact@v3
       with:
         name: ${{ env.release_qtd_linux_package_name }}
-        path: ${{ env.starcalc_qtd_linux_artifact_path }}
-    - name: Download built static StarCalc artifact (Linux)
+        path: ${{ env.starpp_qtd_linux_artifact_path }}
+    - name: Download built static STARpp artifact (Linux)
       uses: actions/download-artifact@v3
       with:
         name: ${{ env.release_qts_linux_package_name }}
-        path: ${{ env.starcalc_qts_linux_artifact_path }}
+        path: ${{ env.starpp_qts_linux_artifact_path }}
     - name: Zip up release artifacts
       run: |
-        7z a "${{ env.release_qtd_win_package_name }}.zip" "${{ env.starcalc_qtd_win_artifact_path }}/*"
-        7z a "${{ env.release_qts_win_package_name }}.zip" "${{ env.starcalc_qts_win_artifact_path }}/*"
-        7z a "${{ env.release_qtd_linux_package_name }}.zip" "${{ env.starcalc_qtd_linux_artifact_path }}/*"
-        7z a "${{ env.release_qts_linux_package_name }}.zip" "${{ env.starcalc_qts_linux_artifact_path }}/*"
+        7z a "${{ env.release_qtd_win_package_name }}.zip" "${{ env.starpp_qtd_win_artifact_path }}/*"
+        7z a "${{ env.release_qts_win_package_name }}.zip" "${{ env.starpp_qts_win_artifact_path }}/*"
+        7z a "${{ env.release_qtd_linux_package_name }}.zip" "${{ env.starpp_qtd_linux_artifact_path }}/*"
+        7z a "${{ env.release_qts_linux_package_name }}.zip" "${{ env.starpp_qts_linux_artifact_path }}/*"
     - name: Generate release
       uses: softprops/action-gh-release@v1
       with:
-        name: "StarCalc Release v${{ needs.tag_master_and_sync_dev.outputs.new_version }}"
+        name: "STARpp Release v${{ needs.tag_master_and_sync_dev.outputs.new_version }}"
         tag_name: "v${{ needs.tag_master_and_sync_dev.outputs.new_version }}"
         fail_on_unmatched_files: true
         generate_release_notes: true

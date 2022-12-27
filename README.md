@@ -1,12 +1,12 @@
-# StarCalc
+# STAR++
 
-StarCalc is an implementation of the [STAR voting method](https://www.starvoting.org/).
+STAR++ is an implementation of the [STAR voting method](https://www.starvoting.org/).
 
 It exists as a CMake consumable library and reference command-line application that demonstrates use of the library.
 
 The original motivation for this project was to facilitate automated election result calculation of a single-round voting system for the [Philadelphia Film Critics Circle](https://philafcc.org/) annual awards, which was realized as the reference application.
 
-[![Dev Builds](https://github.com/oblivioncth/StarCalc/actions/workflows/push-reaction.yml/badge.svg?branch=dev)](https://github.com/oblivioncth/StarCalc/actions/workflows/push-reaction.yml)
+[![Dev Builds](https://github.com/oblivioncth/STARpp/actions/workflows/push-reaction.yml/badge.svg?branch=dev)](https://github.com/oblivioncth/STARpp/actions/workflows/push-reaction.yml)
 
 ## Features
 
@@ -15,18 +15,18 @@ The original motivation for this project was to facilitate automated election re
  - Supports Bloc STAR Voting (determining the winner(s) for one or more seats)
  - Can be configured to allow true-ties instead of employing a random tiebreak when other tiebreaks have failed
  - Optional extra Condorcet Protocol tiebreaker for Scoring Round ties
- - Optional runoff simulation to reduce unresolvable ties (see [DefactoWinner](https://oblivioncth.github.io/StarCalc/class_star_1_1_calculator.html#details))
+ - Optional runoff simulation to reduce unresolvable ties (see [DefactoWinner](https://oblivioncth.github.io/STARpp/class_star_1_1_calculator.html#details))
  - Optional Qt signal connection that details calculation steps
 
 ## Library
-Detailed documentation of this library, facilitated by Doxygen, is available at: https://oblivioncth.github.io/StarCalc/
+Detailed documentation of this library, facilitated by Doxygen, is available at: https://oblivioncth.github.io/STARpp/
 
 ### Getting Started
-Either grab the latest [release](https://github.com/oblivioncth/StarCalc/releases/) or [build the library from source](https://oblivioncth.github.io/StarCalc/index.html#autotoc_md4), and import using CMake.
+Either grab the latest [release](https://github.com/oblivioncth/STARpp/releases/) or [build the library from source](https://oblivioncth.github.io/STARpp/index.html#autotoc_md4), and import using CMake.
 
 Building from source is recommended as this library can easily be integrated as a dependency into your project using CMake's FetchContent. An example of this is demonstrated in the documentation.
 
-Finally, the [Minimal Example](https://oblivioncth.github.io/StarCalc/index.html#autotoc_md3) gives a basic overview of the lib's API.
+Finally, the [Minimal Example](https://oblivioncth.github.io/STARpp/index.html#autotoc_md3) gives a basic overview of the lib's API.
 
 You can also refer to the reference application source to get a better understanding of how to use the library.
 
@@ -58,7 +58,7 @@ Lastly, the files are loaded via the application's command-line parameters as sh
 ### Usage
 The application uses the following syntax scheme:
     
-    StarCalc <options>
+    STARpp <options>
 
 **Options**:
  - **-h | --help | -?:** Prints usage information
@@ -73,7 +73,7 @@ The application uses the following syntax scheme:
 
 **Example:**
 
-    StarCalc -c path/to/cat_config.ini -b path/to/ballot_box.csv
+    STARpp -c path/to/cat_config.ini -b path/to/ballot_box.csv
     
 Using no calculator options will result in the application following the recommended standard STAR protocol when determining winners.
 
@@ -105,19 +105,19 @@ The configuration of this projects supports consumption both via find_package() 
 
 **CMake Options:**
 
- - `STARCALC_TESTS` set to ON in order to generate tests
- - `STARCALC_DOCS` set to ON in order to generate the documentation target
+ - `STARPP_TESTS` set to ON in order to generate tests
+ - `STARPP_DOCS` set to ON in order to generate the documentation target
 
 **CMake Targets**
  - `all` - Builds the library, reference application, and tests
- - `starcalc_base` - Builds the library
- - `starcalc_frontend` - Builds the reference application
- - `starcalc_docs` - Builds the documentation
- - `starcalc_tst_...` - Various test targets. To actually run tests, just build the general CMake tests target `test`
+ - `starpp_base` - Builds the library
+ - `starpp_frontend` - Builds the reference application
+ - `starpp_docs` - Builds the documentation
+ - `starpp_tst_...` - Various test targets. To actually run tests, just build the general CMake tests target `test`
 
 **CMake Install Components:**
  - `all` - Installs all built components
- - `starcalc` - Installs top-level files (README.md, CMake package configuration files, etc.)
- - `starcalc_base` - Installs the library
- - `starcalc_frontend` - Installs the reference application
- - `starcalc_docs` - Installs the documentation
+ - `starpp` - Installs top-level files (README.md, CMake package configuration files, etc.)
+ - `starpp_base` - Installs the library
+ - `starpp_frontend` - Installs the reference application
+ - `starpp_docs` - Installs the documentation

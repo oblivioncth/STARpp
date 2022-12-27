@@ -14,7 +14,7 @@ namespace Star
  *  @brief The QualifierResult class holds the outcome of a runoff qualifier.
  *
  *  When filling a seat in a STAR election, two candidates from the total pool are seeded into the runoff round
- *  before the final winner is determined, a process that StarCalc has dubbed the "Runoff Qualifier". A given
+ *  before the final winner is determined, a process that STAR++ has dubbed the "Runoff Qualifier". A given
  *  instance of this class contains information about the result of one of these qualifiers for a single seat.
  *  This information can be useful for inspecting the details of the STAR process, how close a given election
  *  was, and whether the strength of votes or consensus were the larger deciding factor for a particular winner.
