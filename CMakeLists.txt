@@ -14,7 +14,6 @@ project(STARpp
     LANGUAGES CXX
     DESCRIPTION "C++ implementation of the STAR voting system"
 )
-set(FORMAL_NAME "STAR Calculator")
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
@@ -36,7 +35,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 
 # Get helper scripts
 include(STARpp/FetchOBCMake)
-fetch_ob_cmake("v0.1.1")
+fetch_ob_cmake("4c62432a643183afd792bb2ead4db8b1a4a16854")
 
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)

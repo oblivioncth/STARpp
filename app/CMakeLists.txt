@@ -1,5 +1,7 @@
 #================= Common Build =========================
 
+set(APP_NAME "STAR Calculator")
+
 # Allow includes relative to source root
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -40,11 +42,14 @@ target_link_libraries(${APP_TARGET_NAME}
 )
 
 ## Forward select project variables to C++ code
-include(OB/ProjectVars)
-set_cxx_project_vars(${APP_TARGET_NAME}
-    VERSION_STR "\"${PROJECT_VERSION}\""
-    SHORT_NAME "\"${PROJECT_NAME}\""
-    APP_NAME "\"${FORMAL_NAME}\""
+include(OB/CppVars)
+add_cpp_vars(${APP_TARGET_NAME}
+    NAME "project_vars"
+    PREFIX "PROJECT_"
+    VARS
+        VERSION_STR "\"${PROJECT_VERSION}\""
+        SHORT_NAME "\"${PROJECT_NAME}\""
+        APP_NAME "\"${APP_NAME}\""
 )
 
 ################# Windows Build #################
