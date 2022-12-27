@@ -1,4 +1,4 @@
-name: Build StarCalc - Windows
+name: Build STARpp - Windows
 on:
   workflow_call:
     secrets:
@@ -11,20 +11,20 @@ on:
     outputs:
       qt_shared_artifact_name:
         description: "Qx (Qt shared) build artifact"
-        value: ${{ jobs.build-starcalc.outputs.qt_shared_artifact_name }}
+        value: ${{ jobs.build-starpp.outputs.qt_shared_artifact_name }}
       qt_static_artifact_name:
-        description: "StarCalc (Qt static) build artifact"
-        value: ${{ jobs.build-starcalc.outputs.qt_static_artifact_name }}
+        description: "STARpp (Qt static) build artifact"
+        value: ${{ jobs.build-starpp.outputs.qt_static_artifact_name }}
 env:
   qt_install_dir: ${{ github.workspace }}/Qt/Install
   qt_download_dir: ${{ github.workspace }}/Qt/Download
-  starcalc_src_suffix: StarCalc/Source
-  starcalc_src_dir: ${{ github.workspace }}/StarCalc/Source
-  starcalc_build_dir: ${{ github.workspace }}/StarCalc/Build
+  starpp_src_suffix: STARpp/Source
+  starpp_src_dir: ${{ github.workspace }}/STARpp/Source
+  starpp_build_dir: ${{ github.workspace }}/STARpp/Build
 
 jobs:
-  build-starcalc:
-    name: Build StarCalc - Windows (Release)
+  build-starpp:
+    name: Build STARpp - Windows (Release)
     strategy:
       matrix:
         qt_linkage: [shared, static]
@@ -54,9 +54,9 @@ jobs:
         export_to: env,log
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
-        echo "starcalc_package_path=${{ env.starcalc_build_dir }}/out/dist" >> $Env:GITHUB_ENV
-        $starcalc_install_path="${{ env.starcalc_build_dir }}/out/install"
-        echo "starcalc_install_path=$starcalc_install_path" >> $Env:GITHUB_ENV
+        echo "starpp_package_path=${{ env.starpp_build_dir }}/out/dist" >> $Env:GITHUB_ENV
+        $starpp_install_path="${{ env.starpp_build_dir }}/out/install"
+        echo "starpp_install_path=$starpp_install_path" >> $Env:GITHUB_ENV
         echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake.bat" >> $Env:GITHUB_ENV
     - name: Cache Qt Build
       id: cache-qt
@@ -85,42 +85,42 @@ jobs:
       run: |
         choco install doxygen.install --version 1.9.4
         choco install graphviz  
-    - name: Checkout StarCalc
+    - name: Checkout STARpp
       uses: actions/checkout@v3
       with:
-        path: ${{ env.starcalc_src_suffix }}
+        path: ${{ env.starpp_src_suffix }}
         fetch-depth: 0 # Required for verbose versioning to work correctly  
-    - name: Build/Install StarCalc
-      working-directory: ${{ env.starcalc_src_dir }}
+    - name: Build/Install STARpp
+      working-directory: ${{ env.starpp_src_dir }}
       shell: cmd
       run: |
         echo "Setup C++ Build Environment..."
         CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
         echo "Configure CMake using Qt wrapper..."
-        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.starcalc_src_dir}}" -B "${{ env.starcalc_build_dir }}" -D STARCALC_TESTS=ON -D STARCALC_DOCS=ON
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.starpp_src_dir}}" -B "${{ env.starpp_build_dir }}" -D STARPP_TESTS=ON -D STARPP_DOCS=ON
         echo "Changing to build directory..."
-        cd "%starcalc_build_dir%"
-        echo "Building StarCalc Debug..."
-        cmake --build . --target starcalc_base --config Debug
-        echo "Building StarCalc Release..."
+        cd "%starpp_build_dir%"
+        echo "Building STARpp Debug..."
+        cmake --build . --target starpp_base --config Debug
+        echo "Building STARpp Release..."
         cmake --build . --target all --config Release
-        echo "Building StarCalc docs..."
-        cmake --build . --target starcalc_docs --config Release
-        echo "Installing StarCalc Debug..."
+        echo "Building STARpp docs..."
+        cmake --build . --target starpp_docs --config Release
+        echo "Installing STARpp Debug..."
         cmake --install . --config Debug
-        echo "Installing StarCalc Release/Docs..."
+        echo "Installing STARpp Release/Docs..."
         cmake --install . --config Release
-        echo "Packaging StarCalc..."
+        echo "Packaging STARpp..."
         cpack -C "Release"
         echo "Running tests..."
         cmake --build . --target test --config Release
         echo "Build complete."
-    - name: Get StarCalc artifact name
+    - name: Get STARpp artifact name
       id: get_artifact_name
-      run: echo "${{ env.artifact_output_var }}=$((Get-ChildItem -Path "${{ env.starcalc_package_path }}" -Filter *.zip)[0].BaseName)" >> $Env:GITHUB_OUTPUT
-    - name: Upload StarCalc build artifact
+      run: echo "${{ env.artifact_output_var }}=$((Get-ChildItem -Path "${{ env.starpp_package_path }}" -Filter *.zip)[0].BaseName)" >> $Env:GITHUB_OUTPUT
+    - name: Upload STARpp build artifact
       uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.get_artifact_name.outputs[env.artifact_output_var] }}
-        path: ${{ env.starcalc_install_path }}
+        path: ${{ env.starpp_install_path }}
         if-no-files-found: error

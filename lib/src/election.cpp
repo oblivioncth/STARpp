@@ -13,7 +13,7 @@ namespace Star
  *
  *  @brief The Election class represents a collection of candidates and ballots.
  *
- *  One of the two quintessential classes of StarCalc, the Election class acts as a literal election. An Election
+ *  One of the two quintessential classes of STAR++, the Election class acts as a literal election. An Election
  *  is created via Election::Builder and then "counted" with a Calculator, which provides a corresponding
  *  ElectionResults instance.
  *

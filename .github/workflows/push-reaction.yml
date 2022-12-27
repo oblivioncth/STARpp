@@ -1,4 +1,4 @@
-name: StarCalc Push Reaction
+name: STARpp Push Reaction
 on:
   workflow_dispatch:
   push:
@@ -7,15 +7,15 @@ on:
 
 jobs:
   trigger-windows-build:
-    name: Build StarCalc (Windows)
-    uses: ./.github/workflows/build-starcalc-windows.yml
+    name: Build STARpp (Windows)
+    uses: ./.github/workflows/build-starpp-windows.yml
     secrets:
       qt_shared_url: ${{ secrets.QT_WINDOWS_SHARED_URL }}
       qt_static_url: ${{ secrets.QT_WINDOWS_STATIC_URL }}
       
   trigger-linux-build:
-    name: Build StarCalc (Linux)
-    uses: ./.github/workflows/build-starcalc-linux.yml
+    name: Build STARpp (Linux)
+    uses: ./.github/workflows/build-starpp-linux.yml
     secrets:
       qt_shared_url: ${{ secrets.QT_LINUX_SHARED_URL }}
       qt_static_url: ${{ secrets.QT_LINUX_STATIC_URL }}
