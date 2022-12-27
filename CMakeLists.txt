@@ -35,7 +35,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 
 # Get helper scripts
 include(STARpp/FetchOBCMake)
-fetch_ob_cmake("4c62432a643183afd792bb2ead4db8b1a4a16854")
+fetch_ob_cmake("605ce06def4a7b64ce119d3500b5d7651cd55046")
 
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -96,7 +96,12 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
-fetch_qx("285b863ec9739d6eb7c803d9b6554d71afed75ee")
+fetch_qx(
+    REF "285b863ec9739d6eb7c803d9b6554d71afed75ee"
+    COMPONENTS
+        Core
+        Io
+)
 
 # Fetch Neargye's Magic Enum
 include(OB/FetchMagicEnum)
