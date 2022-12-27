@@ -9,8 +9,8 @@ set(target_name "${TESTS_TARGET_PREFIX}_${test_name}")
 add_executable(${target_name} ${test_name}.cpp)
 starcalc_add_test(NAME ${target_name} COMMAND ${target_name})
 target_link_libraries(${target_name}
-	PRIVATE 
-		Qt6::Test
-		StarCalc::Base
-                StarCalc::TestCommon
+    PRIVATE
+            Qt6::Test
+            StarCalc::Base
+            StarCalc::TestCommon
 )
