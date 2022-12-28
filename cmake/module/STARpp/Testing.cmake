@@ -5,7 +5,7 @@ macro(starpp_add_test)
     cmake_parse_arguments(__CUS_ADD_TEST "" "NAME" "" ${ARGN})
 
     # Validate input
-    if(${__CUS_ADD_TEST_KEYWORDS_MISSING_VALUES})
+    if(__CUS_ADD_TEST_KEYWORDS_MISSING_VALUES)
         foreach(missing_val ${__CUS_ADD_TEST_KEYWORDS_MISSING_VALUES})
             message(ERROR "A value for '${missing_val}' must be provided")
         endforeach()
