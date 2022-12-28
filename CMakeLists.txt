@@ -97,7 +97,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
 fetch_qx(
-    REF "285b863ec9739d6eb7c803d9b6554d71afed75ee"
+    REF "ba863e099f893bfc184f2b505dc00fb4a585771e"
     COMPONENTS
         Core
         Io
