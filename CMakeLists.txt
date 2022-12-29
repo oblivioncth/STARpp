@@ -1,7 +1,7 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.24.0)
+cmake_minimum_required(VERSION 3.25.0)
 
 # Configuration options
 option(STARPP_TESTS "Build STAR++ tests" OFF)
