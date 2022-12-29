@@ -95,6 +95,8 @@ jobs:
       run: sudo apt-get install ninja-build
     - name: Install Harfbuzz
       run: sudo apt-get install libharfbuzz-dev
+    - name: Install XCB Related libs
+      run: sudo apt-get install libxkbcommon-x11-dev
     - name: Checkout STARpp
       uses: actions/checkout@v3
       with:
