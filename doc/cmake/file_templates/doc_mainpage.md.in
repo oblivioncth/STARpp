@@ -230,8 +230,8 @@ cmake --build . --target starpp_frontend --config Release
 cmake --build . --target starpp_docs --config Release
 
 # Install Debug/Release libraries, reference application, and documentation
-cmake --build . --target install --config Debug
-cmake --build . --target install --config Release
+cmake --install . --config Debug
+cmake --install . --config Release
 
 # Create the output package
 cpack.exe -C Debug;Release
