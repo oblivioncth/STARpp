@@ -96,7 +96,7 @@ jobs:
     - name: Install Harfbuzz
       run: sudo apt-get install libharfbuzz-dev
     - name: Install XCB Related libs
-      run: sudo apt-get install libxkbcommon-x11-dev libxcb-icccm4-dev
+      run: sudo apt-get install libxkbcommon-x11-dev libxcb-icccm4-dev libxcb-image0
     - name: Checkout STARpp
       uses: actions/checkout@v3
       with:
