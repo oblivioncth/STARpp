@@ -12,7 +12,7 @@ option(STARPP_DOCS "Build STAR++ documentation" OFF)
 project(STARpp
     VERSION 0.1.0.1
     LANGUAGES CXX
-    DESCRIPTION "C++ implementation of the STAR voting system"
+    DESCRIPTION "C++ implementation of STAR voting"
 )
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
