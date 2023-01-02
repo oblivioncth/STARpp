@@ -43,6 +43,7 @@ void tst_ties::all_tie_cases_data()
     QString candidate3 = "CanThree";
     QString candidate4 = "CanFour";
     QString candidate5 = "CanFive";
+    QString candidate6 = "CanSix";
 
     // Helper
     auto addTestRow = [&](const QString& testName,
@@ -308,6 +309,113 @@ void tst_ties::all_tie_cases_data()
                .build(),
         Star::Calculator::AllowTrueTies
     );
+
+    addTestRow("Scoring Round - Second place N-way tie [Uses runoff simulation]",
+        {
+            {
+                {.candidate = candidate1, .score = 3},
+                {.candidate = candidate2, .score = 5},
+                {.candidate = candidate3, .score = 4},
+                {.candidate = candidate4, .score = 5},
+                {.candidate = candidate5, .score = 4},
+                {.candidate = candidate6, .score = 4},
+            },
+            {
+                {.candidate = candidate1, .score = 4},
+                {.candidate = candidate2, .score = 0},
+                {.candidate = candidate3, .score = 3},
+                {.candidate = candidate4, .score = 4},
+                {.candidate = candidate5, .score = 5},
+                {.candidate = candidate6, .score = 0},
+            },
+            {
+                {.candidate = candidate1, .score = 4},
+                {.candidate = candidate2, .score = 4},
+                {.candidate = candidate3, .score = 5},
+                {.candidate = candidate4, .score = 5},
+                {.candidate = candidate5, .score = 5},
+                {.candidate = candidate6, .score = 4},
+            },
+            {
+                {.candidate = candidate1, .score = 4},
+                {.candidate = candidate2, .score = 4},
+                {.candidate = candidate3, .score = 4},
+                {.candidate = candidate4, .score = 2},
+                {.candidate = candidate5, .score = 5},
+                {.candidate = candidate6, .score = 5},
+            },
+            {
+                {.candidate = candidate1, .score = 0},
+                {.candidate = candidate2, .score = 5},
+                {.candidate = candidate3, .score = 0},
+                {.candidate = candidate4, .score = 0},
+                {.candidate = candidate5, .score = 0},
+                {.candidate = candidate6, .score = 0},
+            },
+            {
+                {.candidate = candidate1, .score = 3},
+                {.candidate = candidate2, .score = 5},
+                {.candidate = candidate3, .score = 5},
+                {.candidate = candidate4, .score = 5},
+                {.candidate = candidate5, .score = 4},
+                {.candidate = candidate6, .score = 4},
+            },
+            {
+                {.candidate = candidate1, .score = 3},
+                {.candidate = candidate2, .score = 3},
+                {.candidate = candidate3, .score = 4},
+                {.candidate = candidate4, .score = 4},
+                {.candidate = candidate5, .score = 3},
+                {.candidate = candidate6, .score = 5},
+            },
+            {
+                {.candidate = candidate1, .score = 1},
+                {.candidate = candidate2, .score = 0},
+                {.candidate = candidate3, .score = 0},
+                {.candidate = candidate4, .score = 5},
+                {.candidate = candidate5, .score = 5},
+                {.candidate = candidate6, .score = 2},
+            },
+            {
+                {.candidate = candidate1, .score = 4},
+                {.candidate = candidate2, .score = 0},
+                {.candidate = candidate3, .score = 4},
+                {.candidate = candidate4, .score = 5},
+                {.candidate = candidate5, .score = 5},
+                {.candidate = candidate6, .score = 5},
+            },
+            {
+                {.candidate = candidate1, .score = 3},
+                {.candidate = candidate2, .score = 5},
+                {.candidate = candidate3, .score = 4},
+                {.candidate = candidate4, .score = 3},
+                {.candidate = candidate5, .score = 4},
+                {.candidate = candidate6, .score = 4},
+            },
+            {
+                {.candidate = candidate1, .score = 2},
+                {.candidate = candidate2, .score = 4},
+                {.candidate = candidate3, .score = 5},
+                {.candidate = candidate4, .score = 4},
+                {.candidate = candidate5, .score = 3},
+                {.candidate = candidate6, .score = 5},
+            },
+            {
+                {.candidate = candidate1, .score = 2},
+                {.candidate = candidate2, .score = 5},
+                {.candidate = candidate3, .score = 1},
+                {.candidate = candidate4, .score = 5},
+                {.candidate = candidate5, .score = 0},
+                {.candidate = candidate6, .score = 5},
+            }
+        },
+        Star::ExpectedElectionResult::Builder()
+               .wSeat(Star::Seat(candidate4, Star::QualifierResult({candidate4}, {candidate5, candidate6})))
+               .build(),
+        Star::Calculator::AllowTrueTies | Star::Calculator::CondorcetProtocol | Star::Calculator::DefactoWinner
+    );
+
+    // TODO: Runoff round tests
 }
 
 void tst_ties::all_tie_cases()
