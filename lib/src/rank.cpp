@@ -8,8 +8,54 @@
 // Rank
 //===============================================================================================================
 
+/*!
+ *  @struct Rank star/rank.h
+ *
+ *  @brief The Rank struct represents a relative position for a given standing that can be occupied by multiple
+ *  candidates.
+ *
+ *  This struct is generally used within a list in order to present overall candidate rankings for different
+ *  metrics.
+ */
+
+//-Struct Enums---------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @enum Rank::Order
+ *
+ *  This enum represents the sort order of rankings.
+ */
+
+/*!
+ *  @var Rank::Order Rank::Ascending
+ *  Ascending sort order.
+ */
+
+/*!
+ *  @var Rank::Order Rank::Descending
+ *  Descending sort order.
+ */
+
+//-Struct Fields---------------------------------------------------------------------------------------------------
+//Public:
+/*!
+ *  @var int Rank::value
+ *
+ *  The value that defines the rank.
+ */
+
+/*!
+ *  @var QSet<QString> Rank::candidates
+ *
+ *  The candidates that are part of the rank.
+ */
+
 //-Struct Functions-------------------------------------------------------------------------------------------------
 //Public:
+/*!
+ *  Creates rankings of the candidates in the candidate-score map @a valueMap, sorted
+ *  according to @a order.
+ */
 QList<Rank> Rank::rankSort(const QMap<QString, int>& valueMap, Order order)
 {
     QList<Rank> rankings;

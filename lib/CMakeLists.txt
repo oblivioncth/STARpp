@@ -29,7 +29,7 @@
 # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
 # https://stackoverflow.com/questions/45777734/install-export-requires-target-from-subproject
 
-# Add executable target
+# Add library target
 qt_add_library(${LIB_TARGET_NAME} STATIC)
 
 # Make alias target so target can be referred to with its friendly
@@ -42,13 +42,16 @@ set(CXX_PUBLIC_HEADERS
     election.h
     electionresult.h
     expectedelectionresult.h
+    qualifierresult.h
     rank.h
     reference.h
+    seat.h
 )
 
 set(CXX_PRIVATE_HEADERS
     headtoheadresults.h
     reference/ballotbox_p.h
+    reference/calculatoroptions_p.h
     reference/categoryconfig_p.h
     reference/resultset_p.h
 )
@@ -59,11 +62,14 @@ set(CXX_IMPLEMENTATION
     electionresult.cpp
     expectedelectionresult.cpp
     headtoheadresults.cpp
+    qualifierresult.cpp
     rank.cpp
     reference.cpp
     reference/ballotbox_p.cpp
+    reference/calculatoroptions_p.cpp
     reference/categoryconfig_p.cpp
     reference/resultset_p.cpp
+    seat.cpp
 )
 
 # Build pathed implementation file list

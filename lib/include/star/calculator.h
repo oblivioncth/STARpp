@@ -8,6 +8,7 @@
 // Project Includes
 #include "star/election.h"
 #include "star/electionresult.h"
+#include "star/qualifierresult.h"
 
 namespace Star
 {
@@ -24,7 +25,8 @@ public:
     {
         NoOptions = 0x00,
         AllowTrueTies = 0x01,
-        CondorcetProtocol = 0x02
+        CondorcetProtocol = 0x02,
+        DefactoWinner = 0x04
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -37,35 +39,37 @@ private:
     static inline const QString LOG_EVENT_INITAL_RAW_RANKINGS = QStringLiteral("Initial score rankings:");
     static inline const QString LOG_EVENT_CALC_HEAD_TO_HEAD = QStringLiteral("Pre-calculating head-to-head matchup results...");
 
-    // Logging - Determine Scoring round Leaders
-    static inline const QString LOG_EVENT_DETERMINE_SCORING_ROUND_LEADERS = QStringLiteral("Determining scoring round score leaders...");
-    static inline const QString LOG_EVENT_SCORING_ROUND_FIRST_TIE_BENIGN = QStringLiteral("There is a benign 2-way tie for scoring round first place <%1>:");
-    static inline const QString LOG_EVENT_SCORING_ROUND_FIRST_TIE = QStringLiteral("There is a %1-way tie for scoring round first place <%2>:");
-    static inline const QString LOG_EVENT_SCORING_ROUND_FIRST_NO_TIE = QStringLiteral(R"(Scoring round first place is uncontested: "%1")");
-    static inline const QString LOG_EVENT_SCORING_ROUND_SECOND_TIE = QStringLiteral("There is a %1-way tie for scoring round second place <%2>:");
-    static inline const QString LOG_EVENT_SCORING_ROUND_SECOND_NO_TIE = QStringLiteral(R"(Scoring round second place is uncontested: "%1")");
-    static inline const QString LOG_EVENT_SCORING_ROUND_LEADERS = QStringLiteral("Scoring round leaders are:");
+    // Logging - Perform Runoff Qualifier
+    static inline const QString LOG_EVENT_QUALIFIER = QStringLiteral("Performing runoff qualifier to seed candidates for the runoff.");
+    static inline const QString LOG_EVENT_QUALIFIER_TOP = QStringLiteral("Trying to determine remaining %1 candidate(s) to advance between:");
+    static inline const QString LOG_EVENT_QUALIFIER_ADVANCE_CANDIDATES = QStringLiteral("Advancing candidate(s):");
+    static inline const QString LOG_EVENT_QUALIFIER_CUT_CANDIDATES = QStringLiteral("Cutting candidate(s):");
+    static inline const QString LOG_EVENT_QUALIFIER_NO_RANDOM = QStringLiteral("Random tiebreaker is disabled.");
+    static inline const QString LOG_EVENT_QUALIFIER_UNSUCCESSFUL = QStringLiteral("Unable to resolve scoring round tie to reach the target number of candidates.");
+    static inline const QString LOG_EVENT_QUALIFIER_RESULT = QStringLiteral(
+        "Qualifier Result:\n"
+        "First Seed: %1\n"
+        "Second Seed: %2\n"
+        "Simultaneous: %3\n"
+        "Overflow: {%4}\n"
+    );
 
-    // Logging - Scoring round Candidate Tie Reduction
-    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_REDUCTION = QStringLiteral("Resolving %1-way tie down to the target of %2 candidates...");
-    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_TOP = QStringLiteral("Trying to determine remaining %1 candidate(s) to advance between:");
-    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_CUT_CANDIDATES = QStringLiteral("Cutting candidate(s):");
-    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_ADVANCE_CANDIDATES = QStringLiteral("Advancing candidate(s):");
-    static inline const QString LOG_EVENT_SCORING_ROUND_NO_RANDOM = QStringLiteral("Random tiebreaker is disabled.");
-    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_UNSUCCESSFUL = QStringLiteral(R"(Unable to resolve scoring round tie to reach the target number of candidates.)");
-    static inline const QString LOG_EVENT_SCORING_ROUND_TIE_REDUCTION_RESULT = QStringLiteral("Scoring round tie reduced to:");
+    // Logging - Defacto Winner Check
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_CHECK = QStringLiteral(R"(Simulating runoff for potential defacto winner "%1" between:)");
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_CHECK_WIN = QStringLiteral(R"(The first seed won against "%1".)");
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_CHECK_FAIL = QStringLiteral(R"(The first seed lost to "%1".)");
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_CHECK_SUCCESS = QStringLiteral("The first seed wins all simulated runoffs.");
 
-    // Logging - Main Runoff
-    static inline const QString LOG_EVENT_RUNOFF_CANDIDATES = QStringLiteral(R"("%1" & "%2" advance to the runoff.)");
-    static inline const QString LOG_EVENT_PERFORM_PRIMARY_RUNOFF = QStringLiteral("Performing primary runoff...");
+    // Logging - Runoff
+    static inline const QString LOG_EVENT_RUNOFF = QStringLiteral(R"(Observing runoff between "%1" and "%2".)");
     static inline const QString LOG_EVENT_RUNOFF_HEAD_TO_HEAD_WINNER_CHECK = QStringLiteral("Checking for clear winner of head-to-head.");
-    static inline const QString LOG_EVENT_RUNOFF_TIE = QStringLiteral("There candidates in the runoff are tied in terms of preference.");
+    static inline const QString LOG_EVENT_RUNOFF_TIE = QStringLiteral("The candidates in the runoff are tied in terms of preference.");
     static inline const QString LOG_EVENT_RUNOFF_HIGHER_SCORE_CHECK = QStringLiteral("Checking for the candidate with the higher score.");
     static inline const QString LOG_EVENT_RUNOFF_MORE_FIVE_STAR_CHECK = QStringLiteral("Checking for the candidate with more five star votes.");
     static inline const QString LOG_EVENT_RUNOFF_CHOOSING_RANDOM_WINNER = QStringLiteral("Choosing runoff winner randomly.");
     static inline const QString LOG_EVENT_RUNOFF_NO_RANDOM = QStringLiteral("Random tiebreaker is disabled, the runoff candidates remained tied.");
     static inline const QString LOG_EVENT_RUNOFF_WINNER = QStringLiteral(R"(The runoff resulted in a win for: "%1")");
-    static inline const QString LOG_EVENT_RUNOFF_UNRESOLVED = QStringLiteral(R"(The runoff tie could not be broken.)");
+    static inline const QString LOG_EVENT_RUNOFF_UNRESOLVED = QStringLiteral("The runoff tie could not be broken.");
 
     // Logging - Ranking
     static inline const QString LOG_EVENT_RANK_BY_SCORE = QStringLiteral("Ranking relevant candidates by score (%1)...");
@@ -88,19 +92,23 @@ private:
     // Logging - Main
     static inline const QString LOG_EVENT_FILLING_SEAT = QStringLiteral("Filling seat %1...");
     static inline const QString LOG_EVENT_DIRECT_SEAT_FILL = QStringLiteral("Only one candidate remains, seat can be filled directly.");
+    static inline const QString LOG_EVENT_RUNOFF_CANDIDATES = QStringLiteral(R"("%1" & "%2" advance to the runoff.)");
     static inline const QString LOG_EVENT_NO_RUNOFF = QStringLiteral("The number of candidates could not be narrowed to two in order to perform the runoff.");
+    static inline const QString LOG_EVENT_DEFACTO_WINNER_SEAT_FILL = QStringLiteral(R"(Filling seat with defacto winner "%1")");
+    static inline const QString LOG_EVENT_PERFORM_PRIMARY_RUNOFF = QStringLiteral("Performing primary runoff...");
 
     // Logging - Final Results
-    static inline const QString LOG_EVENT_FINAL_RESULTS = QStringLiteral("Final Results:\n"
-                                                                         "--------------\n"
-                                                                         "\n"
-                                                                         "Filled Seats:\n"
-                                                                         "%1"
-                                                                         "\n"
-                                                                         "Unresolved Candidates:\n"
-                                                                         "%2"
-                                                                         "\n"
-                                                                         "Unfilled Seats: %3\n");
+    static inline const QString LOG_EVENT_FINAL_RESULTS = QStringLiteral(
+        "Final Results:\n"
+        "\n"
+        "Filled Seats:\n"
+        "%1"
+        "\n"
+        "Unresolved Candidates:\n"
+        "%2"
+        "\n"
+        "Unfilled Seats: %3\n"
+    );
 
     // Logging - Finish
     static inline const QString LOG_EVENT_CALC_FINISH = QStringLiteral("Calculation complete.");
@@ -110,6 +118,7 @@ private:
     static inline const QString LIST_ITEM_RANK = QStringLiteral("\t%1) { \"%2\" } <%3>");
     static inline const QString LIST_ITEM_SEAT = QStringLiteral("\t%1) \"%2\"");
     static inline const QString LIST_ITEM_UNRESOLVED = QStringLiteral("\t- \"%1\"");
+    static inline const QString LIST_ITEM_NONE = QStringLiteral("\t *NONE*");
 
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
@@ -132,9 +141,9 @@ public:
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
     // Main steps
-    QSet<QString> determineScoringRoundLeaders(const QList<Rank>& scoreRankings);
-    QString performPrimaryRunoff(QPair<QString, QString> candidates) const;
-    QSet<QString> scoringRoundTieReduction(const QSet<QString>& candidates, qsizetype desiredCount) const;
+    QualifierResult performRunoffQualifier(const QList<Rank>& scoreRankings) const;
+    bool checkForDefactoWinner(const QString& firstSeed, const QSet<QString>& overflow) const;
+    QString performRunoff(std::pair<QString, QString> candidates) const;
 
     // Utility
     QList<Rank> rankByScore(const QSet<QString>& candidates, Rank::Order order) const;
@@ -152,6 +161,7 @@ private:
     QString createCandidateGeneralSetString(const QSet<QString>& candidates) const;
     QString createCandidateToalScoreSetString(const QSet<QString>& candidates) const;
     QString createCandidateRankListString(const QList<Rank>& ranks) const;
+    void logQualifierResult(const QualifierResult& result) const;
     void logElectionResults(const ElectionResult& results) const;
 
 public:

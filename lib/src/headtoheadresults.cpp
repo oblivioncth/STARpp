@@ -6,12 +6,15 @@
 
 namespace Star
 {
-
+/*! @cond */
 //===============================================================================================================
 // HeadToHeadResults
 //===============================================================================================================
 
 //-Constructor---------------------------------------------------------------------------------------------------------
+//Private:
+HeadToHeadResults::HeadToHeadResults() {}
+
 //Public:
 HeadToHeadResults::HeadToHeadResults(const Election* election)
 {
@@ -120,7 +123,7 @@ void HeadToHeadResults::narrow(QSet<QString> candidates, NarrowMode mode)
 {
     auto shouldCull = [&](const QString& c){
         return candidates.contains(c) && mode == Exclusive ||
-              !candidates.contains(c) && mode == Inclusive;
+               !candidates.contains(c) && mode == Inclusive;
     };
 
     auto sItr = mStats.begin();
@@ -137,7 +140,6 @@ void HeadToHeadResults::narrow(QSet<QString> candidates, NarrowMode mode)
         stat.defeats.removeIf([&](const QString& c){ return shouldCull(c); });
         stat.victories.removeIf([&](const QString& c) { return shouldCull(c); });
 
-        // NOTE: Getting list from preferences is fine because the list should always be the same for pref and anti-pref
         Q_ASSERT(stat.preferences.count() == stat.antiPreferences.count());
         QList<QString> cans = stat.preferences.components();
         for(const QString& c : cans)
@@ -153,9 +155,53 @@ void HeadToHeadResults::narrow(QSet<QString> candidates, NarrowMode mode)
 
 HeadToHeadResults HeadToHeadResults::narrowed(QSet<QString> candidates, NarrowMode mode)
 {
-    HeadToHeadResults cpy(*this);
-    cpy.narrow(candidates, mode);
-    return cpy;
-}
+    /* NOTE: Starts with an empty copy, then only fills it with the narrowed candidates, which is optimal
+     * for memory usage; however, this is also slower as there are several memory allocations involved
+     * instead of just one. The following is worse for memory but better for speed:
+     *
+     * HeadToHeadResults narrowedCopy(*this);
+     * narrowedCopy.narrow(candidates, mode);
+     * return narrowedCopy;
+     */
 
+    HeadToHeadResults narrowedCopy;
+
+    auto shouldCopy = [&](const QString& c){
+        return !candidates.contains(c) && mode == Exclusive ||
+               candidates.contains(c) && mode == Inclusive;
+    };
+
+    for(auto sItr = mStats.cbegin(); sItr != mStats.cend(); sItr++)
+    {
+        QString canA = sItr.key();
+
+        if(!shouldCopy(canA))
+            continue;
+
+        const CandidateStats& stat = *sItr;
+
+        for(const QString& canB : stat.victories)
+            if(shouldCopy(canB))
+                narrowedCopy.mStats[canA].victories.insert(canB);
+
+
+        for(const QString& canB : stat.defeats)
+            if(shouldCopy(canB))
+                narrowedCopy.mStats[canA].defeats.insert(canB);
+
+        Q_ASSERT(stat.preferences.count() == stat.antiPreferences.count());
+        QList<QString> prefCans = stat.preferences.components();
+        for(const QString& canB : prefCans)
+        {
+            if(shouldCopy(canB))
+            {
+                narrowedCopy.mStats[canA].preferences.insert(canB, stat.preferences.value(canB));
+                narrowedCopy.mStats[canA].antiPreferences.insert(canB, stat.antiPreferences.value(canB));
+            }
+        }
+    }
+
+    return narrowedCopy;
+}
+/*! @endcond */
 }

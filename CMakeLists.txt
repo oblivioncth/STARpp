@@ -1,19 +1,19 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.24.0)
+cmake_minimum_required(VERSION 3.25.0)
 
 # Configuration options
-option(STARCALC_TESTS "Build StarCalc tests" OFF)
+option(STARPP_TESTS "Build STAR++ tests" OFF)
+option(STARPP_DOCS "Build STAR++ documentation" OFF)
 
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
-project(StarCalc
-    VERSION 0.1.0.1
+project(STARpp
+    VERSION 0.2
     LANGUAGES CXX
-    DESCRIPTION "An application to determine the winner of an election using the STAR voting system"
+    DESCRIPTION "C++ implementation of STAR voting"
 )
-set(FORMAL_NAME "STAR Calculator")
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
@@ -34,8 +34,8 @@ set(PROJ_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${PROJ_SCRIPTS_PATH}/module")
 
 # Get helper scripts
-include(StarCalc/FetchOBCMake)
-fetch_ob_cmake("v0.1.1")
+include(STARpp/FetchOBCMake)
+fetch_ob_cmake("605ce06def4a7b64ce119d3500b5d7651cd55046")
 
 # General Variables
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -83,18 +83,25 @@ setup_verbose_versioning(PROJECT_VERSION_VERBOSE)
 set(QT_COMPONENTS
     Core
 )
-if(STARCALC_TESTS)
+if(STARPP_TESTS)
     list(APPEND QT_COMPONENTS Test)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
+# Find Qt package
+include(OB/BetterFindQt6)
+find_qt6_package(REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 # Disable deprecated code
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
-fetch_qx("3de0116d75f94dcc14ab5c9c0bcfa3c1854aba09")
+fetch_qx(
+    REF "ba863e099f893bfc184f2b505dc00fb4a585771e"
+    COMPONENTS
+        Core
+        Io
+)
 
 # Fetch Neargye's Magic Enum
 include(OB/FetchMagicEnum)
@@ -105,13 +112,19 @@ set(LIB_TARGET_NAME ${PROJECT_NAME_LC}_base)
 set(LIB_ALIAS_NAME ${PROJECT_NAME}::Base)
 set(LIB_EXPORT_NAME Base)
 set(LIB_INCLUDE_ROOT_NAME star)
+set(LIB_TARGET_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_subdirectory(lib)
 
 set(APP_TARGET_NAME ${PROJECT_NAME_LC}_frontend)
 set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)
 add_subdirectory(app)
 
-if(STARCALC_TESTS)
+if(STARPP_DOCS)
+    set(DOC_TARGET_NAME ${PROJECT_NAME_LC}_docs)
+    add_subdirectory(doc)
+endif()
+
+if(STARPP_TESTS)
     enable_testing()
     set(TESTS_TARGET_PREFIX ${PROJECT_NAME_LC})
     set(TESTS_COMMON_ALIAS_NAME ${PROJECT_NAME}::TestCommon)
@@ -160,7 +173,7 @@ install(FILES
 
 set(CPACK_PACKAGE_VENDOR "oblivioncth")
 set(CPACK_PACKAGE_DIRECTORY "${PACKAGE_PREFIX}")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${PROJECT_VERSION_VERBOSE}_(Qt${Qt6_VERSION}-${Qt6_LINKAGE})_${CMAKE_SYSTEM_NAME}_${TARGET_ARCH}")
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")

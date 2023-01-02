@@ -4,11 +4,12 @@
 // Project Includes
 #include "star/election.h"
 #include "star/expectedelectionresult.h"
+#include "star/calculator.h"
 
 namespace Star
 {
 
-enum class ReferenceErrorType { NoError, CategoryConfig, BallotBox, ExpectedResult };
+enum class ReferenceErrorType { NoError, CategoryConfig, BallotBox, ExpectedResult, CalcOptions };
 
 struct ReferenceError
 {
@@ -27,6 +28,8 @@ ReferenceError electionsFromReferenceInput(QList<Election>& returnBuffer,
 ReferenceError expectedResultsFromReferenceInput(QList<ExpectedElectionResult>& returnBuffer,
                                                  const QString& resultSetPath);
 
+ReferenceError calculatorOptionsFromReferenceInput(Star::Calculator::Options& returnBuffer,
+                                                   const QString& calcOptionsPath);
 }
 
 #endif // REFERENCE_H

@@ -12,6 +12,7 @@
 
 namespace Star
 {
+/*! @cond */
 
 // Project Forward Declarations
 class RefCategoryConfig;
@@ -55,7 +56,7 @@ class RefBallotBox::Reader
 //-Class Variables--------------------------------------------------------------------------------------------------
 private:
     // Error
-    static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading the ballot box");
+    static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading the ballot box.");
 
     static inline const QString ERR_INVALID_ROW_COUNT = QStringLiteral("The ballot box has less than the minimum required row count (headings + 2 voters).");
     static inline const QString ERR_INVALID_COLUMN_COUNT = QStringLiteral("The ballot box has a different number of columns than specified by the category configuration (%1 vs %2).");
@@ -91,7 +92,7 @@ private:
 public:
     Qx::GenericError readInto();
 };
-
+/*! @endcond */
 }
 
 #endif //BALLOTBOX_P_H

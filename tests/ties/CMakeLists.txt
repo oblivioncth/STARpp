@@ -7,10 +7,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(test_name "tst_ties")
 set(target_name "${TESTS_TARGET_PREFIX}_${test_name}")
 add_executable(${target_name} ${test_name}.cpp)
-add_test(NAME ${target_name} COMMAND ${target_name})
+starpp_add_test(NAME ${target_name} COMMAND ${target_name})
 target_link_libraries(${target_name}
-	PRIVATE 
-		Qt6::Test
-		StarCalc::Base
-                StarCalc::TestCommon
+    PRIVATE
+            Qt6::Test
+            STARpp::Base
+            STARpp::TestCommon
 )

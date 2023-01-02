@@ -86,10 +86,11 @@ private:
 
 //-Constructor---------------------------------------------------------------------------------------------------------
 public:
-    Builder(const QString& name);
+    Builder(const QString& name = QString());
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 public:
+    Builder& wName(const QString& name);
     Builder& wBallot(const Voter& voter, const QList<Vote>& votes);
     Builder& wSeatCount(int count);
     void reset();
