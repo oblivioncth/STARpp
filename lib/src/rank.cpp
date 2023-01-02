@@ -4,6 +4,9 @@
 // Qt Includes
 #include <QMultiMap>
 
+namespace Star
+{
+
 //===============================================================================================================
 // Rank
 //===============================================================================================================
@@ -104,4 +107,6 @@ QList<Rank> Rank::rankSort(const QMap<QString, int>& valueMap, Order order)
         rankings.append(currentRank);
 
     return rankings;
+}
+
 }
