@@ -50,3 +50,8 @@ Seats = 2
   ]
 ]
 //! [Expected Results Format]
+
+//! [Calculator Options Format]
+AllowTrueTies
+CondorcetProtocol
+//! [Calculator Options Format]

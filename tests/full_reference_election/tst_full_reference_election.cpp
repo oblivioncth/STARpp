@@ -36,22 +36,26 @@ void tst_full_reference_election::various_ref_elections_data()
     QTest::addColumn<QString>("bb_path");
     QTest::addColumn<QString>("cc_path");
     QTest::addColumn<QString>("er_path");
+    QTest::addColumn<QString>("op_path");
 
     // Populate test table rows from file
     QDir data(":/data");
     QFileInfoList dataFiles = data.entryInfoList(QDir::NoFilter, QDir::Name);
-    QVERIFY(dataFiles.size() % 3 == 0);
+    QVERIFY(dataFiles.size() % 4 == 0);
 
-    for(qsizetype i = 0; i < dataFiles.size() - 2; i += 3)
+    qsizetype testSets = dataFiles.size()/4;
+    for(qsizetype i = 0; i < testSets; i++)
     {
-        const QFileInfo& bbFile = dataFiles[i];
-        const QFileInfo& ccFile = dataFiles[i + 1];
-        const QFileInfo& erFile = dataFiles[i + 2];
+        qsizetype fileStart = i * 4;
+        const QFileInfo& bbFile = dataFiles[fileStart];
+        const QFileInfo& ccFile = dataFiles[fileStart + 1];
+        const QFileInfo& erFile = dataFiles[fileStart + 2];
+        const QFileInfo& opFile = dataFiles[fileStart + 3];
 
-        QVERIFY(bbFile.baseName() == ccFile.baseName() && bbFile.baseName() == erFile.baseName());
-        QVERIFY(bbFile.suffix() == "csv" && ccFile.suffix() == "ini" && erFile.suffix() == "json");
+        QVERIFY(bbFile.baseName() == ccFile.baseName() && bbFile.baseName() == erFile.baseName() && bbFile.baseName() == opFile.baseName());
+        QVERIFY(bbFile.suffix() == "csv" && ccFile.suffix() == "ini" && erFile.suffix() == "json" && opFile.suffix() == "opt");
 
-        QTest::newRow(C_STR(bbFile.baseName())) << bbFile.filePath() << ccFile.filePath() << erFile.filePath();
+        QTest::newRow(C_STR(bbFile.baseName())) << bbFile.filePath() << ccFile.filePath() << erFile.filePath() << opFile.filePath();
     }
 }
 
@@ -61,6 +65,7 @@ void tst_full_reference_election::various_ref_elections()
     QFETCH(QString, bb_path);
     QFETCH(QString, cc_path);
     QFETCH(QString, er_path);
+    QFETCH(QString, op_path);
 
     // Load expected results
     QList<Star::ExpectedElectionResult> expectedResults;
@@ -72,9 +77,14 @@ void tst_full_reference_election::various_ref_elections()
     Star::ReferenceError electionLoadError = Star::electionsFromReferenceInput(elections, cc_path, bb_path);
     QVERIFY2(!electionLoadError.isValid(), electionLoadError.errorDetails.toStdString().c_str());
 
+    // Load options
+    Star::Calculator::Options cOptions;
+    Star::ReferenceError calcOptionsLoadError = Star::calculatorOptionsFromReferenceInput(cOptions, op_path);
+    QVERIFY2(!calcOptionsLoadError.isValid(), calcOptionsLoadError.errorDetails.toStdString().c_str());
+
     // Create calculator
     Star::Calculator calculator;
-    calculator.setOptions(Star::Calculator::AllowTrueTies);
+    calculator.setOptions(cOptions);
 
     // Check the results of each election
     for(qsizetype i = 0; i < elections.size(); i++)
