@@ -79,6 +79,17 @@ bool Seat::isFilled() const { return !mWinner.isNull(); }
 bool Seat::isExceptionFilled() const { return !isNull() && mQualifierResult.isNull(); } // NOTE: Filled without runoff
 
 /*!
+ *  Returns @c true if the seat's winner is its second seed instead of its first seed, and the candidates were not
+ *  simultaneously seeded; otherwise, returns @c false.
+ *
+ *  @sa QualifierResult::isSeededSimultaneously().
+ */
+bool Seat::isUpset() const
+{
+    return isFilled() && !mQualifierResult.isSeededSimultaneously() && mWinner != mQualifierResult.firstSeed();
+}
+
+/*!
  *  Returns the candidate that won the seat.
  *
  *  @sa isFilled() and qualifierResult().

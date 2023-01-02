@@ -29,6 +29,7 @@ public:
     bool isNull() const;
     bool isFilled() const;
     bool isExceptionFilled() const;
+    bool isUpset() const;
 
     QString winner() const;
     QualifierResult qualifierResult() const;
