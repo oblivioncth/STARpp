@@ -1,5 +1,6 @@
 # STAR++
 <img align="left" src="https://i.imgur.com/RAGGXwJ.png" width=25%>
+
 STAR++ is an implementation of the [STAR voting method](https://www.starvoting.org/).
 
 It exists as a CMake consumable library and reference command-line application that demonstrates use of the library.
@@ -82,7 +83,7 @@ Using no calculator options will result in the application following the recomme
 ### Summary
 
  - C++20
- - CMake >= 3.24.0
+ - CMake >= 3.25.0
  - Targets:
 	 - Windows 10+
 	 - Linux (Tested on Ubuntu 20.04)
