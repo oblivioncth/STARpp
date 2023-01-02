@@ -4,6 +4,9 @@
 // Qt Includes
 #include <QSet>
 
+namespace Star
+{
+
 struct Rank
 {
     enum Order { Ascending, Descending };
@@ -13,5 +16,7 @@ struct Rank
 
     static QList<Rank> rankSort(const QMap<QString, int>& valueMap, Order order = Descending);
 };
+
+}
 
 #endif // RANK_H
