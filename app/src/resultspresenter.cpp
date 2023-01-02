@@ -72,7 +72,7 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
 
     // Print raw score rankings
     cout << HEADING_SCORE_RANKINGS << endl;
-    for(const Rank& rank : result.election()->scoreRankings())
+    for(const Star::Rank& rank : result.election()->scoreRankings())
         cout << RAW_SCORE_TEMPLATE.arg(Qx::String::join(rank.candidates, R"(", ")")).arg(rank.value) << endl;
     cout << endl;
 

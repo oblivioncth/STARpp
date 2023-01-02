@@ -10,7 +10,7 @@ option(STARPP_DOCS "Build STAR++ documentation" OFF)
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
 project(STARpp
-    VERSION 0.2.0.1
+    VERSION 0.2.0.2
     LANGUAGES CXX
     DESCRIPTION "C++ implementation of STAR voting"
 )
