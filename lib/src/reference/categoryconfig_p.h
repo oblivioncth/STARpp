@@ -56,7 +56,7 @@ private:
 
 //-Class Variables--------------------------------------------------------------------------------------------------
 private:
-    static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading the category configuration");
+    static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading the category configuration.");
 
     static inline const QString ERR_DOES_NOT_EXIST = QStringLiteral("The specified file does not exist.");
     static inline const QString ERR_EMPTY = QStringLiteral("The provided file is empty.");
