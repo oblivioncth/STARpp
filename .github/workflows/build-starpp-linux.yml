@@ -10,7 +10,7 @@ on:
         required: true
     outputs:
       qt_shared_artifact_name:
-        description: "Qx (Qt shared) build artifact"
+        description: "STARpp (Qt shared) build artifact"
         value: ${{ jobs.build-starpp.outputs.qt_shared_artifact_name }}
       qt_static_artifact_name:
         description: "STARpp (Qt static) build artifact"
