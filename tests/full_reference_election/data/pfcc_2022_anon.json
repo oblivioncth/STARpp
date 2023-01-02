@@ -1,0 +1,258 @@
+[
+  [
+    {
+      "winner": "Everything Everywhere All at Once",
+      "qualifier": {
+        "firstAdv": ["Everything Everywhere All at Once"],
+        "secondAdv": ["Tár"]       
+      }
+    },
+    {
+      "winner": "Tár",
+      "qualifier": {
+        "firstAdv": ["RRR", "Tár"],
+        "secondAdv": []       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Top Gun: Maverick",
+      "qualifier": {
+        "firstAdv": ["Top Gun: Maverick"],
+        "secondAdv": ["RRR"]       
+      }
+    },
+    {
+      "winner": "RRR",
+      "qualifier": {
+        "firstAdv": ["RRR"],
+        "secondAdv": ["Avatar: The Way of Water"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Dan Kwan & Daniel Scheinert: Everything Everywhere All at Once",
+      "qualifier": {
+        "firstAdv": ["S.S. Rajamouli: RRR"],
+        "secondAdv": ["Dan Kwan & Daniel Scheinert: Everything Everywhere All at Once"]       
+      }
+    },
+    {
+      "winner": "Todd Field: Tár",
+      "qualifier": {
+        "firstAdv": ["S.S. Rajamouli: RRR"],
+        "secondAdv": ["Todd Field: Tár"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Cate Blanchett: Tár",
+      "qualifier": {
+        "firstAdv": ["Cate Blanchett: Tár"],
+        "secondAdv": ["Michelle Yeoh: Everything, Everywhere All at Once"]       
+      }
+    },
+    {
+      "winner": "Michelle Yeoh: Everything, Everywhere All at Once",
+      "qualifier": {
+        "firstAdv": ["Michelle Yeoh: Everything, Everywhere All at Once"],
+        "secondAdv": ["Aubrey Plaza: Emily the Criminal"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Brendan Frasier: The Whale",
+      "qualifier": {
+        "firstAdv": ["Austin Butler: Elvis"],
+        "secondAdv": ["Brendan Frasier: The Whale"]       
+      }
+    },
+    {
+      "winner": "Bill Nighy: Living",
+      "qualifier": {
+        "firstAdv": ["Austin Butler: Elvis"],
+        "secondAdv": ["Bill Nighy: Living"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Janelle Monáe: Glass Onion: A Knives Out Mystery",
+      "qualifier": {
+        "firstAdv": ["Janelle Monáe: Glass Onion: A Knives Out Mystery"],
+        "secondAdv": ["Stephanie Hsu: Everything Everywhere All at Once"]       
+      }
+    },
+    {
+      "winner": "Stephanie Hsu: Everything Everywhere All at Once",
+      "qualifier": {
+        "firstAdv": ["Stephanie Hsu: Everything Everywhere All at Once"],
+        "secondAdv": ["Jamie Lee Curtis: Everything Everywhere All at Once"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Ke Huy Quan: Everything Everywhere All at Once",
+      "qualifier": {
+        "firstAdv": ["Ke Huy Quan: Everything Everywhere All at Once"],
+        "secondAdv": ["Brendan Gleeson: The Banshees of Inisherin"]       
+      }
+    },
+    {
+      "winner": "Brendan Gleeson: The Banshees of Inisherin",
+      "qualifier": {
+        "firstAdv": ["Brendan Gleeson: The Banshees of Inisherin"],
+        "secondAdv": ["Ben Wishaw: Women Talking"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Everything Everywhere All at Once",
+      "qualifier": {
+        "firstAdv": ["Everything Everywhere All at Once"],
+        "secondAdv": ["Glass Onion: A Knives Out Mystery"]       
+      }
+    },
+    {
+      "winner": "Glass Onion: A Knives Out Mystery",
+      "qualifier": {
+        "firstAdv": ["Glass Onion: A Knives Out Mystery", "Tár"],
+        "secondAdv": []       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "RRR",
+      "qualifier": {
+        "firstAdv": ["RRR"],
+        "secondAdv": ["Tár"]       
+      }
+    },
+    {
+      "winner": "Tár",
+      "qualifier": {
+        "firstAdv": ["Tár"],
+        "secondAdv": ["Babylon"]      
+      }
+    }
+  ],
+  [
+    {
+      "winner": "John Patton Ford: Emily the Criminal",
+      "qualifier": {
+        "firstAdv": ["John Patton Ford: Emily the Criminal"],
+        "secondAdv": ["Goran Stolevski: You Won't Be Alone"]       
+      }
+    },
+    {
+      "winner": "Goran Stolevski: You Won't Be Alone",
+      "qualifier": {
+        "firstAdv": ["Goran Stolevski: You Won't Be Alone"],
+        "secondAdv": ["Charlotte Wells: Aftersun"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Stephanie Hsu: Everything Everywhere All at Once",
+      "qualifier": {
+        "firstAdv": ["Stephanie Hsu: Everything Everywhere All at Once"],
+        "secondAdv": ["Austin Butler: Elvis"]       
+      }
+    },
+    {
+      "winner": "Austin Butler: Elvis",
+      "qualifier": {
+        "firstAdv": ["Austin Butler: Elvis"],
+        "secondAdv": ["Thuso Mbedu: The Woman King"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "RRR",
+      "qualifier": {
+        "firstAdv": ["RRR"],
+        "secondAdv": ["Top Gun: Maverick"]       
+      }
+    },
+    {
+      "winner": "Top Gun: Maverick",
+      "qualifier": {
+        "firstAdv": ["Top Gun: Maverick"],
+        "secondAdv": ["Tár"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Goodnight Oppy",
+      "qualifier": {
+        "firstAdv": ["Goodnight Oppy"],
+        "secondAdv": ["Fire of Love"]       
+      }
+    },
+    {
+      "winner": "Fire of Love",
+      "qualifier": {
+        "firstAdv": ["Fire of Love"],
+        "secondAdv": ["All the Beauty and the Bloodshed"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "RRR",
+      "qualifier": {
+        "firstAdv": ["RRR"],
+        "secondAdv": ["Holy Spider"]       
+      }
+    },
+    {
+      "winner": "Holy Spider",
+      "qualifier": {
+        "firstAdv": ["Holy Spider"],
+        "secondAdv": ["Decision to Leave"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Pinocchio (del Toro)",
+      "qualifier": {
+        "firstAdv": ["Pinocchio (del Toro)"],
+        "secondAdv": ["Turning Red"]       
+      }
+    },
+    {
+      "winner": "Turning Red",
+      "qualifier": {
+        "firstAdv": ["Turning Red"],
+        "secondAdv": ["Marcel the Shell with Shoes On"]       
+      }
+    }
+  ],
+  [
+    {
+      "winner": "Glass Onion: A Knives Out Mystery",
+      "qualifier": {
+        "firstAdv": ["Everything Everywhere All at Once"],
+        "secondAdv": ["Glass Onion: A Knives Out Mystery"]       
+      }
+    },
+    {
+      "winner": "Everything Everywhere All at Once",
+      "qualifier": {
+        "firstAdv": ["Everything Everywhere All at Once"],
+        "secondAdv": ["The Menu"]       
+      }
+    }
+  ]
+]
