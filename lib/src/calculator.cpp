@@ -1,9 +1,6 @@
 // Unit Include
 #include "star/calculator.h"
 
-// Standard Library Includes
-#include <ranges>
-
 // Qt Includes
 #include <QRandomGenerator>
 
