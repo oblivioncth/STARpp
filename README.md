@@ -34,6 +34,8 @@ You can also refer to the reference application source to get a better understan
 ## Reference Application
 This application creates multiple elections from a specific input format (i.e. an election with multiple categories), calculates the results, and then prints them to stdout.
 
+The structuring is a bit clunky due to limitations with the PFCC's polling method. Once possible, a more friendly format will be devised.
+
 First, it expects a CSV of votes that consists of a header row, followed by one row per ballot. The first two fields of the header row don't matter, but the following fields should consist of the candidates for each category. The first field of a ballot row does not matter, while the second should contain the candidates name (for now it is unconditionally obfuscated), and finally the remainder should contain a score (0-5) that corresponds to the candidate in the above header row.
 
 **Example:**
