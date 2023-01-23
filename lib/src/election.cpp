@@ -56,7 +56,7 @@ QString Election::name() const { return mName; }
 QStringList Election::candidates() const { return mTotals.keys(); }
 
 /*!
- *  Returns the list of ballots provider for the election.
+ *  Returns the list of ballots provided for the election.
  */
 const QList<Election::Ballot>& Election::ballots() const { return mBallots; }
 
