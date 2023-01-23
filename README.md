@@ -32,7 +32,7 @@ Finally, the [Minimal Example](https://oblivioncth.github.io/STARpp/index.html#a
 You can also refer to the reference application source to get a better understanding of how to use the library.
 
 ## Reference Application
-This application creates multiple elections from a specific input format (i.e. an election with multiple categories), calculates the results, and then prints them to stdout.
+This application creates multiple elections from a specific input format (i.e. an election with multiple categories), calculates the results, and then prints them to stdout. It also will produce a detailed process log in the current working directory.
 
 The structuring is a bit clunky due to limitations with the PFCC's polling method. Once possible, a more friendly format will be devised.
 
