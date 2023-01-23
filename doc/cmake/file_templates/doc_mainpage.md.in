@@ -40,7 +40,6 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} path\to\starpp_package)
 
 3) Import the package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# When no components are specified, all available components will be imported
 find_package(STARpp 0.1) # Or whichever version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
