@@ -40,7 +40,6 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} path\to\starpp_package)
 
 3) Import the package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# When no components are specified, all available components will be imported
 find_package(STARpp 0.1) # Or whichever version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -123,6 +122,8 @@ The latest *generally* stable source is available in the 'master' branch of http
 The requirements for building from Git are the same as for using STAR++, with the obvious exception that Doxygen (as well as Graphviz) is also needed to build the documentation.
 
 If newer to working with Qt, it is easiest to build from within Qt creator as it handles a large portion of environment setup, including adding Qt to CMake's package search list, automatically. Simply make sure that a kit is configured in Qt Creator that uses a compatible version of Qt, open the CMakeLists.txt file as a project, and build with the desired configuration.
+
+Alternatively, you can use the `qt-cmake` wrapper for similar Qt environment automation when building the project on the command-line, which is shown further down.
 
 The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config (recommended), and may require some tweaking to work with single configuration generators.
 

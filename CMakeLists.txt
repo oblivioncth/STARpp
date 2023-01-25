@@ -3,19 +3,20 @@
 # CMake
 cmake_minimum_required(VERSION 3.25.0)
 
-# Configuration options
-option(STARPP_TESTS "Build STAR++ tests" OFF)
-option(STARPP_DOCS "Build STAR++ documentation" OFF)
-
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
 project(STARpp
-    VERSION 0.2.0.3
+    VERSION 0.2.0.4
     LANGUAGES CXX
     DESCRIPTION "C++ implementation of STAR voting"
 )
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
+set(PROJECT_NAME_FORMAL "STAR++")
+
+# Configuration options
+option(STARPP_TESTS "Build STAR++ tests" OFF)
+option(STARPP_DOCS "Build STAR++ documentation" OFF)
 
 # C++
 set(CMAKE_CXX_STANDARD 20)

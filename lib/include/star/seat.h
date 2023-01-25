@@ -3,7 +3,6 @@
 
 // Qt Includes
 #include <QObject>
-#include <QFlags>
 
 // Project Includes
 #include "star/qualifierresult.h"
