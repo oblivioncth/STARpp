@@ -46,8 +46,7 @@ jobs:
     if: github.event.pull_request.merged == true
     uses: ./.github/workflows/build-starpp-windows.yml
     secrets:
-      qt_shared_url: ${{ secrets.QT_WINDOWS_SHARED_URL }}
-      qt_static_url: ${{ secrets.QT_WINDOWS_STATIC_URL }}
+      qt_ffynnon_cred: ${{ secrets.OBYBOT_FFYNNON_CREDS }}
       
   build_starpp_release_linux:
     name: Build STARpp Release (Linux)
@@ -55,8 +54,7 @@ jobs:
     if: github.event.pull_request.merged == true
     uses: ./.github/workflows/build-starpp-linux.yml
     secrets:
-      qt_shared_url: ${{ secrets.QT_LINUX_SHARED_URL }}
-      qt_static_url: ${{ secrets.QT_LINUX_STATIC_URL }}
+      qt_ffynnon_cred: ${{ secrets.OBYBOT_FFYNNON_CREDS }}
 
   update-docs:
     name: Update gh-pages
