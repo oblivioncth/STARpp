@@ -5,6 +5,10 @@ on:
       qt_ffynnon_cred:
         description: 'Credentials for getting Qt from Ffynnon'
         required: true
+    outputs:
+      doc_artifact_name:
+        description: "Name of artifact used to update docs"
+        value: ${{ jobs.build-starpp.outputs.doc_artifact_name }}
 env:
   qt_install_dir: ${{ github.workspace }}/Qt/Install
   starpp_src_suffix: STARpp/Source
@@ -21,6 +25,8 @@ jobs:
     env:
       vs_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise
       cmake_gen: Ninja Multi-Config
+    outputs:
+      doc_artifact_name: ${{ steps.set_doc_artifact_name.outputs.doc_artifact_name }}
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
@@ -72,10 +78,13 @@ jobs:
         cmake --build . --target test --config Release
         echo "Build complete."
     - name: Get STARpp artifact name
-      id: get_artifact_name
       run: |
         $artifact_name=$((Get-ChildItem -Path "${{ env.starpp_package_path }}" -Filter *.zip)[0].BaseName)
         echo "current_artifact_name=$artifact_name" >> $Env:GITHUB_ENV
+    - name: Set doc artifact name
+      id: set_doc_artifact_name
+      if: matrix.qt_linkage == 'static'
+      run: echo "doc_artifact_name=$current_artifact_name" >> $Env:GITHUB_OUTPUT
     - name: Upload STARpp build artifact
       uses: actions/upload-artifact@v3
       with:
