@@ -6,7 +6,6 @@ on:
         description: 'Credentials for getting Qt from Ffynnon'
         required: true
 env:
-  general_download_dir: ${{ github.workspace }}/Download
   qt_install_dir: ${{ github.workspace }}/Qt/Install
   starpp_src_suffix: STARpp/Source
   starpp_src_dir: ${{ github.workspace }}/STARpp/Source
