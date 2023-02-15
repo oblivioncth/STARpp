@@ -1,7 +1,7 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.25.0)
+cmake_minimum_required(VERSION 3.24.0)
 
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
@@ -98,7 +98,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 # Fetch Qx (build and import from source)
 include(OB/FetchQx)
 fetch_qx(
-    REF "ba863e099f893bfc184f2b505dc00fb4a585771e"
+    REF "4661b909d8c7d2df5a45aa7786ec7f458a733d48"
     COMPONENTS
         Core
         Io
@@ -121,6 +121,11 @@ set(APP_ALIAS_NAME ${PROJECT_NAME}::Frontend)
 add_subdirectory(app)
 
 if(STARPP_DOCS)
+    # Requires higher CMake version
+    if("${CMAKE_VERSION}" VERSION_LESS "3.25.0")
+        message(FATAL_ERROR "CMake 3.25.0 or greater is required to build the ${PROJECT_NAME} documentation!")
+    endif()
+
     set(DOC_TARGET_NAME ${PROJECT_NAME_LC}_docs)
     add_subdirectory(doc)
 endif()
