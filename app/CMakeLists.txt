@@ -35,7 +35,7 @@ target_sources(${APP_TARGET_NAME}
 # Link target to libraries
 target_link_libraries(${APP_TARGET_NAME}
     PRIVATE
-        STARpp::Base
+        STAR::Base
         Qx::Core
         Qx::Io
         magic_enum::magic_enum
@@ -43,7 +43,7 @@ target_link_libraries(${APP_TARGET_NAME}
 
 ## Forward select project variables to C++ code
 include(OB/CppVars)
-add_cpp_vars(${APP_TARGET_NAME}
+ob_add_cpp_vars(${APP_TARGET_NAME}
     NAME "project_vars"
     PREFIX "PROJECT_"
     VARS
