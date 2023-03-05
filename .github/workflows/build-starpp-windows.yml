@@ -19,8 +19,14 @@ jobs:
   build-starpp:
     name: Build STARpp - Windows (Release)
     strategy:
+      fail-fast: false
       matrix:
-        qt_linkage: [shared, static]
+        lib_linkage: [shared, static]
+        include:
+          - lib_linkage: shared
+            cmake_bsl: ON
+          - lib_linkage: static
+            cmake_bsl: OFF
     runs-on: windows-latest
     env:
       vs_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise
@@ -37,10 +43,10 @@ jobs:
     - name: Install Qt (custom build)
       uses: oblivioncth/actions/general/install-and-cache-qt-from-ffynnon@dev
       with:
-        version: 6.4.0
+        version: 6.4.2
         os: windows
         compiler: msvc2022
-        linkage: ${{ matrix.qt_linkage }}
+        linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
         credentials: ${{ secrets.qt_ffynnon_cred }}
     - name: Install Doxygen & Graphviz
@@ -59,15 +65,13 @@ jobs:
         echo "Setup C++ Build Environment..."
         CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
         echo "Configure CMake using Qt wrapper..."
-        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.starpp_src_dir}}" -B "${{ env.starpp_build_dir }}" -D STARPP_TESTS=ON -D STARPP_DOCS=ON
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.starpp_src_dir}}" -B "${{ env.starpp_build_dir }}" -D BUILD_SHARED_LIBS=${{ matrix.cmake_bsl }} -D STARPP_TESTS=ON -D STARPP_DOCS=ON
         echo "Changing to build directory..."
         cd "%starpp_build_dir%"
         echo "Building STARpp Debug..."
         cmake --build . --target starpp_base --config Debug
-        echo "Building STARpp Release..."
+        echo "Building STARpp Release/Docs..."
         cmake --build . --target all --config Release
-        echo "Building STARpp docs..."
-        cmake --build . --target starpp_docs --config Release
         echo "Installing STARpp Debug..."
         cmake --install . --config Debug
         echo "Installing STARpp Release/Docs..."

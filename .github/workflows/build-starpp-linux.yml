@@ -15,12 +15,38 @@ jobs:
   build-starpp:
     name: Build STARpp - Linux (Release)
     strategy:
+      fail-fast: false
       matrix:
-        qt_linkage: [shared, static]
-    runs-on: ubuntu-20.04
+        os: [ubuntu-20.04, ubuntu-22.04]
+        compiler: [gcc, clang]
+        lib_linkage: [shared, static]
+        include:
+          - os: ubuntu-20.04
+            compiler: gcc
+            c_comp: gcc-10
+            cxx_comp: g++-10
+            qt_comp: clang12
+          - os: ubuntu-20.04
+            compiler: clang
+            c_comp: clang-12
+            cxx_comp: clang++-12
+            qt_comp: clang12            
+          - os: ubuntu-22.04
+            compiler: gcc
+            c_comp: gcc-12
+            cxx_comp: g++-12
+            qt_comp: clang14
+          - os: ubuntu-22.04
+            compiler: clang
+            c_comp: clang-14
+            cxx_comp: clang++-14
+            qt_comp: clang14
+          - lib_linkage: shared
+            cmake_bsl: ON
+          - lib_linkage: static
+            cmake_bsl: OFF
+    runs-on: ${{ matrix.os }}
     env:
-      c_comp: clang-12
-      cxx_comp: clang++-12
       cmake_gen: Ninja Multi-Config
     steps:
     - name: Set derived variables with shell because GitHub Actions env context sucks
@@ -34,8 +60,8 @@ jobs:
       with:
         version: 6.4.2
         os: linux
-        compiler: clang12
-        linkage: ${{ matrix.qt_linkage }}
+        compiler: ${{ matrix.qt_comp }}
+        linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
         credentials: ${{ secrets.qt_ffynnon_cred }}
     - name: Install Doxygen
@@ -61,15 +87,13 @@ jobs:
       working-directory: ${{ env.starpp_src_dir }}
       run: |
         echo Configuring CMake...
-        "$qt_cmake" -G "$cmake_gen" -S "$starpp_src_dir" -B "$starpp_build_dir" -D CMAKE_CXX_COMPILER="$cxx_comp" -D CMAKE_C_COMPILER="$c_comp"  -D STARPP_TESTS=ON -D STARPP_DOCS=ON
+        "$qt_cmake" -G "$cmake_gen" -S "$starpp_src_dir" -B "$starpp_build_dir" -D CMAKE_CXX_COMPILER="${{ matrix.cxx_comp }}" -D CMAKE_C_COMPILER="${{ matrix.c_comp }}" -D BUILD_SHARED_LIBS="${{ matrix.cmake_bsl }}" -D STARPP_TESTS=ON -D STARPP_DOCS=ON
         echo Changing to build directory...
         cd "$starpp_build_dir"
         echo Building STARpp Debug...
         cmake --build . --target starpp_base --config Debug
-        echo Building STARpp Release...
+        echo Building STARpp Release/Docs...
         cmake --build . --target all --config Release
-        echo Building STARpp Docs...
-        cmake --build . --target starpp_docs --config Release
         echo Installing STARpp Debug
         cmake --install . --config Debug
         echo Installing STARpp Release/Docs
@@ -83,7 +107,7 @@ jobs:
       id: get_artifact_name
       run: |
         cpack_name=$(find "${{ env.starpp_package_path }}" -type f -name "*.zip")
-        artifact_name=$(basename "$cpack_name" .zip)
+        artifact_name="$(basename "$cpack_name" .zip) [${{ matrix.cxx_comp }}]"
         echo "current_artifact_name=$artifact_name" >> $GITHUB_ENV
     - name: Upload STARpp build artifact
       uses: actions/upload-artifact@v3
