@@ -69,7 +69,7 @@ jobs:
         echo "Changing to build directory..."
         cd "%starpp_build_dir%"
         echo "Building STARpp Debug..."
-        cmake --build . --target starpp_base --config Debug
+        cmake --build . --target star_base --config Debug
         echo "Building STARpp Release/Docs..."
         cmake --build . --target all --config Release
         echo "Installing STARpp Debug..."
