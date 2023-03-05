@@ -1,6 +1,9 @@
 #ifndef EXPECTEDELECTIONRESULT_H
 #define EXPECTEDELECTIONRESULT_H
 
+// Shared Library Support
+#include "star/star_base_export.h"
+
 // Qt Includes
 #include <QStringList>
 
@@ -10,7 +13,7 @@
 namespace Star
 {
 
-class ExpectedElectionResult
+class STAR_BASE_EXPORT ExpectedElectionResult
 {
 //-Inner Classes----------------------------------------------------------------------------------------------------
 public:
@@ -36,7 +39,7 @@ public:
     bool operator!=(const ElectionResult& result) const;
 };
 
-class ExpectedElectionResult::Builder
+class STAR_BASE_EXPORT ExpectedElectionResult::Builder
 {
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:

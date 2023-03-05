@@ -1,6 +1,9 @@
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
 
+// Shared Library Support
+#include "star/star_base_export.h"
+
 // Qt Includes
 #include <QObject>
 #include <QFlags>
@@ -16,7 +19,7 @@ namespace Star
 // Forward Declarations
 class HeadToHeadResults;
 
-class Calculator : public QObject
+class STAR_BASE_EXPORT Calculator : public QObject
 {
     Q_OBJECT
 //-Class Enums------------------------------------------------------------------------------------------------------
