@@ -1,6 +1,9 @@
 #ifndef ELECTION_H
 #define ELECTION_H
 
+// Shared Library Support
+#include "star/star_base_export.h"
+
 // Qt Includes
 #include "qdatetime.h"
 #include <QString>
@@ -12,7 +15,7 @@
 namespace Star
 {
 
-class Election
+class STAR_BASE_EXPORT Election
 {
 //-Inner Classes----------------------------------------------------------------------------------------------------
 public:
@@ -58,7 +61,7 @@ struct Election::Vote
     int score = 0;
 };
 
-class Election::Ballot
+class STAR_BASE_EXPORT Election::Ballot
 {
     friend class Election::Builder;
 //-Instance Variables--------------------------------------------------------------------------------------------------
@@ -78,7 +81,7 @@ public:
     QString preference(const QString& candidateA, const QString& candidateB) const;
 };
 
-class Election::Builder
+class STAR_BASE_EXPORT Election::Builder
 {
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:

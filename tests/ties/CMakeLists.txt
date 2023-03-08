@@ -11,6 +11,6 @@ starpp_add_test(NAME ${target_name} COMMAND ${target_name})
 target_link_libraries(${target_name}
     PRIVATE
             Qt6::Test
-            STARpp::Base
-            STARpp::TestCommon
+            STAR::Base
+            STAR::TestCommon
 )

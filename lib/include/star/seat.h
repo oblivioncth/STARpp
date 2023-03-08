@@ -1,6 +1,9 @@
 #ifndef SEAT_H
 #define SEAT_H
 
+// Shared Library Support
+#include "star/star_base_export.h"
+
 // Qt Includes
 #include <QObject>
 
@@ -10,7 +13,7 @@
 namespace Star
 {
 
-class Seat
+class STAR_BASE_EXPORT Seat
 {
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:
