@@ -13,7 +13,7 @@ project(STARpp
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("01f3a66a586749a210acd3a471cd167a0e052530")
+fetch_ob_cmake("990d4c4a3987722a173f948b59fd45ce924a7d9c")
 
 # Initialize project according to standard rules
 include(OB/Project)
