@@ -90,7 +90,7 @@ jobs:
         echo "current_artifact_name=$artifact_name" >> $Env:GITHUB_ENV
     - name: Set doc artifact name
       id: set_doc_artifact_name
-      if: matrix.qt_linkage == 'static'
+      if: matrix.lib_linkage == 'static'
       run: echo "doc_artifact_name=$current_artifact_name" >> $Env:GITHUB_OUTPUT
     - name: Upload STARpp build artifact
       uses: actions/upload-artifact@v3
