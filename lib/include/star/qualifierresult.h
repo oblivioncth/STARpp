@@ -1,6 +1,9 @@
 #ifndef QUALIFIERRESULT_H
 #define QUALIFIERRESULT_H
 
+// Shared Library Support
+#include "star/star_base_export.h"
+
 // Qt Includes
 #include <QSet>
 #include <QString>
@@ -12,7 +15,7 @@ namespace Star
  * process Calculator needed to go to fill both
  */
 
-class QualifierResult
+class STAR_BASE_EXPORT QualifierResult
 {
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:

@@ -2,23 +2,11 @@ name: Build STARpp - Linux
 on:
   workflow_call:
     secrets:
-      qt_shared_url:
-        description: 'MEGA Qt shared install archive URL'
+      qt_ffynnon_cred:
+        description: 'Credentials for getting Qt from Ffynnon'
         required: true
-      qt_static_url:
-        description: 'MEGA Qt static install archive URL'
-        required: true
-    outputs:
-      qt_shared_artifact_name:
-        description: "STARpp (Qt shared) build artifact"
-        value: ${{ jobs.build-starpp.outputs.qt_shared_artifact_name }}
-      qt_static_artifact_name:
-        description: "STARpp (Qt static) build artifact"
-        value: ${{ jobs.build-starpp.outputs.qt_static_artifact_name }}
 env:
-  general_download_dir: ${{ github.workspace }}/Download
   qt_install_dir: ${{ github.workspace }}/Qt/Install
-  qt_download_dir: ${{ github.workspace }}/Qt/Download
   starpp_src_suffix: STARpp/Source
   starpp_src_dir: ${{ github.workspace }}/STARpp/Source
   starpp_build_dir: ${{ github.workspace }}/STARpp/Build
@@ -27,64 +15,55 @@ jobs:
   build-starpp:
     name: Build STARpp - Linux (Release)
     strategy:
+      fail-fast: false
       matrix:
-        qt_linkage: [shared, static]
-    runs-on: ubuntu-20.04
+        os: [ubuntu-20.04, ubuntu-22.04]
+        compiler: [gcc, clang]
+        lib_linkage: [shared, static]
+        include:
+          - os: ubuntu-20.04
+            compiler: gcc
+            c_comp: gcc-10
+            cxx_comp: g++-10
+            qt_comp: clang12
+          - os: ubuntu-20.04
+            compiler: clang
+            c_comp: clang-12
+            cxx_comp: clang++-12
+            qt_comp: clang12            
+          - os: ubuntu-22.04
+            compiler: gcc
+            c_comp: gcc-12
+            cxx_comp: g++-12
+            qt_comp: clang14
+          - os: ubuntu-22.04
+            compiler: clang
+            c_comp: clang-14
+            cxx_comp: clang++-14
+            qt_comp: clang14
+          - lib_linkage: shared
+            cmake_bsl: ON
+          - lib_linkage: static
+            cmake_bsl: OFF
+    runs-on: ${{ matrix.os }}
     env:
-      c_comp: clang-12
-      cxx_comp: clang++-12
       cmake_gen: Ninja Multi-Config
-    outputs:
-      qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
-      qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
     steps:
-    - name: Set matrix derived variables
-      uses: kanga333/variable-mapper@v0.3.0
-      with:
-        key: ${{ matrix.qt_linkage }}
-        map: |
-          {
-            "shared": {
-              "qt_install_url": "${{ secrets.qt_shared_url }}",
-              "artifact_output_var": "qt_shared_artifact_name"
-            },
-            "static": {
-              "qt_install_url": "${{ secrets.qt_static_url }}",
-              "artifact_output_var": "qt_static_artifact_name"
-            }
-          }
-        export_to: env,log
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |  
         echo "starpp_package_path=${{ env.starpp_build_dir }}/out/dist" >> $GITHUB_ENV
         starpp_install_path="${{ env.starpp_build_dir }}/out/install"
         echo "starpp_install_path=$starpp_install_path" >> $GITHUB_ENV
         echo "qt_cmake=$qt_install_dir/bin/qt-cmake" >> $GITHUB_ENV
-    - name: Cache Qt Build
-      id: cache-qt
-      uses: actions/cache@v3
+    - name: Install Qt (custom build)
+      uses: oblivioncth/actions/general/install-and-cache-qt-from-ffynnon@dev
       with:
+        version: 6.4.2
+        os: linux
+        compiler: ${{ matrix.qt_comp }}
+        linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
-        key: ${{ env.qt_install_url }}
-    - name: Install megatools
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      uses: oblivioncth/actions/ubuntu/install-megatools-from-megous@dev
-      with:
-        version: 1.11.0.20220519
-    - name: Create Qt Download Directory
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: mkdir -p "${{ env.qt_download_dir }}"
-    - name: Download Qt Install
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: megatools dl "$qt_install_url" --path "${{ env.qt_download_dir }}"
-    - name: Determine Qt Install Package Name
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: |
-        qt_install_name=$(ls "${{ env.qt_download_dir }}" | grep "qt-.*7z")
-        echo "qt_install_dest=${{ env.qt_download_dir }}/$qt_install_name" >> $GITHUB_ENV
-    - name: Extract Qt Install
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
+        credentials: ${{ secrets.qt_ffynnon_cred }}
     - name: Install Doxygen
       uses: oblivioncth/actions/ubuntu/install-doxygen-from-sourceforge@dev
       with:
@@ -108,33 +87,27 @@ jobs:
       working-directory: ${{ env.starpp_src_dir }}
       run: |
         echo Configuring CMake...
-        "$qt_cmake" -G "$cmake_gen" -S "$starpp_src_dir" -B "$starpp_build_dir" -D CMAKE_CXX_COMPILER="$cxx_comp" -D CMAKE_C_COMPILER="$c_comp"  -D STARPP_TESTS=ON -D STARPP_DOCS=ON
+        "$qt_cmake" -G "$cmake_gen" -S "$starpp_src_dir" -B "$starpp_build_dir" -D CMAKE_CXX_COMPILER="${{ matrix.cxx_comp }}" -D CMAKE_C_COMPILER="${{ matrix.c_comp }}" -D BUILD_SHARED_LIBS="${{ matrix.cmake_bsl }}" -D STARPP_TESTS=ON -D STARPP_DOCS=ON
         echo Changing to build directory...
         cd "$starpp_build_dir"
-        echo Building STARpp Debug...
-        cmake --build . --target starpp_base --config Debug
-        echo Building STARpp Release...
+        echo Building STARpp Release/Docs...
         cmake --build . --target all --config Release
-        echo Building STARpp Docs...
-        cmake --build . --target starpp_docs --config Release
-        echo Installing STARpp Debug
-        cmake --install . --config Debug
+        echo Running tests...
+        ctest -C Release --output-on-failure
         echo Installing STARpp Release/Docs
         cmake --install . --config Release
         echo Packaging STARpp...
         cpack -C "Release"
-        echo Running tests...
-        cmake --build . --target test --config Release
         echo Build complete.
     - name: Get STARpp artifact name
       id: get_artifact_name
       run: |
-        cpack_name=$(find * -type f -name "*.zip")
-        artifact_name=$(basename "$cpack_name" .zip)
-        echo "${{ env.artifact_output_var }}=$artifact_name" >> $GITHUB_OUTPUT
+        cpack_name=$(find "${{ env.starpp_package_path }}" -type f -name "*.zip")
+        artifact_name="$(basename "$cpack_name" .zip) [${{ matrix.cxx_comp }}]"
+        echo "current_artifact_name=$artifact_name" >> $GITHUB_ENV
     - name: Upload STARpp build artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ steps.get_artifact_name.outputs[env.artifact_output_var] }}
+        name: ${{ env.current_artifact_name }}
         path: ${{ env.starpp_install_path }}
         if-no-files-found: error

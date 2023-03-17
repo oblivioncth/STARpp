@@ -10,12 +10,10 @@ jobs:
     name: Build STARpp (Windows)
     uses: ./.github/workflows/build-starpp-windows.yml
     secrets:
-      qt_shared_url: ${{ secrets.QT_WINDOWS_SHARED_URL }}
-      qt_static_url: ${{ secrets.QT_WINDOWS_STATIC_URL }}
+      qt_ffynnon_cred: ${{ secrets.OBYBOT_FFYNNON_CREDS }}
       
   trigger-linux-build:
     name: Build STARpp (Linux)
     uses: ./.github/workflows/build-starpp-linux.yml
     secrets:
-      qt_shared_url: ${{ secrets.QT_LINUX_SHARED_URL }}
-      qt_static_url: ${{ secrets.QT_LINUX_STATIC_URL }}
+      qt_ffynnon_cred: ${{ secrets.OBYBOT_FFYNNON_CREDS }}

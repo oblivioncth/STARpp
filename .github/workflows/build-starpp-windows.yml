@@ -2,22 +2,15 @@ name: Build STARpp - Windows
 on:
   workflow_call:
     secrets:
-      qt_static_url:
-        description: 'MEGA Qt static install archive URL'
-        required: true
-      qt_shared_url:
-        description: 'MEGA Qt shared install archive URL'
+      qt_ffynnon_cred:
+        description: 'Credentials for getting Qt from Ffynnon'
         required: true
     outputs:
-      qt_shared_artifact_name:
-        description: "STARpp (Qt shared) build artifact"
-        value: ${{ jobs.build-starpp.outputs.qt_shared_artifact_name }}
-      qt_static_artifact_name:
-        description: "STARpp (Qt static) build artifact"
-        value: ${{ jobs.build-starpp.outputs.qt_static_artifact_name }}
+      doc_artifact_name:
+        description: "Name of artifact used to update docs"
+        value: ${{ jobs.build-starpp.outputs.doc_artifact_name }}
 env:
   qt_install_dir: ${{ github.workspace }}/Qt/Install
-  qt_download_dir: ${{ github.workspace }}/Qt/Download
   starpp_src_suffix: STARpp/Source
   starpp_src_dir: ${{ github.workspace }}/STARpp/Source
   starpp_build_dir: ${{ github.workspace }}/STARpp/Build
@@ -26,65 +19,44 @@ jobs:
   build-starpp:
     name: Build STARpp - Windows (Release)
     strategy:
+      fail-fast: false
       matrix:
-        qt_linkage: [shared, static]
+        lib_linkage: [shared, static]
+        include:
+          - lib_linkage: shared
+            cmake_bsl: ON
+          - lib_linkage: static
+            cmake_bsl: OFF
     runs-on: windows-latest
     env:
       vs_dir: C:/Program Files/Microsoft Visual Studio/2022/Enterprise
       cmake_gen: Ninja Multi-Config
     outputs:
-      qt_shared_artifact_name: ${{ steps.get_artifact_name.outputs.qt_shared_artifact_name }}
-      qt_static_artifact_name: ${{ steps.get_artifact_name.outputs.qt_static_artifact_name }}
+      doc_artifact_name: ${{ steps.set_doc_artifact_name.outputs.doc_artifact_name }}
     steps:
-    - name: Set matrix derived variables
-      uses: kanga333/variable-mapper@v0.3.0
-      with:
-        key: ${{ matrix.qt_linkage }}
-        map: |
-          {
-            "shared": {
-              "qt_install_url": "${{ secrets.qt_shared_url }}",
-              "artifact_output_var": "qt_shared_artifact_name"
-            },
-            "static": {
-              "qt_install_url": "${{ secrets.qt_static_url }}",
-              "artifact_output_var": "qt_static_artifact_name"
-            }
-          }
-        export_to: env,log
     - name: Set derived variables with shell because GitHub Actions env context sucks
       run: |
         echo "starpp_package_path=${{ env.starpp_build_dir }}/out/dist" >> $Env:GITHUB_ENV
         $starpp_install_path="${{ env.starpp_build_dir }}/out/install"
         echo "starpp_install_path=$starpp_install_path" >> $Env:GITHUB_ENV
         echo "qt_cmake=${Env:qt_install_dir}/bin/qt-cmake.bat" >> $Env:GITHUB_ENV
-    - name: Cache Qt Build
-      id: cache-qt
-      uses: actions/cache@v3
+    - name: Install Qt (custom build)
+      uses: oblivioncth/actions/general/install-and-cache-qt-from-ffynnon@dev
       with:
+        version: 6.4.2
+        os: windows
+        compiler: msvc2022
+        linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
-        key: ${{ env.qt_install_url }}
-    - name: Install megatools
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: choco install megatools
-    - name: Create Qt Download Directory
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: New-Item -Path "${{ env.qt_download_dir }}" -ItemType "directory"
-    - name: Download Qt Install
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: megatools dl "${Env:qt_install_url}" --path "${{ env.qt_download_dir }}"
-    - name: Determine Qt Install Package Name
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: |
-        $qt_install_name=(Get-ChildItem -Path "${{ env.qt_download_dir }}" -Name -Filter qt-*.7z)
-        echo "qt_install_dest=${{ env.qt_download_dir }}/${qt_install_name}" >> $Env:GITHUB_ENV
-    - name: Extract Qt Install
-      if: steps.cache-qt.outputs.cache-hit != 'true'
-      run: 7z x ${{ env.qt_install_dest }} -o${{ env.qt_install_dir }}
-    - name: Install Doxygen & Graphviz
-      run: |
-        choco install doxygen.install --version 1.9.4
-        choco install graphviz  
+        credentials: ${{ secrets.qt_ffynnon_cred }}
+    - name: Install Doxygen
+      uses: oblivioncth/actions/general/cache-and-install-doxygen-from-ffynnon@dev
+      with:
+        version: 1.9.4
+        os: windows
+        credentials: ${{ secrets.qt_ffynnon_cred }}
+    - name: Install Graphviz
+      run: choco install graphviz  
     - name: Checkout STARpp
       uses: actions/checkout@v3
       with:
@@ -97,30 +69,32 @@ jobs:
         echo "Setup C++ Build Environment..."
         CALL "${{ env.vs_dir }}\Common7\Tools\VsDevCmd.bat" -arch=amd64
         echo "Configure CMake using Qt wrapper..."
-        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.starpp_src_dir}}" -B "${{ env.starpp_build_dir }}" -D STARPP_TESTS=ON -D STARPP_DOCS=ON
+        CALL "${{ env.qt_cmake }}" -G "${{ env.cmake_gen }}" -S "${{ env.starpp_src_dir}}" -B "${{ env.starpp_build_dir }}" -D BUILD_SHARED_LIBS=${{ matrix.cmake_bsl }} -D STARPP_TESTS=ON -D STARPP_DOCS=ON
         echo "Changing to build directory..."
         cd "%starpp_build_dir%"
-        echo "Building STARpp Debug..."
-        cmake --build . --target starpp_base --config Debug
-        echo "Building STARpp Release..."
+        echo "Building STARpp Release/Docs..."
         cmake --build . --target all --config Release
-        echo "Building STARpp docs..."
-        cmake --build . --target starpp_docs --config Release
-        echo "Installing STARpp Debug..."
-        cmake --install . --config Debug
+        echo "Running tests..."
+        ctest -C Release --output-on-failure
         echo "Installing STARpp Release/Docs..."
         cmake --install . --config Release
         echo "Packaging STARpp..."
         cpack -C "Release"
-        echo "Running tests..."
-        cmake --build . --target test --config Release
         echo "Build complete."
+    - name: Remove VC Runtime Redistributable Added by Qt # Required until an option to disable this is added to Qt
+      run: |
+        Remove-Item "${{ env.starpp_install_path }}/bin/vc_redist*"
     - name: Get STARpp artifact name
-      id: get_artifact_name
-      run: echo "${{ env.artifact_output_var }}=$((Get-ChildItem -Path "${{ env.starpp_package_path }}" -Filter *.zip)[0].BaseName)" >> $Env:GITHUB_OUTPUT
+      run: |
+        $artifact_name=$((Get-ChildItem -Path "${{ env.starpp_package_path }}" -Filter *.zip)[0].BaseName)
+        echo "current_artifact_name=$artifact_name" >> $Env:GITHUB_ENV
+    - name: Set doc artifact name
+      id: set_doc_artifact_name
+      if: matrix.lib_linkage == 'static'
+      run: echo "doc_artifact_name=$current_artifact_name" >> $Env:GITHUB_OUTPUT
     - name: Upload STARpp build artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ steps.get_artifact_name.outputs[env.artifact_output_var] }}
+        name: ${{ env.current_artifact_name }}
         path: ${{ env.starpp_install_path }}
         if-no-files-found: error

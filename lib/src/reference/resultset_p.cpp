@@ -83,17 +83,13 @@ Qx::GenericError ResultSetReader::readInto()
             if((convError = Qx::Json::checkedKeyRetrieval(jSecondAdvArray, jQualifierObj, KEY_QUALIFIER_SECOND_ADV_ARRAY)).isValid())
                 return convError;
 
-            // Convert qualifier arrays to string lists
-            QList<QString> firstAdv;
-            QList<QString> secondAdv;
-            if((convError = Qx::Json::checkedArrayConversion(firstAdv, jFirstAdvArray)).isValid())
+            // Convert qualifier arrays to sets
+            QSet<QString> firstAdvSet;
+            QSet<QString> secondAdvSet;
+            if((convError = Qx::Json::checkedArrayConversion(firstAdvSet, jFirstAdvArray)).isValid())
                 return convError;
-            if((convError = Qx::Json::checkedArrayConversion(secondAdv, jSecondAdvArray)).isValid())
+            if((convError = Qx::Json::checkedArrayConversion(secondAdvSet, jSecondAdvArray)).isValid())
                 return convError;
-
-            // Convert to set
-            QSet<QString> firstAdvSet = QSet<QString>(firstAdv.constBegin(), firstAdv.constEnd());
-            QSet<QString> secondAdvSet = QSet<QString>(secondAdv.constBegin(), secondAdv.constEnd());
 
             // Add seat to builder
             eerb.wSeat(Seat(winner, QualifierResult(firstAdvSet, secondAdvSet)));

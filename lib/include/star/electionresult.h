@@ -1,7 +1,8 @@
 #ifndef ELECTIONRESULT_H
 #define ELECTIONRESULT_H
 
-// Qt Includes
+// Shared Library Support
+#include "star/star_base_export.h"
 
 // Project Includes
 #include "star/election.h"
@@ -10,7 +11,7 @@
 namespace Star
 {
 
-class ElectionResult
+class STAR_BASE_EXPORT ElectionResult
 {
 //-Instance Variables--------------------------------------------------------------------------------------------------
 private:

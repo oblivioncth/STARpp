@@ -82,7 +82,7 @@ namespace Star
  *  time the first seed wins against all of them.
  *
  *  Ending the election prematurely in this circumstance would be unfortunate, since it is essentially known
- *  that the first seed should would the seat anyway.
+ *  that the first seed would win the seat anyway.
  *
  *  Enabling this option avoids the issue by simulating the runoffs between the first seed and each of the
  *  candidates tied for second seed. If the first does win all of the simulations, then they are declared
