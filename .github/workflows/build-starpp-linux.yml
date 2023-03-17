@@ -92,12 +92,12 @@ jobs:
         cd "$starpp_build_dir"
         echo Building STARpp Release/Docs...
         cmake --build . --target all --config Release
+        echo Running tests...
+        cmake --build . --target test --config Release
         echo Installing STARpp Release/Docs
         cmake --install . --config Release
         echo Packaging STARpp...
         cpack -C "Release"
-        echo Running tests...
-        cmake --build . --target test --config Release
         echo Build complete.
     - name: Get STARpp artifact name
       id: get_artifact_name
