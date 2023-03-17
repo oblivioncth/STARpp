@@ -75,7 +75,7 @@ jobs:
         echo "Building STARpp Release/Docs..."
         cmake --build . --target all --config Release
         echo "Running tests..."
-        cmake --build . --target test --config Release
+        ctest -C Release --output-on-failure
         echo "Installing STARpp Release/Docs..."
         cmake --install . --config Release
         echo "Packaging STARpp..."
