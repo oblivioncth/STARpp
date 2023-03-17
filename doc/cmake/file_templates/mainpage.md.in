@@ -14,16 +14,30 @@ Requirements
  - An x64, C++@CMAKE_CXX_STANDARD@ capable compiler
  - Qt6
  - CMake @TRUE_CMAKE_MINIMUM_REQUIRED@ or greater
- - Windows 10/11 or Linux (only tested on Ubuntu)
+ - OS
+	 - Windows 10 or above
+	 - Linux (untested on more general Unix systems)
  
 Packaging
 ----------
-STAR++ is provided as a CMake package composed of a single static library and with several public header files.
+STAR++ is provided as a CMake package composed of a single library, several public header files, and the reference application.
+
+#### Package Components:
+
+ - `Base` - The main library
+ - `Frontend` - The reference application
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Example STAR++ Import
 find_package(STARpp)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If no components are specified in the `find_package()` call, only the main library will be imported.
+
+STAR++ is also composed to gracefully support CMake's FetchContent mechanism. All exportable targets are named to match their corresponding component when packaged, and feature alias targets with the same names when building. This allows consumers to access the targets via the same name regardless of whether they are using a pre-built package of STAR++ or building it as a sub-project.
+
+For example, the `Base` component corresponds to the `starpp_base` target, which can also be referred to via `STARpp::Base`.
+
 
 Getting Started
 ---------------
@@ -127,6 +141,11 @@ Alternatively, you can use the `qt-cmake` wrapper for similar Qt environment aut
 
 The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config (recommended), and may require some tweaking to work with single configuration generators.
 
+#### CMake Options:
+
+ - `STARPP_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
+ - `STARPP_TESTS` - Set to `ON` in order to generate the test targets (OFF)
+ - `BUILD_SHARED_LIBS` - Build STAR++ as a shared library instead of a static one (OFF)
 #### CMake Targets:
 
  - `all` - Builds the STAR++ library and reference application
@@ -137,18 +156,13 @@ The CMake project is designed to be used with multi-configuration generators suc
  - `starpp_tst_...` - Builds the various test targets. To actually run tests, just build the general CMake tests target `test`.
 
 #### CMake Install Components:
-- `all` - Installs all built components
+
 - `starpp` - Installs top-level files (README.md, CMake package configuration files, etc.) 
 - `starpp_base` - Installs the built library
 - `starpp_frontend` - Installs the built reference application
 - `starpp_docs` - Installs the built documentation
 
-If STAR++ is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project.
-
-#### CMake Options:
-
- - `STARPP_DOCS` - Set to `ON` in order to generate the documentation target
- - `STARPP_TESTS` - Set to `ON` in order to generate the test targets
+If STAR++ is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project. They can still be installed by directly referencing their component names as shown above.
 
 #### Documentation:
 In order for the `starpp_docs` target to be generated the CMake cache variable **STARPP_DOCS** must be set to *ON* when CMake is invoked:
@@ -202,11 +216,11 @@ The project contains a suite of tests to ensure that the library functions as in
     
 #### Package
 By default, the CMakeLists project configures CPack to create an artifact ZIP containing:
- - Debug/Release artifacts of the static library
- - A Release artifact of the reference application
+ - The library
+ - The reference application
  - Documentation
 
-The following is the general build process required to successfully generate this package via a shadow build on Windows:
+The following is the general build process required to successfully generate this package via a shadow build on Windows. Adjust the configuration as you see fit:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Set the environment variables that follow as desired
@@ -220,15 +234,9 @@ CALL "%Qt_ROOT%\bin\qt-cmake" -G "Ninja Multi-Config" -S "%STARPP_SOURCE_DIR%" -
 # Go to Build directory
 cd /D "%STARPP_BUILD_DIR%"
 
-# Build the Debug/Release library
-cmake.exe --build . --target starpp_base --config Debug
-cmake.exe --build . --target starpp_base --config Release
-
-# Build the reference application
-cmake --build . --target starpp_frontend --config Release
-
-# Build the documentation
-cmake --build . --target starpp_docs --config Release
+# Build the Debug/Release library, reference app, and documentation
+cmake.exe --build . --target all --config Debug
+cmake.exe --build . --target all --config Release
 
 # Install Debug/Release libraries, reference application, and documentation
 cmake --install . --config Debug
