@@ -1,8 +1,8 @@
 html {
 	--side-nav-fixed-width: 340px;
-    --primary-color: #CC6428;
-    --primary-dark-color: #7A4E33;
-    --primary-light-color: #E29F6F;
+    --primary-color: #28B3CC;
+    --primary-dark-color: #326D77;
+    --primary-light-color: #70CFE0;
 }
 
 html.dark-mode {
