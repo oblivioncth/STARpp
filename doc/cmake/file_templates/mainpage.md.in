@@ -284,4 +284,4 @@ target_link_libraries(SomeExe
 )
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This approach will avoid concerns of ensuring compatibility between Qt configurations for your project and STAR++, since both will be built with the same copy of Qt.
+This allows for more flexibility in downstream projects as they can more easily alter the configuration of libsquish on-the-fly as needed.
