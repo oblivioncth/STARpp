@@ -85,42 +85,25 @@ Using no calculator options will result in the application following the recomme
 ### Summary
 
  - C++20
- - CMake >= 3.25.0
+ - CMake >= 3.23.0
  - Targets:
 	 - Windows 10+
-	 - Linux (Tested on Ubuntu 20.04)
+	 - Linux
 
 ### Dependencies
 - Qt6
 - [Qx](https://github.com/oblivioncth/Qx/)
 - [Neargye's Magic Enum](https://github.com/Neargye/magic_enum)
-- Doxygen (for documentation)
+- [OBCMake](https://github.com/oblivioncth/OBCmake) (build script support, fetched automatically)
+- [Doxygen](https://www.doxygen.nl/)  (for documentation)
 
-### Builds
-Tested with:
- - Windows: MSVC2022
- - Linux: Clang 12
+## Pre-built Releases/Artifacts
+
+Releases and some workflows currently provide builds of libsquish in various combinations of platforms and compilers. View the repository [Actions](https://github.com/oblivioncth/STARpp/actions) or [Releases](https://github.com/oblivioncth/STARpp/releases) to see examples
 
 ### Details
 The source for this project is managed by a sensible CMake configuration that allows for straightforward compilation and consumption of its target(s), either as a sub-project or as an imported package. All required dependencies except for Qt6 and Doxygen are automatically acquired via CMake's FetchContent mechanism.
 
 The configuration of this projects supports consumption both via find_package() and FetchContent.
 
-**CMake Options:**
-
- - `STARPP_TESTS` set to ON in order to generate tests
- - `STARPP_DOCS` set to ON in order to generate the documentation target
-
-**CMake Targets**
- - `all` - Builds the library, reference application, and tests
- - `starpp_base` - Builds the library
- - `starpp_frontend` - Builds the reference application
- - `starpp_docs` - Builds the documentation
- - `starpp_tst_...` - Various test targets. To actually run tests, just build the general CMake tests target `test`
-
-**CMake Install Components:**
- - `all` - Installs all built components
- - `starpp` - Installs top-level files (README.md, CMake package configuration files, etc.)
- - `starpp_base` - Installs the library
- - `starpp_frontend` - Installs the reference application
- - `starpp_docs` - Installs the documentation
+See the *Packaging* and *Building From Source* sections of the [documentation](https://oblivioncth.github.io/STARpp/) for a detailed overview of the various CMake options, targets, install components, etc.
