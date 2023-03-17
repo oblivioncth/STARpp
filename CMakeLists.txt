@@ -13,16 +13,13 @@ project(STARpp
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("fa4641c34c6f7f11111d5ae73a3b41c59e095caa")
+fetch_ob_cmake("202d606507f26a95c10d15ea170c7aed9e5c5341")
 
 # Initialize project according to standard rules
 include(OB/Project)
-ob_standard_project_setup()
-
-# Standard setup overrides
-set(PROJECT_NAMESPACE "STAR")
-string(TOLOWER "${PROJECT_NAMESPACE}" PROJECT_NAMESPACE_LC)
-string(TOUPPER "${PROJECT_NAMESPACE}" PROJECT_NAMESPACE_UC)
+ob_standard_project_setup(
+    NAMESPACE "STAR"
+)
 
 # Additional Project Variables
 set(PROJECT_NAME_FORMAL "STAR++")
@@ -30,6 +27,7 @@ set(PROJECT_NAME_FORMAL "STAR++")
 # Configuration options
 option(STARPP_TESTS "Build STAR++ tests" OFF)
 option(STARPP_DOCS "Build STAR++ documentation" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries." OFF) # Redundant due to OB, but explicit
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
@@ -95,7 +93,7 @@ endif()
 if(STARPP_TESTS)
     enable_testing()
     set(TESTS_TARGET_PREFIX ${PROJECT_NAMESPACE_LC})
-    set(TESTS_COMMON_ALIAS_NAME ${PROJECT_NAMESPACE}::TestCommon)
+    set(TESTS_COMMON_TARGET "${TESTS_TARGET_PREFIX}_tst_common")
     add_subdirectory(tests)
 endif()
 
