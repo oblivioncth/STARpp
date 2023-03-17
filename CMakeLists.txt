@@ -13,7 +13,7 @@ project(STARpp
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("990d4c4a3987722a173f948b59fd45ce924a7d9c")
+fetch_ob_cmake("fa4641c34c6f7f11111d5ae73a3b41c59e095caa")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -67,7 +67,7 @@ set(STARPP_QX_COMPONENTS
 
 include(OB/FetchQx)
 ob_fetch_qx(
-    REF "a290fd23bb36779aeccf2ae881b542d22d716829"
+    REF "72e93eb5986b62ebd4ac26971572b4860724b5d2"
     COMPONENTS
         ${STARPP_QX_COMPONENTS}
 )
@@ -110,8 +110,8 @@ ob_standard_project_package_config(
     COMPATIBILITY "SameMinorVersion"
     CONFIG STANDARD
         TARGET_CONFIGS
-            "${PROJECT_NAMESPACE}::${LIB_ALIAS_NAME}"
-            "${PROJECT_NAMESPACE}::${APP_ALIAS_NAME}"
+            TARGET "${PROJECT_NAMESPACE}::${LIB_ALIAS_NAME}" COMPONENT "${LIB_ALIAS_NAME}" DEFAULT
+            TARGET "${PROJECT_NAMESPACE}::${APP_ALIAS_NAME}" COMPONENT "${APP_ALIAS_NAME}"
         DEPENDS
             PACKAGE "Qt6" COMPONENTS ${STARPP_QT_COMPONENTS}
             PACKAGE "Qx" VERSION ${Qx_VERSION} COMPONENTS ${STARPP_QX_COMPONENTS}

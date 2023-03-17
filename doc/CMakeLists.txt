@@ -11,8 +11,7 @@ list(APPEND DOXYGEN_PREDEFINED
     STAR_BASE_EXPORT=
 )
 
-ob_standard_documentation(
-    TARGET_NAME "${DOC_TARGET_NAME}"
+ob_standard_documentation(${DOC_TARGET_NAME}
     DOXY_VER 1.9.4
     PROJ_NAME "${PROJECT_NAME_FORMAL}"
     QT_PREFIX "${Qt6_PREFIX_PATH}"
