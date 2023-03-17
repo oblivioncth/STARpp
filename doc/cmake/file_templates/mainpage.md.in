@@ -13,7 +13,7 @@ Requirements
 
  - An x64, C++@CMAKE_CXX_STANDARD@ capable compiler
  - Qt6
- - CMake @TRUE_CMAKE_MINIMUM_REQUIRED@ or greater
+ - CMake @PROJECT_CMAKE_MINIMUM_REQUIRED_VERSION@ or greater
  - OS
 	 - Windows 10 or above
 	 - Linux (untested on more general Unix systems)
