@@ -5,7 +5,6 @@ ob_add_basic_standard_test(
     TARGET_VAR test_target
     LINKS
         ${TESTS_COMMON_TARGET}
-        STAR::Base
 )
 
 # Bundle test data
