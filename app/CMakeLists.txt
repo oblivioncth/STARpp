@@ -38,5 +38,5 @@ ob_add_cpp_vars(${APP_TARGET_NAME}
     VARS
         VERSION_STR "\"${PROJECT_VERSION}\""
         SHORT_NAME "\"${PROJECT_NAME}\""
-        APP_NAME "\"${APP_NAME}\""
+        APP_NAME "\"${PROJECT_NAME_FORMAL}\""
 )
