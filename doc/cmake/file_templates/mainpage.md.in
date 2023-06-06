@@ -284,4 +284,4 @@ target_link_libraries(SomeExe
 )
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This allows for more flexibility in downstream projects as they can more easily alter the configuration of libsquish on-the-fly as needed.
+This allows for more flexibility in downstream projects as they can more easily alter the configuration of STAR++ on-the-fly as needed.
