@@ -99,7 +99,7 @@ Using no calculator options will result in the application following the recomme
 
 ## Pre-built Releases/Artifacts
 
-Releases and some workflows currently provide builds of libsquish in various combinations of platforms and compilers. View the repository [Actions](https://github.com/oblivioncth/STARpp/actions) or [Releases](https://github.com/oblivioncth/STARpp/releases) to see examples
+Releases and some workflows currently provide builds of STARpp in various combinations of platforms and compilers. View the repository [Actions](https://github.com/oblivioncth/STARpp/actions) or [Releases](https://github.com/oblivioncth/STARpp/releases) to see examples
 
 ### Details
 The source for this project is managed by a sensible CMake configuration that allows for straightforward compilation and consumption of its target(s), either as a sub-project or as an imported package. All required dependencies except for Qt6 and Doxygen are automatically acquired via CMake's FetchContent mechanism.
