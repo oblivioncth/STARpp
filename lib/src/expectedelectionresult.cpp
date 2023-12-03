@@ -75,20 +75,12 @@ QList<Seat> ExpectedElectionResult::seats() const { return mSeats; }
  *  Returns @c true if this expected election result is the same as the election result
  *  @a result; otherwise, returns @c false.
  *
- *  @sa operator!=() and sameOutcomeAs().
+ *  @sa sameOutcomeAs().
  */
 bool ExpectedElectionResult::operator==(const ElectionResult& result) const
 {
     return mSeats == result.seats();
 }
-
-/*!
- *  Returns @c true if this expected election result is not the same as the election result
- *  @a result; otherwise, returns @c false.
- *
- *  @sa operator==() and sameOutcomeAs().
- */
-bool ExpectedElectionResult::operator!=(const ElectionResult& result) const { return !(*this == result); }
 
 //===============================================================================================================
 // ExpectedElectionResult::Builder

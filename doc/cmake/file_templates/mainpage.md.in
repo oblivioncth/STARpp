@@ -22,7 +22,7 @@ Packaging
 ----------
 STAR++ is provided as a CMake package composed of a single library, several public header files, and the reference application.
 
-#### Package Components:
+### Package Components:
 
  - `Base` - The main library
  - `Frontend` - The reference application
@@ -141,12 +141,13 @@ Alternatively, you can use the `qt-cmake` wrapper for similar Qt environment aut
 
 The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config (recommended), and may require some tweaking to work with single configuration generators.
 
-#### CMake Options:
+### CMake Options:
 
  - `STARPP_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
  - `STARPP_TESTS` - Set to `ON` in order to generate the test targets (OFF)
  - `BUILD_SHARED_LIBS` - Build STAR++ as a shared library instead of a static one (OFF)
-#### CMake Targets:
+
+### CMake Targets:
 
  - `all` - Builds the STAR++ library and reference application
  - `install` - Installs the build output into `CMAKE_INSTALL_PREFIX`
@@ -155,7 +156,7 @@ The CMake project is designed to be used with multi-configuration generators suc
  - `starpp_docs` - Builds the STAR++ documentation
  - `starpp_tst_...` - Builds the various test targets. To actually run tests, just build the general CMake tests target `test`.
 
-#### CMake Install Components:
+### CMake Install Components:
 
 - `starpp` - Installs top-level files (README.md, CMake package configuration files, etc.) 
 - `starpp_base` - Installs the built library
@@ -164,7 +165,8 @@ The CMake project is designed to be used with multi-configuration generators suc
 
 If STAR++ is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project. They can still be installed by directly referencing their component names as shown above.
 
-#### Documentation:
+### Documentation:
+
 In order for the `starpp_docs` target to be generated the CMake cache variable **STARPP_DOCS** must be set to *ON* when CMake is invoked:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cmake.exe (...) -D STARPP_DOCS=ON
@@ -211,10 +213,12 @@ The path for this documentation varies depending on how you obtained Qt, but is 
     # By default on Windows <QT_SOFTWARE> is C:\Program Files\Qt
     # On Linux it is often /usr/local/Qt
     
-#### Tests:
+### Tests:
+
 The project contains a suite of tests to ensure that the library functions as intended. They will be expanded upon as the library matures.
     
-#### Package
+### Package:
+
 By default, the CMakeLists project configures CPack to create an artifact ZIP containing:
  - The library
  - The reference application

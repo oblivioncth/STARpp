@@ -12,6 +12,28 @@ namespace Star
 {
 /*! @cond */
 //===============================================================================================================
+// RefBallotBoxError
+//===============================================================================================================
+
+//-Constructor--------------------------------------------------------------------
+RefBallotBoxError::RefBallotBoxError(Type t) :
+    mType(t),
+    mString(ERR_STRINGS.value(t))
+{}
+
+//-Instance Functions-------------------------------------------------------------
+//Public:
+bool RefBallotBoxError::isValid() const { return mType != NoError; }
+RefBallotBoxError::Type RefBallotBoxError::type() const { return mType; }
+QString RefBallotBoxError::string() const { return mString; }
+
+//Private:
+Qx::Severity RefBallotBoxError::deriveSeverity() const { return Qx::Critical; }
+quint32 RefBallotBoxError::deriveValue() const { return mType; }
+QString RefBallotBoxError::derivePrimary() const { return MAIN_ERR_MSG; }
+QString RefBallotBoxError::deriveSecondary() const { return mString; }
+
+//===============================================================================================================
 // RefBallotBox
 //===============================================================================================================
 
@@ -39,7 +61,7 @@ RefBallotBox::Reader::Reader(RefBallotBox* targetBox, const QString& filePath, c
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Private:
-Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& headingsRow)
+RefBallotBoxError RefBallotBox::Reader::parseCategories(const QList<QVariant>& headingsRow)
 {
     // Fill out categories
     qsizetype cIdx = STATIC_FIELD_COUNT; // Skip known headings
@@ -54,10 +76,10 @@ Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& he
         {
             QString candidateField = headingsRow[cIdx].toString().trimmed();
             if(candidateField.isEmpty())
-                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_BLANK_VALUE.arg(0).arg(cIdx));
+                return RefBallotBoxError(RefBallotBoxError::BlankValue, 0, cIdx);
 
             if(candidates.contains(candidateField))
-                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE_CANDIDATE);
+                return RefBallotBoxError(RefBallotBoxError::DuplicateCandidate);
 
             candidates += candidateField;
         }
@@ -66,10 +88,10 @@ Qx::GenericError RefBallotBox::Reader::parseCategories(const QList<QVariant>& he
         mTargetBox->mCategories.append(category);
     }
 
-    return Qx::GenericError();
+    return RefBallotBoxError();
 }
 
-Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballotRow, qsizetype ballotNum)
+RefBallotBoxError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballotRow, qsizetype ballotNum)
 {
     // Ignore lines with all empty fields
     bool allEmpty = true;
@@ -83,7 +105,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
     }
 
     if(allEmpty)
-        return Qx::GenericError();
+        return RefBallotBoxError();
 
     // Read submission date
     QDate submitted = QDate::fromString(ballotRow[SUBMISSION_DATE_INDEX].toString(), "d-MMM-yy").addYears(100);
@@ -94,7 +116,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
     // Read voter name
     QString voterName = ballotRow[MEMBER_NAME_INDEX].toString();
     if(voterName.isEmpty())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_BLANK_VALUE.arg(ballotNum).arg(MEMBER_NAME_INDEX));
+        return RefBallotBoxError(RefBallotBoxError::BlankValue, ballotNum, MEMBER_NAME_INDEX);
 
     // Create ballot with existing info
     RefBallot ballot{.voter = voterName, .submissionDate = submitted, .votes = {}};
@@ -122,7 +144,7 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
             int vote = voteField.toUInt(&validValue); // Stored as int, but should be a uint
 
             if(!validValue || vote > 5)
-                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VOTE.arg(ballotNum).arg(cIdx));
+                return RefBallotBoxError(RefBallotBoxError::InvalidVote, ballotNum, cIdx);
 
             categoryVotes.append(vote);
         }
@@ -133,38 +155,38 @@ Qx::GenericError RefBallotBox::Reader::parseBallot(const QList<QVariant>& ballot
     // Add ballot to box
     mTargetBox->mBallots.append(ballot);
 
-    return Qx::GenericError();
+    return RefBallotBoxError();
 }
 
 //Public:
-Qx::GenericError RefBallotBox::Reader::readInto()
+RefBallotBoxError RefBallotBox::Reader::readInto()
 {
     // Error tracking
-    Qx::GenericError errorStatus;
+    RefBallotBoxError errorStatus;
 
     // Quickly check if file is empty
     if(Qx::fileIsEmpty(mCsvFile))
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_EMPTY);
+        return RefBallotBoxError(RefBallotBoxError::Empty);
 
     // Read whole CSV into memory as raw data
     QByteArray csv;
     Qx::IoOpReport readReport = Qx::readBytesFromFile(csv, mCsvFile);
     if(readReport.isFailure())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(readReport.outcomeInfo());
+        return RefBallotBoxError(RefBallotBoxError::IoError, readReport.outcomeInfo());
 
     // Parse into DsvTable
     Qx::DsvParseError dsvError;
     Qx::DsvTable csvTable = Qx::DsvTable::fromDsv(csv, ',', '"', &dsvError);
     if(dsvError.error() != Qx::DsvParseError::NoError)
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(dsvError.errorString());
+        return RefBallotBoxError(RefBallotBoxError::IoError, dsvError.errorString());
 
     // Ensure the minimum amount of rows are present
     if(csvTable.rowCount() < 3)
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_ROW_COUNT);
+        return RefBallotBoxError(RefBallotBoxError::InvalidRowCount);
 
     // Ensure the column count is correct
     if(csvTable.columnCount() != mExpectedFieldCount)
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_COLUMN_COUNT.arg(csvTable.columnCount()).arg(mExpectedFieldCount));
+        return RefBallotBoxError(RefBallotBoxError::InvalidColumnCount, csvTable.columnCount(), mExpectedFieldCount);
 
     // Separate headings from ballot rows
     QList<QVariant> headingRow = csvTable.takeFirstRow();
