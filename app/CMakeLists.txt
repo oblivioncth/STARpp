@@ -16,7 +16,6 @@ ob_add_standard_executable(${APP_TARGET_NAME}
     SOURCE
         core.h
         core.cpp
-        errorcode.h
         referenceelectionconfig.h
         resultspresenter.h
         resultspresenter.cpp

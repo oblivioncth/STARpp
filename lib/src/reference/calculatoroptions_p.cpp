@@ -10,6 +10,28 @@
 namespace Star
 {
 /*! @cond */
+//===============================================================================================================
+// CalcOptionsError
+//===============================================================================================================
+
+//-Constructor--------------------------------------------------------------------
+CalcOptionsError::CalcOptionsError(Type t) :
+    mType(t),
+    mString(ERR_STRINGS.value(t))
+{}
+
+//-Instance Functions-------------------------------------------------------------
+//Public:
+bool CalcOptionsError::isValid() const { return mType != NoError; }
+CalcOptionsError::Type CalcOptionsError::type() const { return mType; }
+QString CalcOptionsError::string() const { return mString; }
+
+//Private:
+Qx::Severity CalcOptionsError::deriveSeverity() const { return Qx::Critical; }
+quint32 CalcOptionsError::deriveValue() const { return mType; }
+QString CalcOptionsError::derivePrimary() const { return MAIN_ERR_MSG; }
+QString CalcOptionsError::deriveSecondary() const { return mString; }
+
 
 //===============================================================================================================
 // RefCalcOptionsReader
@@ -24,23 +46,22 @@ CalcOptionsReader::CalcOptionsReader(Star::Calculator::Options* targetOptions, c
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-Qx::GenericError CalcOptionsReader::readInto()
+CalcOptionsError CalcOptionsReader::readInto()
 {
     QFileInfo optInfo(mOptionsReader.filePath());
 
     // Before checking the reader status, see if the file even exists
     if(!optInfo.exists())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DOES_NOT_EXIST);
+        return CalcOptionsError(CalcOptionsError::DoesNotExist);
 
     // Also, directly check for empty file
     if(optInfo.size() == 0)
-        return Qx::GenericError();
+        return CalcOptionsError();
 
     // Open file
     Qx::IoOpReport openReport = mOptionsReader.openFile();
     if(openReport.isFailure())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(openReport.outcomeInfo());
-
+        return CalcOptionsError(CalcOptionsError::IoError, openReport.outcomeInfo());
 
     // Read file line-by-line
     for(uint line = 0; !mOptionsReader.atEnd(); line++)
@@ -56,14 +77,14 @@ Qx::GenericError CalcOptionsReader::readInto()
         if(potentialOpt.has_value())
             mTargetOptions->setFlag(potentialOpt.value());
         else
-            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_OPTION.arg(line));
+            return CalcOptionsError(CalcOptionsError::InvalidOption, line);
     }
 
     // Check stream status
     if(mOptionsReader.hasError())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(mOptionsReader.status().outcomeInfo());
+        CalcOptionsError(CalcOptionsError::IoError, mOptionsReader.status().outcomeInfo());
 
-    return Qx::GenericError();
+    return CalcOptionsError();
 }
 /*! @endcond */
 }

@@ -36,7 +36,6 @@ public:
     QList<Seat> seats() const;
 
     bool operator==(const ElectionResult& result) const;
-    bool operator!=(const ElectionResult& result) const;
 };
 
 class STAR_BASE_EXPORT ExpectedElectionResult::Builder

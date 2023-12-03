@@ -8,7 +8,7 @@
 #include <QFile>
 
 // Qx Includes
-#include <qx/core/qx-genericerror.h>
+#include <qx/core/qx-abstracterror.h>
 
 namespace Star
 {
@@ -28,6 +28,78 @@ struct RefBallot
     QString voter;
     QDate submissionDate;
     QList<QList<int>> votes;
+};
+
+class QX_ERROR_TYPE(RefBallotBoxError, "Star::RefBallotBoxError", 1150)
+{
+    friend class RefBallotBox;
+//-Class Enums-------------------------------------------------------------
+public:
+    enum Type
+    {
+        NoError,
+        InvalidRowCount,
+        InvalidColumnCount,
+        InvalidDate,
+        Empty,
+        BlankValue,
+        InvalidVote,
+        DuplicateCandidate,
+        IoError
+    };
+
+//-Class Variables-------------------------------------------------------------
+private:
+    static inline const QString MAIN_ERR_MSG = u"Error reading the ballot box."_s;
+    static inline const QHash<Type, QString> ERR_STRINGS{
+        {NoError, u""_s},
+        {InvalidRowCount, u"The ballot box has less than the minimum required row count (headings + 2 voters)."_s},
+        {InvalidColumnCount, u"The ballot box has a different number of columns than specified by the category configuration (%1 vs %2)."_s},
+        {InvalidDate, u"The format of a submission date was invalid."_s},
+        {Empty, u"The provided file contains no ballots."_s},
+        {BlankValue, u"A field expected to have a value was blank (r: %1, c: %2)."_s},
+        {InvalidVote, u"A vote value was not a valid unsigned integer between 0 and 5 (r: %1, c: %2)."_s},
+        {DuplicateCandidate, u"The ballot box contained duplicate candidates within the same category."_s},
+        {IoError, u"IO Error: %1"_s}
+    };
+
+//-Instance Variables-------------------------------------------------------------
+private:
+    Type mType;
+    QString mString;
+
+//-Constructor-------------------------------------------------------------
+private:
+    RefBallotBoxError(Type t = NoError);
+
+    template<typename... Strings>
+        requires (std::same_as<Strings, QString> && ...)
+    RefBallotBoxError(Type t, Strings... args) :
+        RefBallotBoxError(t)
+    {
+        mString = mString.arg(args...);
+    }
+
+    template<typename... Ints>
+        requires (std::integral<Ints> && ...)
+    RefBallotBoxError(Type t, Ints... args) :
+        RefBallotBoxError(t)
+    {
+        auto sub = [this](auto integer) { mString = mString.arg(integer); };
+        (sub(args), ...);
+    }
+
+//-Instance Functions-------------------------------------------------------------
+public:
+    bool isValid() const;
+    Type type() const;
+    QString string() const;
+
+private:
+    Qx::Severity deriveSeverity() const override;
+    quint32 deriveValue() const override;
+    QString derivePrimary() const override;
+    QString deriveSecondary() const override;
 };
 
 class RefBallotBox
@@ -55,19 +127,6 @@ class RefBallotBox::Reader
 {
 //-Class Variables--------------------------------------------------------------------------------------------------
 private:
-    // Error
-    static inline const QString MAIN_ERR_MSG = QStringLiteral("Error reading the ballot box.");
-
-    static inline const QString ERR_INVALID_ROW_COUNT = QStringLiteral("The ballot box has less than the minimum required row count (headings + 2 voters).");
-    static inline const QString ERR_INVALID_COLUMN_COUNT = QStringLiteral("The ballot box has a different number of columns than specified by the category configuration (%1 vs %2).");
-    static inline const QString ERR_INVALID_DATE = QStringLiteral("The format of a submission date was invalid.");
-    static inline const QString ERR_EMPTY = QStringLiteral("The provided file contains no ballots.");
-    static inline const QString ERR_BLANK_VALUE = QStringLiteral("A field expected to have a value was blank (r: %1, c: %2).");
-    static inline const QString ERR_INVALID_VOTE = QStringLiteral("A vote value was not a valid unsigned integer between 0 and 5 (r: %1, c: %2).");
-    static inline const QString ERR_DUPLICATE_CANDIDATE = QStringLiteral("The ballot box contained duplicate candidates within the same category.");
-
-    static inline const Qx::GenericError ERROR_TEMPLATE = Qx::GenericError(Qx::GenericError::Critical, MAIN_ERR_MSG);
-
     // Fields
     static const int STATIC_FIELD_COUNT = 2;
     static const int SUBMISSION_DATE_INDEX = 0;
@@ -86,11 +145,11 @@ public:
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 private:
-    Qx::GenericError parseCategories(const QList<QVariant>& headingsRow);
-    Qx::GenericError parseBallot(const QList<QVariant>& ballotRow, qsizetype ballotNum);
+    RefBallotBoxError parseCategories(const QList<QVariant>& headingsRow);
+    RefBallotBoxError parseBallot(const QList<QVariant>& ballotRow, qsizetype ballotNum);
 
 public:
-    Qx::GenericError readInto();
+    RefBallotBoxError readInto();
 };
 /*! @endcond */
 }
