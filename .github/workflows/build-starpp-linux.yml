@@ -89,6 +89,9 @@ jobs:
       run: sudo apt-get install libxkbcommon-x11-dev libxcb-*-dev
     - name: Install OpenGL lib
       run: sudo apt-get install libglu1-mesa-dev # TODO: See if this can be avoided, for some reason qhelpgenerator needs this, maybe its because it was available during compilation
+    - name: Install EGL [22.04]
+      if: matrix.os == 'ubuntu-22.04'
+      run: sudo apt-get install libegl1-mesa-dev
     - name: Checkout STARpp
       uses: actions/checkout@v3
       with:
