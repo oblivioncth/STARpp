@@ -43,6 +43,9 @@ public:
     HeadToHeadResults(const Election* election);
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
+private:
+    void faceOffStatsUpdate(const QString& can, int canPref, const QString& opp, int oppPref);
+
 public:
     int wins(const QString& candidate) const;
     int losses(const QString& candidate) const;

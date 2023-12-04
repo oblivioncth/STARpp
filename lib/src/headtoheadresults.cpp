@@ -43,28 +43,27 @@ HeadToHeadResults::HeadToHeadResults(const Election* election)
                     prefB++;
             }
 
-            // Update stats for candidate A
-            CandidateStats& statsA = mStats[opponentA];
-            if(prefA > prefB)
-                statsA.victories.insert(opponentB);
-            else if(prefA < prefB)
-                statsA.defeats.insert(opponentB);
-            statsA.preferences.increase(opponentB, prefA);
-            statsA.antiPreferences.increase(opponentB, prefB);
-
-            // Update stats for candidate B
-            CandidateStats& statsB = mStats[opponentB];
-            if(prefB > prefA)
-                statsB.victories.insert(opponentA);
-            else if(prefB < prefA)
-                statsB.defeats.insert(opponentA);
-            statsB.preferences.increase(opponentA, prefB);
-            statsB.antiPreferences.increase(opponentA, prefA);
+            // Update stats for candidates
+            faceOffStatsUpdate(opponentA, prefA, opponentB, prefB);
+            faceOffStatsUpdate(opponentB, prefB, opponentA, prefA);
         }
     }
 }
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
+//Private:
+void HeadToHeadResults::faceOffStatsUpdate(const QString& can, int canPref, const QString& opp, int oppPref)
+{
+    // Update stats for candidate based on results of face-off with opponent
+    CandidateStats& cStats = mStats[can];
+    if(canPref > oppPref)
+        cStats.victories.insert(opp);
+    else if(oppPref < canPref)
+        cStats.defeats.insert(opp);
+    cStats.preferences.increase(opp, canPref);
+    cStats.antiPreferences.increase(opp, oppPref);
+}
+
 //Public:
 int HeadToHeadResults::wins(const QString& candidate) const
 {
