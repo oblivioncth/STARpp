@@ -58,7 +58,7 @@ void ResultPresenter::printElectionResult(const Star::ElectionResult& result)
     const QStringList winners = result.winners();
     cout << HEADING_WINNERS << endl;
     for(qsizetype w = 0; w < winners.size(); w++)
-        cout << WINNER_TEMPLATE.arg(w).arg(winners.at(w)) << endl;
+        cout << WINNER_TEMPLATE.arg(w + 1).arg(winners.at(w)) << endl;
     cout << endl;
 
     if(!result.isComplete())

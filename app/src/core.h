@@ -119,7 +119,7 @@ private:
     /* NOTE: This will cause a compilation error when changing Star::Calculator::Options in order to prompt the developer
      * to ensure any new options have been described above and then manually check them off here
      */
-#
+
     static_assert(magic_enum::enum_values<Star::Calculator::Option>() == std::array<Star::Calculator::Option, 4>{
             Star::Calculator::NoOptions,
             Star::Calculator::AllowTrueTies,
