@@ -187,7 +187,7 @@ Qx::Error Core::initialize()
     else
     {
         CoreError err(CoreError::InvalidArgs, ERR_MISSING_REF_PATHS);
-        logError(NAME, err);
+        postError(NAME, err);
         return err;
     }
 
