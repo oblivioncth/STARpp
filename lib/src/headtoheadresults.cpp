@@ -58,7 +58,7 @@ void HeadToHeadResults::faceOffStatsUpdate(const QString& can, int canPref, cons
     CandidateStats& cStats = mStats[can];
     if(canPref > oppPref)
         cStats.victories.insert(opp);
-    else if(oppPref < canPref)
+    else if(oppPref > canPref)
         cStats.defeats.insert(opp);
     cStats.preferences.increase(opp, canPref);
     cStats.antiPreferences.increase(opp, oppPref);
