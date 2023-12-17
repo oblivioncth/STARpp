@@ -5,6 +5,9 @@
 #include "reference/ballotbox_p.h"
 #include "reference/resultset_p.h"
 
+// Qx Includes
+#include <qx/core/qx-error.h>
+
 /*!
  *  @file reference.h
  *
@@ -186,12 +189,12 @@ namespace
         return views;
     }
 
-    ReferenceError qxGenErrToRefError(ReferenceErrorType type, const Qx::GenericError& error)
+    ReferenceError qxErrToRefError(ReferenceErrorType type, const Qx::Error& error)
     {
         if(!error.isValid())
             return ReferenceError();
 
-        return ReferenceError{ .type = type, .error = error.primaryInfo(), .errorDetails = error.secondaryInfo() };
+        return ReferenceError{ .type = type, .error = error.primary(), .errorDetails = error.secondary() };
     }
 }
 
@@ -210,19 +213,19 @@ ReferenceError electionsFromReferenceInput(QList<Election>& returnBuffer,
     returnBuffer.clear();
 
     // Status tracker
-    Qx::GenericError errorStatus;
+    Qx::Error errorStatus;
 
     // Read category config
     RefCategoryConfig cc;
     RefCategoryConfig::Reader ccReader(&cc, categoryConfigPath);
     if((errorStatus = ccReader.readInto()).isValid())
-        return qxGenErrToRefError(ReferenceErrorType::CategoryConfig, errorStatus);
+        return qxErrToRefError(ReferenceErrorType::CategoryConfig, errorStatus);
 
     // Read ballot box
     RefBallotBox bb;
     RefBallotBox::Reader bbReader(&bb, ballotBoxPath, &cc);
     if((errorStatus = bbReader.readInto()).isValid())
-        return qxGenErrToRefError(ReferenceErrorType::BallotBox, errorStatus);
+        return qxErrToRefError(ReferenceErrorType::BallotBox, errorStatus);
 
     // Create elections from standard ballot box
 
@@ -245,7 +248,7 @@ ReferenceError expectedResultsFromReferenceInput(QList<ExpectedElectionResult>& 
 
     // Read file
     ResultSetReader rsReader(&returnBuffer, resultSetPath);
-    return qxGenErrToRefError(ReferenceErrorType::ExpectedResult, rsReader.readInto());
+    return qxErrToRefError(ReferenceErrorType::ExpectedResult, rsReader.readInto());
 }
 
 /*!
@@ -262,7 +265,7 @@ ReferenceError calculatorOptionsFromReferenceInput(Star::Calculator::Options& re
 
     // Read file
     CalcOptionsReader opReader(&returnBuffer, calcOptionsPath);
-    return qxGenErrToRefError(ReferenceErrorType::CalcOptions, opReader.readInto());
+    return qxErrToRefError(ReferenceErrorType::CalcOptions, opReader.readInto());
 }
 
 }

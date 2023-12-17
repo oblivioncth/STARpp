@@ -8,6 +8,28 @@ namespace Star
 {
 /*! @cond */
 //===============================================================================================================
+// RefCategoryConfigError
+//===============================================================================================================
+
+//-Constructor--------------------------------------------------------------------
+RefCategoryConfigError::RefCategoryConfigError(Type t) :
+    mType(t),
+    mString(ERR_STRINGS.value(t))
+{}
+
+//-Instance Functions-------------------------------------------------------------
+//Public:
+bool RefCategoryConfigError::isValid() const { return mType != NoError; }
+RefCategoryConfigError::Type RefCategoryConfigError::type() const { return mType; }
+QString RefCategoryConfigError::string() const { return mString; }
+
+//Private:
+Qx::Severity RefCategoryConfigError::deriveSeverity() const { return Qx::Critical; }
+quint32 RefCategoryConfigError::deriveValue() const { return mType; }
+QString RefCategoryConfigError::derivePrimary() const { return MAIN_ERR_MSG; }
+QString RefCategoryConfigError::deriveSecondary() const { return mString; }
+
+//===============================================================================================================
 // RefCategoryConfig
 //===============================================================================================================
 
@@ -38,22 +60,22 @@ RefCategoryConfig::Reader::Reader(RefCategoryConfig* targetConfig, const QString
 
 //-Instance Functions-------------------------------------------------------------------------------------------------
 //Public:
-Qx::GenericError RefCategoryConfig::Reader::readInto()
+RefCategoryConfigError RefCategoryConfig::Reader::readInto()
 {
     QFileInfo iniInfo(mIniReader.filePath());
 
     // Before checking the reader status, see if the file even exists
     if(!iniInfo.exists())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DOES_NOT_EXIST);
+        return RefCategoryConfigError(RefCategoryConfigError::DoesNotExist);
 
     // Also, directly check for empty file
     if(iniInfo.size() == 0)
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_EMPTY);
+        return RefCategoryConfigError(RefCategoryConfigError::Empty);
 
     // Open file
     Qx::IoOpReport openReport = mIniReader.openFile();
     if(openReport.isFailure())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(openReport.outcomeInfo());
+        return RefCategoryConfigError(RefCategoryConfigError::IoError, openReport.outcomeInfo());
 
     // Set default section
     Section currentSection = Section::None;
@@ -77,16 +99,16 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
             else if(iniLine == RefCategoryConfig::SECTION_HEADING_GENERAL)
                 currentSection = Section::General;
             else
-                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_LAYOUT.arg(line));
+                return RefCategoryConfigError(RefCategoryConfigError::InvalidLayout, line);
         }
         else if(currentSection == Section::None) // No Section
-            return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_INI.arg(line));
+            return RefCategoryConfigError(RefCategoryConfigError::InvalidIni, line);
         else // Key/Value
         {
             // Split key/value
             QStringList keyValueList = iniLine.split('=');
             if(keyValueList.size() != 2)
-                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_INI.arg(line));
+                return RefCategoryConfigError(RefCategoryConfigError::InvalidIni, line);
 
             QString key = keyValueList.at(0).trimmed();
             QString valueStr = keyValueList.at(1).trimmed();
@@ -96,14 +118,14 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
             uint value = valueStr.toUInt(&validValue);
 
             if(!validValue)
-                return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_VALUE_TYPE.arg(line));
+                return RefCategoryConfigError(RefCategoryConfigError::InvalidValueType, line);
 
             // Sections
             if(currentSection == Section::Categories)
             {
                 // Ensure value is valid
                 if(value < 2)
-                    return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_CATEGORY_COUNT.arg(line));
+                    return RefCategoryConfigError(RefCategoryConfigError::InvalidCategoryCount, line);
 
                 // Make sure this isn't a duplicate
                 auto start = mTargetConfig->headers().constBegin();
@@ -113,7 +135,7 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
                 }) != end);
 
                 if(dupe)
-                    return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_DUPLICATE_CATEGORY.arg(line));
+                    return RefCategoryConfigError(RefCategoryConfigError::DuplicateCategory, line);
 
                 // Add header to target config
                 RefCategoryHeader ch{.name = key, .candidateCount = value};
@@ -129,12 +151,12 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
                 {
                     // Ensure value is valid
                     if(value < 1)
-                        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_SEAT_COUNT.arg(line));
+                        return RefCategoryConfigError(RefCategoryConfigError::InvalidSeatCount, line);
 
                     mTargetConfig->mSeats = value;
                 }
                 else
-                    return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_INVALID_GENERAL_KEY.arg(line));
+                    return RefCategoryConfigError(RefCategoryConfigError::InvalidGeneralKey, line);
             }
             else
                 qCritical("Unhandled section");
@@ -143,17 +165,17 @@ Qx::GenericError RefCategoryConfig::Reader::readInto()
 
     // Check stream status
     if(mIniReader.hasError())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(mIniReader.status().outcomeInfo());
+        return RefCategoryConfigError(RefCategoryConfigError::IoError, mIniReader.status().outcomeInfo());
 
     // Fail if there are no categories
     if(mTargetConfig->mHeaders.isEmpty())
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_NO_CATEGORIES);
+        return RefCategoryConfigError(RefCategoryConfigError::NoCategories);
 
     // Fail if seat count wasn't specified
     if(mTargetConfig->mSeats < 1)
-        return Qx::GenericError(ERROR_TEMPLATE).setSecondaryInfo(ERR_NO_SEATS);
+        return RefCategoryConfigError(RefCategoryConfigError::NoSeats);
 
-    return Qx::GenericError();
+    return RefCategoryConfigError();
 }
 /*! @endcond */
 }

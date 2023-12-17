@@ -16,7 +16,6 @@ ob_add_standard_executable(${APP_TARGET_NAME}
     SOURCE
         core.h
         core.cpp
-        errorcode.h
         referenceelectionconfig.h
         resultspresenter.h
         resultspresenter.cpp
@@ -38,5 +37,5 @@ ob_add_cpp_vars(${APP_TARGET_NAME}
     VARS
         VERSION_STR "\"${PROJECT_VERSION}\""
         SHORT_NAME "\"${PROJECT_NAME}\""
-        APP_NAME "\"${APP_NAME}\""
+        APP_NAME "\"${PROJECT_NAME_FORMAL}\""
 )

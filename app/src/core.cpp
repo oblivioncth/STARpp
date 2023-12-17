@@ -12,6 +12,30 @@
 #define ENUM_NAME(eenum) QString(magic_enum::enum_name(eenum).data())
 
 //===============================================================================================================
+// CoreError
+//===============================================================================================================
+
+//-Constructor-------------------------------------------------------------
+//Private:
+CoreError::CoreError(Type t, const QString& s, Qx::Severity sv) :
+    mType(t),
+    mSpecific(s),
+    mSeverity(sv)
+{}
+
+//-Instance Functions-------------------------------------------------------------
+//Public:
+bool CoreError::isValid() const { return mType != NoError; }
+QString CoreError::specific() const { return mSpecific; }
+CoreError::Type CoreError::type() const { return mType; }
+
+//Private:
+Qx::Severity CoreError::deriveSeverity() const { return mSeverity; }
+quint32 CoreError::deriveValue() const { return mType; }
+QString CoreError::derivePrimary() const { return ERR_STRINGS.value(mType); }
+QString CoreError::deriveSecondary() const { return mSpecific; }
+
+//===============================================================================================================
 // CORE
 //===============================================================================================================
 
@@ -31,13 +55,13 @@ Core::Core(QCoreApplication* app) :
 
 //-Instance Functions-------------------------------------------------------------
 //Private:
-void Core::handleLogError(Qx::IoOpReport error)
+void Core::handleLogError(const Qx::IoOpReport& error)
 {
     // Note error
     mLogErrorOccurred = true;
 
     // Post error
-    static Qx::GenericError errorMsg(Qx::GenericError::Warning, ERR_LOG_ERROR, error.outcomeInfo());
+    static CoreError errorMsg(CoreError::LogError, error.outcomeInfo(), Qx::Warning);
     Qx::cout << errorMsg;
 }
 
@@ -75,18 +99,18 @@ void Core::showVersion()
     postMessage(CL_VERSION_MESSAGE);
 }
 
-void Core::logElectionData(const ReferenceElectionConfig data)
+void Core::logElectionData(const ReferenceElectionConfig& data)
 {
     logEvent(NAME, LOG_EVENT_ELECTION_DATA_PROVIDED.arg(data.bbPath, data.ccPath));
 }
 
 //Public:
-ErrorCode Core::initialize()
+Qx::Error Core::initialize()
 {
     // Open log
     Qx::IoOpReport logOpen = mLogger.openLog();
     if(logOpen.isFailure())
-        postError(NAME, Qx::GenericError(Qx::GenericError::Warning, logOpen.outcome(), logOpen.outcomeInfo()));
+        postError(NAME, Qx::Error(logOpen).setSeverity(Qx::Warning));
 
     // Log initialization step
     logEvent(NAME, LOG_EVENT_INIT);
@@ -100,9 +124,10 @@ ErrorCode Core::initialize()
     // Parse
     if(!clParser.parse(mArguments))
     {
-        postError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_ARGS, clParser.errorText()));
+        CoreError err(CoreError::InvalidArgs, clParser.errorText());
+        postError(NAME, err);
         showHelp();
-        return ErrorCode::INVALID_ARGS;
+        return err;
     }
 
     // Handle arguments
@@ -141,8 +166,9 @@ ErrorCode Core::initialize()
                 }
                 else
                 {
-                    postError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_CALC_OPTION, optStr));
-                    return ErrorCode::INVALID_CALC_OPT;
+                    CoreError err(CoreError::InvalidCalcOption, optStr);
+                    postError(NAME, err);
+                    return err;
                 }
             }
 
@@ -160,12 +186,13 @@ ErrorCode Core::initialize()
     }
     else
     {
-        logError(NAME, Qx::GenericError(Qx::GenericError::Error, LOG_ERR_INVALID_ARGS, ERR_MISSING_REF_PATHS));
-        return ErrorCode::INVALID_ARGS;
+        CoreError err(CoreError::InvalidArgs, ERR_MISSING_REF_PATHS);
+        postError(NAME, err);
+        return err;
     }
 
     // Return success
-    return ErrorCode::NO_ERR;
+    return CoreError();
 }
 
 bool Core::hasActionableArguments() const { return mRefElectionCfg.has_value(); }
@@ -181,7 +208,7 @@ bool Core::isMinimalPresentation() const { return mMinimal; }
 
 //-Signals & Slots------------------------------------------------------------------------------------------------------------
 //Public slots:
-void Core::logError(QString src, Qx::GenericError error)
+void Core::logError(const QString& src, const Qx::Error& error)
 {
     if(!mLogErrorOccurred)
     {
@@ -191,7 +218,7 @@ void Core::logError(QString src, Qx::GenericError error)
     }
 }
 
-void Core::logEvent(QString src, QString event)
+void Core::logEvent(const QString& src, const QString& event)
 {
     if(!mLogErrorOccurred)
     {
@@ -201,27 +228,29 @@ void Core::logEvent(QString src, QString event)
     }
 }
 
-void Core::logCalculatorDetail(QString detail) { logEvent("Calculator", detail); }
+void Core::logCalculatorDetail(const QString& detail) { logEvent("Calculator", detail); }
 
-ErrorCode Core::logFinish(ErrorCode exitCode)
+ErrorCode Core::logFinish(const Qx::Error& errorState)
 {
+    ErrorCode code = errorState.typeCode();
+
     if(!mLogErrorOccurred)
     {
-        Qx::IoOpReport lr = mLogger.finish(exitCode);
+        Qx::IoOpReport lr = mLogger.finish(code);
         if(lr.isFailure())
             handleLogError(lr);
     }
 
-    return exitCode;
+    return code;
 }
 
-void Core::postError(QString src, Qx::GenericError error)
+void Core::postError(const QString& src, const Qx::Error& error)
 {
     Qx::cout << error << Qt::endl;
     logError(src, error);
 }
 
-void Core::postMessage(QString msg)
+void Core::postMessage(const QString& msg)
 {
     Qx::cout << msg << Qt::endl;
 }

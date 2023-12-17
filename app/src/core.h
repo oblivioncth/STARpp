@@ -14,10 +14,56 @@
 #include <magic_enum.hpp>
 
 // Project Includes
-#include "errorcode.h"
 #include "star/calculator.h"
 #include "referenceelectionconfig.h"
 #include "project_vars.h"
+
+using ErrorCode = quint32;
+
+class QX_ERROR_TYPE(CoreError, "CoreError", 1200)
+{
+    friend class Core;
+//-Class Enums-------------------------------------------------------------
+public:
+    enum Type
+    {
+        NoError,
+        LogError,
+        InvalidArgs,
+        InvalidCalcOption
+    };
+
+//-Class Variables-------------------------------------------------------------
+private:
+    static inline const QHash<Type, QString> ERR_STRINGS{
+        {NoError, u""_s},
+        {LogError, u"Error writing to log"_s},
+        {InvalidArgs, u"Invalid arguments provided."_s},
+        {InvalidCalcOption, u"Invalid calculator option provided."_s}
+    };
+
+//-Instance Variables-------------------------------------------------------------
+private:
+    Type mType;
+    QString mSpecific;
+    Qx::Severity mSeverity;
+
+//-Constructor-------------------------------------------------------------
+private:
+    CoreError(Type t = NoError, const QString& s = {}, Qx::Severity sv = Qx::Critical);
+
+//-Instance Functions-------------------------------------------------------------
+public:
+    bool isValid() const;
+    Type type() const;
+    QString specific() const;
+
+private:
+    Qx::Severity deriveSeverity() const override;
+    quint32 deriveValue() const override;
+    QString derivePrimary() const override;
+    QString deriveSecondary() const override;
+};
 
 class Core : public QObject
 {
@@ -32,7 +78,6 @@ private:
     static inline const QString LOG_FILE_EXT = QStringLiteral("log");
 
     // Logging - Errors
-    static inline const QString LOG_ERR_INVALID_ARGS = QStringLiteral("Invalid arguments provided.");
     static inline const QString LOG_ERR_INVALID_CALC_OPTION = QStringLiteral("Invalid calculator option provided.");
 
     // Logging - Messages
@@ -74,6 +119,7 @@ private:
     /* NOTE: This will cause a compilation error when changing Star::Calculator::Options in order to prompt the developer
      * to ensure any new options have been described above and then manually check them off here
      */
+
     static_assert(magic_enum::enum_values<Star::Calculator::Option>() == std::array<Star::Calculator::Option, 4>{
             Star::Calculator::NoOptions,
             Star::Calculator::AllowTrueTies,
@@ -134,14 +180,14 @@ public:
 
 //-Instance Functions------------------------------------------------------------------------------------------------------
 private:
-    void handleLogError(Qx::IoOpReport error);
+    void handleLogError(const Qx::IoOpReport& error);
     void showHelp();
     void showVersion();
 
-    void logElectionData(const ReferenceElectionConfig data);
+    void logElectionData(const ReferenceElectionConfig& data);
 
 public:
-    ErrorCode initialize();
+    Qx::Error initialize();
     bool hasActionableArguments() const;
     ReferenceElectionConfig referenceElectionConfig() const;
     Star::Calculator::Options calculatorOptions() const;
@@ -149,13 +195,13 @@ public:
 
 //-Signals & Slots------------------------------------------------------------------------------------------------------------
 public slots:
-    void logError(QString src, Qx::GenericError error);
-    void logEvent(QString src, QString event);
-    void logCalculatorDetail(QString detail);
-    ErrorCode logFinish(ErrorCode exitCode);
+    void logError(const QString& src, const Qx::Error& error);
+    void logEvent(const QString& src, const QString& event);
+    void logCalculatorDetail(const QString& detail);
+    ErrorCode logFinish(const Qx::Error& errorState);
 
-    void postError(QString src, Qx::GenericError error);
-    void postMessage(QString msg);
+    void postError(const QString& src, const Qx::Error& error);
+    void postMessage(const QString& msg);
 };
 
 #endif // CORE_H

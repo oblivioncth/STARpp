@@ -1,19 +1,19 @@
 #================= Project Setup ==========================
 
 # CMake
-cmake_minimum_required(VERSION 3.23.0...3.25.0)
+cmake_minimum_required(VERSION 3.23.0...3.26.0)
 
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
 project(STARpp
-    VERSION 0.2.1
+    VERSION 0.2.2
     LANGUAGES CXX
     DESCRIPTION "C++ implementation of STAR voting"
 )
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("v0.3")
+fetch_ob_cmake("v0.3.4")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -65,14 +65,14 @@ set(STARPP_QX_COMPONENTS
 
 include(OB/FetchQx)
 ob_fetch_qx(
-    REF "v0.5"
+    REF "v0.5.6"
     COMPONENTS
         ${STARPP_QX_COMPONENTS}
 )
 
 # Fetch Neargye's Magic Enum
 include(OB/FetchMagicEnum)
-ob_fetch_magicenum("v0.8.0")
+ob_fetch_magicenum("v0.9.5")
 
 # Process Targets
 set(LIB_TARGET_NAME ${PROJECT_NAMESPACE_LC}_base)

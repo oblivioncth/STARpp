@@ -18,14 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, ubuntu-22.04]
-        compiler: [gcc, clang]
+        compiler: [clang]
         lib_linkage: [shared, static]
         include:
-          - os: ubuntu-20.04
-            compiler: gcc
-            c_comp: gcc-10
-            cxx_comp: g++-10
-            qt_comp: clang12
           - os: ubuntu-20.04
             compiler: clang
             c_comp: clang-12
@@ -36,6 +31,13 @@ jobs:
             c_comp: gcc-12
             cxx_comp: g++-12
             qt_comp: clang14
+            lib_linkage: shared
+          - os: ubuntu-22.04
+            compiler: gcc
+            c_comp: gcc-12
+            cxx_comp: g++-12
+            qt_comp: clang14
+            lib_linkage: static
           - os: ubuntu-22.04
             compiler: clang
             c_comp: clang-14
@@ -58,16 +60,25 @@ jobs:
     - name: Install Qt (custom build)
       uses: oblivioncth/actions/general/install-and-cache-qt-from-ffynnon@dev
       with:
-        version: 6.4.2
+        version: 6.6.0
         os: linux
         compiler: ${{ matrix.qt_comp }}
         linkage: ${{ matrix.lib_linkage }}
         path: ${{ env.qt_install_dir }}
         credentials: ${{ secrets.qt_ffynnon_cred }}
+    - name: Update package index
+      run: sudo apt-get update
+    - name: WORKAROUND FOR https://github.com/actions/runner-images/issues/8659
+      if: matrix.os == 'ubuntu-22.04'
+      run: |
+        echo "TEMPORARY WORKAROUND FOR GITHUB RUNNER BUG #8659\n\nRemoving GCC 13 as it breaks Clang14"
+        sudo rm -f /etc/apt/sources.list.d/ubuntu-toolchain-r-ubuntu-test-jammy.list
+        sudo apt-get update
+        sudo apt-get install -y --allow-downgrades libc6=2.35-0ubuntu3.5 libc6-dev=2.35-0ubuntu3.5 libstdc++6=12.3.0-1ubuntu1~22.04 libgcc-s1=12.3.0-1ubuntu1~22.04
     - name: Install Doxygen
       uses: oblivioncth/actions/ubuntu/install-doxygen-from-sourceforge@dev
       with:
-        version: 1.9.4
+        version: 1.9.8
     - name: Install Graphviz
       run: sudo apt-get install graphviz
     - name: Install Ninja
@@ -78,6 +89,9 @@ jobs:
       run: sudo apt-get install libxkbcommon-x11-dev libxcb-*-dev
     - name: Install OpenGL lib
       run: sudo apt-get install libglu1-mesa-dev # TODO: See if this can be avoided, for some reason qhelpgenerator needs this, maybe its because it was available during compilation
+    - name: Install EGL [22.04]
+      if: matrix.os == 'ubuntu-22.04'
+      run: sudo apt-get install libegl1-mesa-dev
     - name: Checkout STARpp
       uses: actions/checkout@v3
       with:

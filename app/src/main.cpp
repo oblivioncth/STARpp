@@ -3,6 +3,7 @@
 
 // Qx Includes
 #include <qx/core/qx-iostream.h>
+#include <qx/core/qx-abstracterror.h>
 
 // Base Includes
 #include "star/election.h"
@@ -27,6 +28,26 @@ const QString MSG_CALCULING_ELECTION_RESULTS = QStringLiteral("Calculating elect
 // Meta
 const QString NAME = QStringLiteral("Main");
 
+// Ref Error adapter
+class QX_ERROR_TYPE(ReferenceErrorAdapter, "Star::ReferenceError", 1201)
+{
+private:
+    const Star::ReferenceError& mErrorRef;
+
+public:
+    ReferenceErrorAdapter(const Star::ReferenceError& e) :
+        mErrorRef(e)
+    {}
+    ReferenceErrorAdapter(ReferenceErrorAdapter&&) = delete;
+    ReferenceErrorAdapter(const ReferenceErrorAdapter&) = delete;
+
+private:
+    quint32 deriveValue() const override { return static_cast<quint32>(mErrorRef.type); }
+    QString derivePrimary() const override { return mErrorRef.error; }
+    QString deriveSecondary() const override { return mErrorRef.errorDetails; }
+};
+QX_DECLARE_ERROR_ADAPTATION(Star::ReferenceError, ReferenceErrorAdapter);
+
 int main(int argc, char *argv[])
 {
     // Setup application
@@ -40,15 +61,15 @@ int main(int argc, char *argv[])
 
     // Create core and initialize it
     Core core(&app);
-    ErrorCode initError = core.initialize();
-    if(initError)
+    Qx::Error initError = core.initialize();
+    if(initError.isValid())
         return core.logFinish(initError);
 
     // Check if election was provided
     if(!core.hasActionableArguments())
     {
         core.logEvent(NAME, LOG_EVENT_NO_ELECTION);
-        return core.logFinish(ErrorCode::NO_ERR);
+        return core.logFinish(Qx::Error());
     }
 
     // Load reference election
@@ -59,8 +80,8 @@ int main(int argc, char *argv[])
     Star::ReferenceError refError = Star::electionsFromReferenceInput(elections, rec.ccPath, rec.bbPath);
     if(refError.isValid())
     {
-        core.postError(NAME, Qx::GenericError(Qx::GenericError::Critical, refError.error, refError.errorDetails));
-        return core.logFinish(ErrorCode::INVALID_REF_ELECTION);
+        core.postError(NAME, refError);
+        return core.logFinish(refError);
     }
     core.logEvent(NAME, LOG_EVENT_ELECTION_COUNT.arg(elections.size()));
 
@@ -86,5 +107,5 @@ int main(int argc, char *argv[])
     ResultPresenter presenter(&results, core.isMinimalPresentation());
     presenter.present();
 
-    return core.logFinish(ErrorCode::NO_ERR);
+    return core.logFinish(Qx::Error());
 }
