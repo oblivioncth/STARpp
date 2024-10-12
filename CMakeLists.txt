@@ -13,7 +13,7 @@ project(STARpp
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("v0.3.5")
+fetch_ob_cmake("9f45dec8dc1cd09d99862b7b7ea335b361cf7ff7")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -54,8 +54,8 @@ endif()
 
 # Find Qt package
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
-include(OB/BetterFindQt6)
-ob_find_qt6_package(REQUIRED COMPONENTS ${STARPP_QT_COMPONENTS})
+include(OB/Qt)
+ob_find_package_qt(REQUIRED COMPONENTS ${STARPP_QT_COMPONENTS})
 
 # Fetch Qx (build and import from source)
 set(STARPP_QX_COMPONENTS
@@ -65,7 +65,7 @@ set(STARPP_QX_COMPONENTS
 
 include(OB/FetchQx)
 ob_fetch_qx(
-    REF "v0.5.6"
+    REF "v0.5.8"
     COMPONENTS
         ${STARPP_QX_COMPONENTS}
 )
