@@ -17,7 +17,7 @@ Requirements
  - OS
 	 - Windows 10 or above
 	 - Linux (untested on more general Unix systems)
- 
+
 Packaging
 ----------
 STAR++ is provided as a CMake package composed of a single library, several public header files, and the reference application.
@@ -139,8 +139,6 @@ If newer to working with Qt, it is easiest to build from within Qt creator as it
 
 Alternatively, you can use the `qt-cmake` wrapper for similar Qt environment automation when building the project on the command-line, which is shown further down.
 
-The CMake project is designed to be used with multi-configuration generators such as Visual Studio or Ninja Multi-Config (recommended), and may require some tweaking to work with single configuration generators.
-
 ### CMake Options:
 
  - `STARPP_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
@@ -158,7 +156,7 @@ The CMake project is designed to be used with multi-configuration generators suc
 
 ### CMake Install Components:
 
-- `starpp` - Installs top-level files (README.md, CMake package configuration files, etc.) 
+- `starpp` - Installs top-level files (README.md, CMake package configuration files, etc.)
 - `starpp_base` - Installs the built library
 - `starpp_frontend` - Installs the built reference application
 - `starpp_docs` - Installs the built documentation
@@ -212,11 +210,11 @@ The path for this documentation varies depending on how you obtained Qt, but is 
     # NOTE:
     # By default on Windows <QT_SOFTWARE> is C:\Program Files\Qt
     # On Linux it is often /usr/local/Qt
-    
+
 ### Tests:
 
 The project contains a suite of tests to ensure that the library functions as intended. They will be expanded upon as the library matures.
-    
+
 ### Package:
 
 By default, the CMakeLists project configures CPack to create an artifact ZIP containing:
