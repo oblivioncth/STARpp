@@ -65,7 +65,7 @@ set(STARPP_QX_COMPONENTS
 
 include(OB/FetchQx)
 ob_fetch_qx(
-    REF "v0.5.8"
+    REF "3ab133c5269658c3ed2994710638ea625a6d2ae0"
     COMPONENTS
         ${STARPP_QX_COMPONENTS}
 )
