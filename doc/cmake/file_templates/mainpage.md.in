@@ -143,6 +143,7 @@ Alternatively, you can use the `qt-cmake` wrapper for similar Qt environment aut
 
  - `STARPP_DOCS` - Set to `ON` in order to generate the documentation target (OFF)
  - `STARPP_TESTS` - Set to `ON` in order to generate the test targets (OFF)
+ - `STARPP_INSTALL_MISC` - Set to `ON` to enable installation of misc components (e.g. README.md/LICENSE) (ON)
  - `BUILD_SHARED_LIBS` - Build STAR++ as a shared library instead of a static one (OFF)
 
 ### CMake Targets:
@@ -156,10 +157,11 @@ Alternatively, you can use the `qt-cmake` wrapper for similar Qt environment aut
 
 ### CMake Install Components:
 
-- `starpp` - Installs top-level files (README.md, CMake package configuration files, etc.)
+- `starpp` - Installs top-level files (CMake package configuration files, etc.)
 - `starpp_base` - Installs the built library
 - `starpp_frontend` - Installs the built reference application
 - `starpp_docs` - Installs the built documentation
+- `starpp_misc` - Installs miscellaneous files (e.g. README.md/LICENSE)
 
 If STAR++ is configured as a sub-project, its install components are automatically removed from the `all` component, as to not pollute the install directory of the top-level project. They can still be installed by directly referencing their component names as shown above.
 

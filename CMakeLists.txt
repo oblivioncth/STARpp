@@ -6,14 +6,14 @@ cmake_minimum_required(VERSION 3.23.0...3.26.0)
 # Project
 # NOTE: DON'T USE TRAILING ZEROS IN VERSIONS
 project(STARpp
-    VERSION 0.2.2
+    VERSION 0.2.3
     LANGUAGES CXX
     DESCRIPTION "C++ implementation of STAR voting"
 )
 
 # Get helper scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchOBCMake.cmake)
-fetch_ob_cmake("9f45dec8dc1cd09d99862b7b7ea335b361cf7ff7")
+fetch_ob_cmake("v0.4.0.2")
 
 # Initialize project according to standard rules
 include(OB/Project)
@@ -27,6 +27,7 @@ set(PROJECT_NAME_FORMAL "STAR++")
 # Configuration options
 option(STARPP_TESTS "Build STAR++ tests" OFF)
 option(STARPP_DOCS "Build STAR++ documentation" OFF)
+option(STARPP_INSTALL_MISC "Enable installation of misc components (e.g README.md/LICENSE)" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries." OFF) # Redundant due to OB, but explicit
 
 # C++
@@ -65,7 +66,7 @@ set(STARPP_QX_COMPONENTS
 
 include(OB/FetchQx)
 ob_fetch_qx(
-    REF "3ab133c5269658c3ed2994710638ea625a6d2ae0"
+    REF "v0.6.1"
     COMPONENTS
         ${STARPP_QX_COMPONENTS}
 )
@@ -112,7 +113,9 @@ ob_standard_project_package_config(
 
 #================= Install ==========================
 
-ob_standard_project_misc_install()
+if(STARPP_INSTALL_MISC)
+    ob_standard_project_misc_install()
+endif()
 
 #====================== CPack ==============================
 
