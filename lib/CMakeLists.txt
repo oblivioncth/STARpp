@@ -35,13 +35,7 @@ ob_add_standard_library(${LIB_TARGET_NAME}
     NAMESPACE "${PROJECT_NAMESPACE}"
     ALIAS "${LIB_ALIAS_NAME}"
     EXPORT_HEADER
-        PATH "${PROJECT_NAMESPACE_LC}/${PROJECT_NAMESPACE_LC}_${LIB_ALIAS_NAME_LC}_export.h"
-    HEADERS_PRIVATE
-        headtoheadresults.h
-        reference/ballotbox_p.h
-        reference/calculatoroptions_p.h
-        reference/categoryconfig_p.h
-        reference/resultset_p.h
+        PATH "${PROJECT_NAMESPACE_LC}/${PROJECT_NAMESPACE_LC}_${LIB_ALIAS_NAME_LC}_export.h"  
     HEADERS_API
         COMMON "${PROJECT_NAMESPACE_LC}"
         FILES
@@ -58,13 +52,18 @@ ob_add_standard_library(${LIB_TARGET_NAME}
         election.cpp
         electionresult.cpp
         expectedelectionresult.cpp
+        headtoheadresults.h
         headtoheadresults.cpp
         qualifierresult.cpp
         rank.cpp
         reference.cpp
+        reference/ballotbox_p.h
         reference/ballotbox_p.cpp
+        reference/calculatoroptions_p.h
         reference/calculatoroptions_p.cpp
+        reference/categoryconfig_p.h
         reference/categoryconfig_p.cpp
+        reference/resultset_p.h
         reference/resultset_p.cpp
         seat.cpp
     LINKS
